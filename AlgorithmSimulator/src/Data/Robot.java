@@ -1,0 +1,117 @@
+package Data;
+
+import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
+
+import RPiInterface.RobotSensorSimulator;
+import RobotMovement.ForwardMovement;
+import RobotMovement.RotateMovement;
+
+public class Robot {
+	public static Robot robot=null;
+	public static Robot getInstance(){
+		if(robot==null){
+			robot= new Robot();
+		}
+		return robot;
+	}
+
+	public Robot(){
+		RobotSensorSimulator sensorSimulator = new RobotSensorSimulator();
+		Thread sensorSimulatorThread = new Thread(sensorSimulator);
+		sensorSimulatorThread.start();
+	}
+	
+	private static final int framePer10CM = 30;
+	private static final int framePerRotate = 30;
+	private static  int milisecondPer10CM = 500;
+
+	private static  int milisecondPerRotate = 500;
+
+	private boolean isExploring =false;
+	private boolean isMoving =false;
+
+	float coordinateX =1f;
+	float coordinateY =1f;
+	float direction =0;
+	
+	public static void setMilisecondPer10CM(int milisecondPer10CM) {
+		Robot.milisecondPer10CM = milisecondPer10CM;
+	}
+
+	public static void setMilisecondPerRotate(int milisecondPerRotate) {
+		Robot.milisecondPerRotate = milisecondPerRotate;
+	}
+	public boolean isMoving() {
+		return isMoving;
+	}
+
+	public void setMoving(boolean isMoving) {
+		this.isMoving = isMoving;
+		if(isMoving==false){
+			for(RobotListener a: arr){
+				a.onRobotStop();
+			}
+		}
+	}
+	public float getDirection() {
+		return direction;
+	}
+	public void setDirection(float direction) {
+		this.direction = direction%360;
+		updateListener();
+	}
+	
+	public float getCoordinateX() {
+		return coordinateX;
+	}
+	public void setCoordinateX(float coordinateX) {
+		//coordinateX =((float)Math.round(coordinateX*10))/10f;
+		this.coordinateX = coordinateX;
+		updateListener();
+	}
+	public float getCoordinateY() {
+		return coordinateY;
+	}
+	public void setCoordinateY(float coordinateY) {
+		//coordinateY =((float)Math.round(coordinateY*10))/10f;
+		this.coordinateY = coordinateY;
+		updateListener();
+	}
+
+	public ForwardMovement forwardProcessor=null;
+	public RotateMovement rotateMovementProcessor=null;
+	public void moveForward(float cm){
+			direction = direction%360;
+		    double radians = Math.toRadians(direction);
+			float x =  ((cm/10f)*(float)Math.sin(radians));
+			float y =  ((cm/10f)*(float)Math.cos(radians));
+			forwardProcessor = new ForwardMovement(x,y, framePer10CM,  milisecondPer10CM);
+			Thread forwardMovementThread = new Thread(forwardProcessor);
+			forwardMovementThread.start();
+	}
+
+	public Semaphore robotSemaphore = new Semaphore(1);
+	public void rotate(float degree){
+			direction = direction%360;
+			rotateMovementProcessor = new RotateMovement(degree,framePerRotate, milisecondPerRotate);
+			Thread rotateMovementThread = new Thread(rotateMovementProcessor);
+			rotateMovementThread.start();
+	}
+	
+	private  ArrayList<RobotListener> arr = new ArrayList<RobotListener>();
+	public  void addListener(RobotListener listener){
+		arr.add(listener);
+	}
+	public  void updateListener(){
+		for(RobotListener a: arr){
+			a.updateRobot();
+		}
+	}
+	public void stopMovement() {
+		if(forwardProcessor!=null)
+			forwardProcessor.stop();
+		if(rotateMovementProcessor!=null)
+			rotateMovementProcessor.stop();
+	}
+}
