@@ -7,6 +7,8 @@ import Data.Robot;
 import Data.RobotListener;
 import Data.WayPoint;
 import Data.WayPointListener;
+import RPiInterface.RobotSensorSimulator;
+import RPiInterface.RobotSensorSimulatorFactory;
 import algorithm.Test;
 import javafx.application.Platform;
 import javafx.scene.layout.BorderPane;
@@ -105,7 +107,6 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 			getChildren().add(tiles[y][x]);
 		}
 	}
-	
 	private void loadRobot(){
 		Robot r = Robot.getInstance();
 		float coordinateX = r.getCoordinateX();
@@ -125,7 +126,18 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 		sensor.radiusYProperty().bind(heightProperty().divide(20).divide(4));
 		sensor.setFill(Color.BLACK);
 		getChildren().addAll(robot,sensor);
+		RobotSensorSimulator ss= r.getSensorSimulator();
+		if(ss!=null){
+			loadSensorSimulator(ss.getSensorType());
+		}
+	}
 
+	private void loadSensorSimulator(String sensorType){
+		Robot r = Robot.getInstance();
+		float coordinateX = r.getCoordinateX();
+		float coordinateY = r.getCoordinateY();
+		float direction = r.getDirection();
+	    double radians = Math.toRadians(direction);
 		getChildren().removeAll(sensors);
 		for(int i =0;i<sensors.length;i++){
 			if(sensors[i]==null){
@@ -134,40 +146,68 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 				sensors[i].setFill(Color.TRANSPARENT);
 				sensors[i].setStrokeWidth(2);	
 			}
-
-			switch(i){
-			case 0:radians = Math.toRadians(direction-45);
-			break;
-			case 1:radians = Math.toRadians(direction+45);
-			break;
-			case 2:radians = Math.toRadians(direction-110);
-			break;
-			case 3:radians = Math.toRadians(direction+110);
-			break;
+			
+			if(sensorType.equals(RobotSensorSimulatorFactory.SENSOR_TYPE_1)){
+				switch(i){
+					case 0:radians = Math.toRadians(direction-50);
+					break;
+					case 1:radians = Math.toRadians(direction+50);
+					break;
+					case 2:radians = Math.toRadians(direction-110);
+					break;
+					case 3:radians = Math.toRadians(direction+110);
+					break;
+				}
+			}
+			if(sensorType.equals(RobotSensorSimulatorFactory.SENSOR_TYPE_2)){
+				switch(i){
+					case 0:radians = Math.toRadians(direction-50);
+					break;
+					case 1:radians = Math.toRadians(direction+50);
+					break;
+					case 2:radians = Math.toRadians(direction-60);
+					break;
+					case 3:radians = Math.toRadians(direction+60);
+					break;
+				}
 			}
 			sensors[i].startXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/0.5f).multiply(Math.sin(radians)))); 
 			sensors[i].startYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/0.5f).multiply(Math.cos(radians))));     
 			if(i==3||i==2){
-				sensors[i].startXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/0.8f).multiply(Math.sin(radians)))); 
-				sensors[i].startYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/0.8f).multiply(Math.cos(radians))));     
+				sensors[i].startXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/0.9f).multiply(Math.sin(radians)))); 
+				sensors[i].startYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/0.9f).multiply(Math.cos(radians))));     
 			}
 			sensors[i].setStrokeWidth(2);
-			switch(i){
-			case 0:radians = Math.toRadians(direction-5);
-			break;
-			case 1:radians = Math.toRadians(direction+5);
-			break;
-			case 2:radians = Math.toRadians(direction-27);
-			break;
-			case 3:radians = Math.toRadians(direction+27);
-			break;
+
+			if(sensorType.equals(RobotSensorSimulatorFactory.SENSOR_TYPE_1)){
+				switch(i){
+					case 0:radians = Math.toRadians(direction-5);
+					break;
+					case 1:radians = Math.toRadians(direction+5);
+					break;
+					case 2:radians = Math.toRadians(direction-25);
+					break;
+					case 3:radians = Math.toRadians(direction+25);
+					break;
+				}
 			}
-			sensors[i].endXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/4f).multiply(Math.sin(radians)))); 
-			sensors[i].endYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/4f).multiply(Math.cos(radians)))); 
+			if(sensorType.equals(RobotSensorSimulatorFactory.SENSOR_TYPE_2)){
+				switch(i){
+					case 0:radians = Math.toRadians(direction-5);
+					break;
+					case 1:radians = Math.toRadians(direction+5);
+					break;
+					case 2:radians = Math.toRadians(direction-85);
+					break;
+					case 3:radians = Math.toRadians(direction+85);
+					break;
+				}
+			}
+			sensors[i].endXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/5f).multiply(Math.sin(radians)))); 
+			sensors[i].endYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/5f).multiply(Math.cos(radians)))); 
 		}
 		getChildren().addAll(sensors);
 	}
-	
 	@Override
 	public void updateMap() {
 		Platform.runLater(new Runnable() {

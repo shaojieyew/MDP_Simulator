@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
 import RPiInterface.RobotSensorSimulator;
+import RPiInterface.RobotSensorSimulatorFactory;
+import RPiInterface.RobotSensorSimulatorType1;
+import RPiInterface.RobotSensorSimulatorType2;
 import RobotMovement.ForwardMovement;
 import RobotMovement.RotateMovement;
 
@@ -17,10 +20,13 @@ public class Robot {
 	}
 
 	public Robot(){
-		RobotSensorSimulator sensorSimulator = new RobotSensorSimulator();
+		/*
+		RobotSensorSimulator sensorSimulator = new RobotSensorSimulatorType1();
 		Thread sensorSimulatorThread = new Thread(sensorSimulator);
 		sensorSimulatorThread.start();
+		*/
 	}
+	
 	
 	private static final int framePer10CM = 30;
 	private static final int framePerRotate = 30;
@@ -30,6 +36,23 @@ public class Robot {
 
 	private boolean isExploring =false;
 	private boolean isMoving =false;
+	
+	private RobotSensorSimulator sensorSimulator = null;
+
+	public RobotSensorSimulator getSensorSimulator() {
+		return sensorSimulator;
+	}
+	public void setSensorSimulatorType(String value) {
+		if(sensorSimulator!=null){
+			sensorSimulator.stop();
+		}
+		sensorSimulator = RobotSensorSimulatorFactory.getInstance(value);
+		if(sensorSimulator!=null){
+			Thread sensorSimulatorThread = new Thread(sensorSimulator);
+			sensorSimulatorThread.start();
+		}
+		updateListener();
+	}
 
 	float coordinateX =1f;
 	float coordinateY =1f;
@@ -114,4 +137,5 @@ public class Robot {
 		if(rotateMovementProcessor!=null)
 			rotateMovementProcessor.stop();
 	}
+
 }

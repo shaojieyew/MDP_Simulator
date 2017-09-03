@@ -20,11 +20,14 @@ import Data.RobotListener;
 import Data.WayPoint;
 import GUI.FXMLController;
 import GUI.MapGUI;
+import RPiInterface.RobotSensorSimulatorType1;
+import RPiInterface.RobotSensorSimulatorType2;
 import algorithm.Test;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -65,6 +68,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 
 	@FXML
 	private TextArea textArea;
+	@FXML
+	private ComboBox sensorCombo;
 	
 	@FXML
 	private void onclickLoadMapFileBtn(){
@@ -244,5 +249,9 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		Map.getInstance().addListener(t);
 		Thread thread = new Thread(t);
 		thread.start();
+	}
+	@FXML
+	public void onSensorSelected() {
+			Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
 	}
 }
