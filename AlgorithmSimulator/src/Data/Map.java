@@ -69,6 +69,8 @@ public class Map {
 				  exploredTiles[y][x]=1;
 				  if(exploredObstacleBinary!=null){
 					  char exploredObstacleBit = exploredObstacleBinary.charAt(obstacleIndex);
+
+					  System.out.println(exploredObstacleBit);
 					  if(exploredObstacleBit=='1'){
 						  obstacles[y][x]=1;
 					  }

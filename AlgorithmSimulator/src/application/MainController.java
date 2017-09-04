@@ -20,18 +20,22 @@ import Data.RobotListener;
 import Data.WayPoint;
 import GUI.FXMLController;
 import GUI.MapGUI;
+import GUI.MapObstacleGUI;
 import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
 import algorithm.Test;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import util.FileUtility;
 import util.FilesChooser;
 import util.HexBin;
@@ -74,7 +78,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	private void onclickLoadMapFileBtn(){
 		String exploredTile="C000000000000000000000000000000000000000000000000000000000000000000000000003";
-		String obstacle="C001100000001000010100000000000001100000000000000000000000000000000000000003";
+		String obstacle="C000000000000000000000000000000000000000000000000000000000000000000000000003";
 		String exploredObstacle=null;
 		
 		
@@ -90,17 +94,19 @@ public class MainController extends FXMLController  implements Initializable, Ro
 					  switch(line){
 					  case 1:
 						  exploredTile=strLine;
-					  break;
-					  case 3:
-						  obstacle=strLine;
-					  break;
+						  break;
 					  case 2:
 						  exploredObstacle=strLine;
-					  break;
+						  break;
+					  case 3:
+						  obstacle=strLine;
+						  break;
 					  }
 					  line++;
-					  if(line==2)
-						  break;
+
+					  System.out.println(line+":"+strLine);
+				//if(line==2)
+				//	break;
 			}
 			in.close();
 		}catch (Exception e){
@@ -166,12 +172,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		MapGUI mapGui = new MapGUI();
-		Robot.getInstance().addListener(mapGui);
 		Robot.getInstance().addListener(this);
-		Map.getInstance().addListener(mapGui);
-		WayPoint.getInstance().addListener(mapGui);
 		mapPane.setCenter(mapGui);
-		
 	}
 
 	@Override
@@ -253,5 +255,18 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	public void onSensorSelected() {
 			Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
+	}
+	@FXML
+	public void onclickEditObstacle() {
+		BorderPane bp = new BorderPane();
+		MapObstacleGUI summaryGUI = new MapObstacleGUI();
+		bp.setCenter(summaryGUI);
+		bp.setMaxWidth(100);
+		bp.setMaxHeight(100);
+		Scene scene2 = new Scene(bp, 400, 550);
+	   Stage stage = new Stage();
+	   stage.setTitle("Obstacles");
+	   stage.setScene(scene2);
+	   stage.show();
 	}
 }

@@ -23,6 +23,7 @@
                <children>
                   <Button fx:id="loadMapFileBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickLoadMapFileBtn" prefHeight="25.0" prefWidth="132.0" text="Load Map File" />
                   <Button fx:id="generateMapStatus" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickGenerateMapStatus" prefHeight="25.0" prefWidth="132.0" text="Generate Status" />
+                  <Button fx:id="editObstacle" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickEditObstacle" prefHeight="25.0" prefWidth="132.0" text="Edit/View Obstacle" />
                   <Button fx:id="resetBtn" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickResetSimulator" prefHeight="25.0" prefWidth="189.0" text="Reset" />
                   <Label text="Robot Coord:" />
                   <HBox>
@@ -75,7 +76,7 @@
                  
                   <Button fx:id="exploreBtn1" mnemonicParsing="false" onMouseClicked="#onclickAlgo1" prefHeight="25.0" prefWidth="162.0" text="Explore">
                      <VBox.margin>
-                        <Insets top="20.0" />
+                        <Insets top="10.0" />
                      </VBox.margin>
                   </Button>
                   <Button fx:id="startEndBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="129.0" text="FastestPath" />

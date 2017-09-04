@@ -1,6 +1,7 @@
 package application;
 	
 import GUI.FXMLController;
+import GUI.MapObstacleGUI;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -36,7 +37,7 @@ public class Main extends Application {
 	                System.exit(0);
 	            }
 			});
-
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

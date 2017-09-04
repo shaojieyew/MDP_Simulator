@@ -19,7 +19,9 @@ import javafx.scene.shape.Rectangle;
 
 public class MapGUI extends BorderPane implements MapListener, RobotListener, WayPointListener{
 	public MapGUI(){
-
+		Map.getInstance().addListener(this);
+		Robot.getInstance().addListener(this);
+		WayPoint.getInstance().addListener(this);
 		Platform.runLater(new Runnable() {
             @Override public void run() {  
         		loadGraphic();   
@@ -34,14 +36,14 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 	         		loadRobot();
 	}
 
-	private static Line[] vertGridLines = new Line[16];
-	private static Line[] horiGridLines = new Line[21];
-	private static Rectangle[][] tiles = new Rectangle[20][15];
-	private static Ellipse sensor = new Ellipse();
-	private static 	Ellipse  robot =  new Ellipse();
-	private static 	Line[] sensors =  new Line[4];
+	private  Line[] vertGridLines = new Line[16];
+	private  Line[] horiGridLines = new Line[21];
+	protected  Rectangle[][] tiles = new Rectangle[20][15];
+	private  Ellipse sensor = new Ellipse();
+	private  Ellipse  robot =  new Ellipse();
+	private  Line[] sensors =  new Line[4];
 	
-	private void loadMap(){
+	protected void loadMap(){
 		for(int x =0;x<15;x++){
 			for(int y=0;y<20;y++){
 				getChildren().remove(tiles[y][x]);
@@ -70,7 +72,7 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 		loadWayPoint();
 	}
 	
-	private void loadStartEnd(){
+	protected void loadStartEnd(){
 		Position[][] definedPoints= {Map.STARTPOINT.getPositions(),Map.ENDPOINT.getPositions()};
 		for(Position positions[]: definedPoints){
 			for(Position pos: positions){
@@ -90,7 +92,7 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 		}
 	}
 	
-	private void loadWayPoint(){
+	protected void loadWayPoint(){
 		Position wp = WayPoint.getInstance().getPosition();
 		if(wp!=null){
 			int x = wp.getPosX();
@@ -109,7 +111,7 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 			getChildren().add(tiles[y][x]);
 		}
 	}
-	private void loadRobot(){
+	protected void loadRobot(){
 		getChildren().removeAll(robot,sensor);
 		Robot r = Robot.getInstance();
 		float x = r.getPosX();
@@ -138,7 +140,7 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 		}
 	}
 
-	private void loadSensorSimulator(String sensorType){
+	protected void loadSensorSimulator(String sensorType){
 		Robot r = Robot.getInstance();
 		float x = r.getPosX();
 		float y = r.getPosY();
