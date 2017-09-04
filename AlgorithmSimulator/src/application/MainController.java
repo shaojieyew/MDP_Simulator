@@ -113,13 +113,13 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private void robotPosXChanged(){
 		Robot robot =Robot.getInstance();
 		int coordinateX = Integer.parseInt(robotXpos.getText());
-		robot.setCoordinateX(coordinateX);
+		robot.setPosX(coordinateX);
 	}
 	@FXML
 	private void robotPosYChanged(){
 		Robot robot =Robot.getInstance();
 		int coordinateY = Integer.parseInt(robotYpos.getText());
-		robot.setCoordinateY(coordinateY);
+		robot.setPosY(coordinateY);
 	}
 	@FXML
 	private void waypointPosChanged(){
@@ -156,8 +156,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	private void onclickResetSimulator(){
 		Robot robot = Robot.getInstance();
-		robot.setCoordinateX(1);
-		robot.setCoordinateY(1);
+		robot.setPosX(1);
+		robot.setPosY(1);
 		robot.setDirection(0);
 		Map map = Map.getInstance();
 		WayPoint.getInstance().setPosition(null);
@@ -179,7 +179,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		Platform.runLater(new Runnable() {
             @Override public void run() {  
             	Robot r = Robot.getInstance();
-            	textArea.setText("Robot coordinate x:"+r.getCoordinateX()+" y:"+r.getCoordinateY()+"\n"+textArea.getText().substring(0,textArea.getText().length()>300?299:textArea.getText().length()));
+            	textArea.setText("Robot coordinate x:"+r.getPosX()+" y:"+r.getPosY()+"\n"+textArea.getText().substring(0,textArea.getText().length()>300?299:textArea.getText().length()));
             }
 		});
 	}

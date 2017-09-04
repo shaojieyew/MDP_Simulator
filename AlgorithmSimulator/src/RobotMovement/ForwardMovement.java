@@ -38,8 +38,8 @@ public class ForwardMovement implements Runnable{
 			}
 	        try {
 				Thread.sleep(milisecondPer10CM/framePer10CM);
-	                	 r.setCoordinateX(r.getCoordinateX()+x);
-	                	 r.setCoordinateY(r.getCoordinateY()+y);
+	                	 r.setPosX(r.getPosX()+x);
+	                	 r.setPosY(r.getPosY()+y);
 
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -47,8 +47,8 @@ public class ForwardMovement implements Runnable{
 			}
 		}
 		DecimalFormat df = new DecimalFormat("#.##");
-	   	r.setCoordinateX(Float.parseFloat(df.format(r.getCoordinateX())));
-	   	r.setCoordinateY(Float.parseFloat(df.format(r.getCoordinateY())));
+	   	r.setPosX(Float.parseFloat(df.format(r.getPosX())));
+	   	r.setPosY(Float.parseFloat(df.format(r.getPosY())));
 		Robot.getInstance().robotSemaphore.release();
 		r.setMoving(false);
 	}

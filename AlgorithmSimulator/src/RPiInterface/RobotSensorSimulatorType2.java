@@ -9,11 +9,13 @@ public class RobotSensorSimulatorType2 extends RobotSensorSimulator {
 	public void sensorInfoUpdate(){
 		Robot robot = Robot.getInstance();
 		Map map = Map.getInstance();
-		int x = Math.round(robot.getCoordinateX());
-		int y = Math.round(robot.getCoordinateY());
+		int x = Math.round(robot.getPosX());
+		int y = Math.round(robot.getPosY());
 		float direction = robot.getDirection();
 		//System.out.println("sensor info... x:"+x +" y:"+y +" direction:" + direction);
-
+		if(x<0||y<0){
+			return;
+		}
 		int exploredTiles[][] = map.getExploredTiles();
 		int obstacles[][] = map.getObstacles();
 		exploredTiles[(y-1)][ (x-1)]=1;
@@ -25,7 +27,8 @@ public class RobotSensorSimulatorType2 extends RobotSensorSimulator {
 		Position lineOfSensor2[] = new Position[6];
 		Position lineOfSensor3[] = new Position[6];
 		Position lineOfSensor4[] = new Position[6];
-		Position[][] lineOfSensors = {lineOfSensor1,lineOfSensor2,lineOfSensor3,lineOfSensor4};
+		Position[][] lineOfSensors = {};
+		//Position[][] lineOfSensors = {lineOfSensor1,lineOfSensor2,lineOfSensor3,lineOfSensor4,lineOfSensor5,lineOfSensor6,lineOfSensor7};
 
 		for(int i =0;i<6;i++){
 			switch ((int)direction){
@@ -152,7 +155,7 @@ public class RobotSensorSimulatorType2 extends RobotSensorSimulator {
 			}
 		}
 
-
+		if(lineOfSensors.length>0)
 		for(Position[] sensors:lineOfSensors){
 			for(Position sensor:sensors){
 				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){

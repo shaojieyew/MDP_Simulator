@@ -18,7 +18,7 @@ public class Test implements Runnable, MapListener, RobotListener{
 	public void updateMap() {
 		mapUpdated=true;
 		try {
-			if(r.getCoordinateY()<14){
+			if(r.getPosX()<14){
 					Thread.sleep(500);
 					r.moveForward(40);
 			}else{
