@@ -51,7 +51,6 @@ public class Map {
 		  String exploredObstacleBinary=null;
 		  if(exploredObstacleHex!=null){
 			  exploredObstacleBinary = HexBin.hexToBin(exploredObstacleHex);
-			  exploredObstacleBinary =exploredObstacleBinary.substring(8);
 		  }
 		  
 		  int obstacleIndex=0;

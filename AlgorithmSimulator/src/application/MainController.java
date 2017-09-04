@@ -214,24 +214,27 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		File file = FilesChooser.save(getStage(), "Save Map Status", Paths.get("").toAbsolutePath().toString(), FilesChooser.FORMAT_TEXT);
 		if(file!=null){
 			String binaryExplored="11";
-			String binaryObstacle="";
+			String binaryExploredObstacle="";
+			String binaryObstacle="11";
 			int exploredTile[][]=Map.getInstance().getExploredTiles();
 			int obstacles[][]=Map.getInstance().getObstacles();
 			for(int y =0;y<20;y++){
 				for(int x =0;x<15;x++){
 					binaryExplored=binaryExplored+exploredTile[y][x];
+					binaryObstacle=binaryObstacle+obstacles[y][x];
 					if(exploredTile[y][x]==1){
-						binaryObstacle=binaryObstacle+obstacles[y][x];
+						binaryExploredObstacle=binaryExploredObstacle+obstacles[y][x];
 					}
 				}
 			}
 			binaryExplored=binaryExplored+"11";
-			if(binaryObstacle.length()%8!=0){
-				for(int i =0;i<binaryObstacle.length()%8;i++){
-					binaryObstacle=binaryObstacle+"1";
+			binaryObstacle=binaryObstacle+"11";
+			if(binaryExploredObstacle.length()%8!=0){
+				for(int i =0;i<binaryExploredObstacle.length()%8;i++){
+					binaryExploredObstacle=binaryExploredObstacle+"1";
 				}
 			}
-			FileUtility.writeWordsToText(HexBin.BinTohex(binaryExplored)+"\n"+HexBin.BinTohex("11111111"+binaryObstacle).substring(2), file.getAbsolutePath());
+			FileUtility.writeWordsToText(HexBin.BinTohex(binaryExplored)+"\n"+HexBin.BinTohex("11111111"+binaryExploredObstacle).substring(2)+"\n"+HexBin.BinTohex(binaryObstacle), file.getAbsolutePath());
 		}
 	}
 
