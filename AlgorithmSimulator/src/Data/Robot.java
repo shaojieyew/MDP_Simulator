@@ -54,10 +54,29 @@ public class Robot {
 		updateListener();
 	}
 
-	float coordinateX =1f;
-	float coordinateY =1f;
-	float direction =0;
-	
+	private float posX=-1f;
+	private float posY=-1f;
+	private float direction =0;
+
+
+	public float getPosX() {
+		return posX;
+	}
+
+	public void setPosX(float posX) {
+		this.posX = posX;
+		updateListener();
+	}
+
+	public float getPosY() {
+		return posY;
+	}
+
+	public void setPosY(float posY) {
+		this.posY = posY;
+		updateListener();
+	}
+
 	public static void setMilisecondPer10CM(int milisecondPer10CM) {
 		Robot.milisecondPer10CM = milisecondPer10CM;
 	}
@@ -85,22 +104,6 @@ public class Robot {
 		updateListener();
 	}
 	
-	public float getCoordinateX() {
-		return coordinateX;
-	}
-	public void setCoordinateX(float coordinateX) {
-		//coordinateX =((float)Math.round(coordinateX*10))/10f;
-		this.coordinateX = coordinateX;
-		updateListener();
-	}
-	public float getCoordinateY() {
-		return coordinateY;
-	}
-	public void setCoordinateY(float coordinateY) {
-		//coordinateY =((float)Math.round(coordinateY*10))/10f;
-		this.coordinateY = coordinateY;
-		updateListener();
-	}
 
 	public ForwardMovement forwardProcessor=null;
 	public RotateMovement rotateMovementProcessor=null;

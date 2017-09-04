@@ -95,6 +95,8 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 		if(wp!=null){
 			int x = wp.getPosX();
 			int y = wp.getPosY();
+			if(x<0||y<0||x>14||y>19)
+				return ;
 			if(tiles[y][x]==null){
 				tiles[y][x] = new Rectangle();
 				tiles[y][x].widthProperty().bind(widthProperty().divide(15));
@@ -108,37 +110,42 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 		}
 	}
 	private void loadRobot(){
-		Robot r = Robot.getInstance();
-		float coordinateX = r.getCoordinateX();
-		float coordinateY = r.getCoordinateY();
-		float direction = r.getDirection();
 		getChildren().removeAll(robot,sensor);
-		robot.centerXProperty().bind(widthProperty().divide(15).multiply(coordinateX));
-		robot.centerYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY));         
+		Robot r = Robot.getInstance();
+		float x = r.getPosX();
+		float y = r.getPosY();
+		if(x<0||y<0||x>14||y>19)
+			return ;
+		float direction = r.getDirection();
+		float xCenterPosition = (float) (x+0.5);
+		float yCenterPosition = (float) (19.5-y);
+		robot.centerXProperty().bind(widthProperty().divide(15).multiply((xCenterPosition)));
+		robot.centerYProperty().bind(heightProperty().divide(20).multiply(yCenterPosition));         
 		robot.radiusXProperty().bind(widthProperty().divide(15));   
 		robot.radiusYProperty().bind(heightProperty().divide(20));
 		robot.setFill(Color.GREEN);
 		direction = direction%360;
 	    double radians = Math.toRadians(direction);
-		sensor.centerXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/0.5f).multiply(Math.sin(radians)))); 
-		sensor.centerYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/0.5f).multiply(Math.cos(radians))));     
+		sensor.centerXProperty().bind(widthProperty().divide(15).multiply(xCenterPosition).add(widthProperty().divide(15f/0.5f).multiply(Math.sin(radians)))); 
+		sensor.centerYProperty().bind(heightProperty().divide(20).multiply(yCenterPosition).subtract(heightProperty().divide(20f/0.5f).multiply(Math.cos(radians))));     
 		sensor.radiusXProperty().bind(widthProperty().divide(15).divide(4));   
 		sensor.radiusYProperty().bind(heightProperty().divide(20).divide(4));
 		sensor.setFill(Color.BLACK);
 		getChildren().addAll(robot,sensor);
 		RobotSensorSimulator ss= r.getSensorSimulator();
 		if(ss!=null){
-			loadSensorSimulator(ss.getSensorType());
+			//loadSensorSimulator(ss.getSensorType());
 		}
 	}
 
 	private void loadSensorSimulator(String sensorType){
 		Robot r = Robot.getInstance();
-		float coordinateX = r.getCoordinateX();
-		float coordinateY = r.getCoordinateY();
+		float x = r.getPosX();
+		float y = r.getPosY();
+		if(x<0||y<0)
+			return ;
 		float direction = r.getDirection();
 	    double radians = Math.toRadians(direction);
-		getChildren().removeAll(sensors);
 		for(int i =0;i<sensors.length;i++){
 			if(sensors[i]==null){
 				sensors[i]=new Line();
@@ -171,11 +178,11 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 					break;
 				}
 			}
-			sensors[i].startXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/0.5f).multiply(Math.sin(radians)))); 
-			sensors[i].startYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/0.5f).multiply(Math.cos(radians))));     
+			sensors[i].startXProperty().bind(widthProperty().divide(15).multiply(x).add(widthProperty().divide(15f/0.5f).multiply(Math.sin(radians)))); 
+			sensors[i].startYProperty().bind(heightProperty().divide(20).multiply(20-y).subtract(heightProperty().divide(20f/0.5f).multiply(Math.cos(radians))));     
 			if(i==3||i==2){
-				sensors[i].startXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/0.9f).multiply(Math.sin(radians)))); 
-				sensors[i].startYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/0.9f).multiply(Math.cos(radians))));     
+				sensors[i].startXProperty().bind(widthProperty().divide(15).multiply(x).add(widthProperty().divide(15f/0.9f).multiply(Math.sin(radians)))); 
+				sensors[i].startYProperty().bind(heightProperty().divide(20).multiply(20-y).subtract(heightProperty().divide(20f/0.9f).multiply(Math.cos(radians))));     
 			}
 			sensors[i].setStrokeWidth(2);
 
@@ -203,8 +210,8 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 					break;
 				}
 			}
-			sensors[i].endXProperty().bind(widthProperty().divide(15).multiply(coordinateX).add(widthProperty().divide(15f/5f).multiply(Math.sin(radians)))); 
-			sensors[i].endYProperty().bind(heightProperty().divide(20).multiply(20-coordinateY).subtract(heightProperty().divide(20f/5f).multiply(Math.cos(radians)))); 
+			sensors[i].endXProperty().bind(widthProperty().divide(15).multiply(x).add(widthProperty().divide(15f/5f).multiply(Math.sin(radians)))); 
+			sensors[i].endYProperty().bind(heightProperty().divide(20).multiply(20-y).subtract(heightProperty().divide(20f/5f).multiply(Math.cos(radians)))); 
 		}
 		getChildren().addAll(sensors);
 	}
