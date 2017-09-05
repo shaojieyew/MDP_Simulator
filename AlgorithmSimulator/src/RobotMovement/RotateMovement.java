@@ -49,7 +49,6 @@ public class RotateMovement implements Runnable{
 		if(direction<0){
 			direction=direction+360;
 		}
-		System.out.println(direction);
 		r.setDirection(direction);
 		r.robotSemaphore.release();
 		r.setMoving(false);

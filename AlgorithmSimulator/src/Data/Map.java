@@ -69,7 +69,7 @@ public class Map {
 				  if(exploredObstacleBinary!=null){
 					  char exploredObstacleBit = exploredObstacleBinary.charAt(obstacleIndex);
 
-					  System.out.println(exploredObstacleBit);
+					  //System.out.println(exploredObstacleBit);
 					  if(exploredObstacleBit=='1'){
 						  obstacles[y][x]=1;
 					  }
@@ -93,9 +93,94 @@ public class Map {
 		  }
 		layoutUpdated();
 	}
-	
+
+	//private static int relations1 [][][][] = new int[20][15][20][15];
+
+	private static  ArrayList<int []>[][] relations = new ArrayList[20][15];
+	//ArrayList<int []> relations2 = new ArrayList<int[]>();
 	private  void layoutUpdated(){
+		for(int x1=1;x1<14;x1++){
+			for(int y1=1;y1<19;y1++){
+				if(       exploredTiles[y1+1][x1+1]==1
+						&&exploredTiles[y1][x1+1]==1
+						&&exploredTiles[y1-1][x1+1]==1
+						&&exploredTiles[y1+1][x1]==1
+						&&exploredTiles[y1][x1]==1
+						&&exploredTiles[y1-1][x1]==1
+						&&exploredTiles[y1+1][x1-1]==1
+						&&exploredTiles[y1][x1-1]==1
+						&&exploredTiles[y1-1][x1-1]==1
+						
+						&&obstacles[y1+1][x1+1]==0
+						&&obstacles[y1][x1+1]==0
+						&&obstacles[y1-1][x1+1]==0
+						&&obstacles[y1+1][x1]==0
+						&&obstacles[y1][x1]==0
+						&&obstacles[y1-1][x1]==0
+						&&obstacles[y1+1][x1-1]==0
+						&&obstacles[y1][x1-1]==0
+						&&obstacles[y1-1][x1-1]==0						
+						
+						){
+					int y2=y1;
+					int x2=x1;
+					for(int i=0;i<4;i++){
+						if(i==0){
+							y2=y1;
+							x2=x1+1;
+						}
+						if(i==1){
+							y2=y1+1;
+							x2=x1;
+						}
+						if(i==2){
+							y2=y1-1;
+							x2=x1;
+						}
+						if(i==3){
+							y2=y1;
+							x2=x1-1;
+						}
+						if(		x2>0&&y2>0&&x2<14&&y2<19
+								&&exploredTiles[y2+1][x2+1]==1
+								&&exploredTiles[y2][x2+1]==1
+								&&exploredTiles[y2-1][x2+1]==1
+								&&exploredTiles[y2+1][x2]==1
+								&&exploredTiles[y2][x2]==1
+								&&exploredTiles[y2-1][x2]==1
+								&&exploredTiles[y2+1][x2-1]==1
+								&&exploredTiles[y2][x2-1]==1
+								&&exploredTiles[y2-1][x2-1]==1
+								
+								&&obstacles[y2+1][x2+1]==0
+								&&obstacles[y2][x2+1]==0
+								&&obstacles[y2-1][x2+1]==0
+								&&obstacles[y2+1][x2]==0
+								&&obstacles[y2][x2]==0
+								&&obstacles[y2-1][x2]==0
+								&&obstacles[y2+1][x2-1]==0
+								&&obstacles[y2][x2-1]==0
+								&&obstacles[y2-1][x2-1]==0	){
+							//relations[y1][x1][y2][x2]=1;
+							int []a1 = {x2,y2};
+							int []a2 = {x1,y1};
+								relations[y1][x1]= new ArrayList<int []>();
+								relations[y2][x2]= new ArrayList<int []>();
+								relations[y1][x1].add(a1);
+								relations[y2][x2].add(a2);
+						}
+					}
+				}
+			}
+		}
+		
 		updateListener();
+		for(int y=0;y<relations.length;y++){
+			for(int x=0;x<relations[y].length;x++){
+				if(relations[y][x]!=null)
+				System.out.println(relations[y][x].get(0)[0]+","+relations[y][x].get(0)[1]);
+			}
+		}
 	}
 	
 	public  void addListener(MapListener listener){

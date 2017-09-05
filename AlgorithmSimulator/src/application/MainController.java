@@ -137,7 +137,6 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		if(waypointYpos.getText().length()>0&&waypointXpos.getText().length()>0){
 			int posX = Integer.parseInt(waypointXpos.getText());
 			int posY = Integer.parseInt(waypointYpos.getText());
-			System.out.println(posX+"-"+posY);
 			wp.setPosition(new Position(posX,posY));
 		}else{
 			wp.setPosition(null);
@@ -260,8 +259,6 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		Test t = new Test();
 		Robot.getInstance().addListener(t);
 		Map.getInstance().addListener(t);
-		Thread thread = new Thread(t);
-		thread.start();
 	}
 	@FXML
 	public void onSensorSelected() {

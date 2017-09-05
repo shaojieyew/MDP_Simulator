@@ -13,7 +13,7 @@ public class RobotSensorSimulatorType3 extends RobotSensorSimulator {
 		int y = Math.round(robot.getPosY());
 		float direction = robot.getDirection();
 		//System.out.println("sensor info... x:"+x +" y:"+y +" direction:" + direction);
-		if(x<0||y<0){
+		if(x<0||y<0||x>14||y>19){
 			return;
 		}
 		int exploredTiles[][] = map.getExploredTiles();
@@ -22,6 +22,33 @@ public class RobotSensorSimulatorType3 extends RobotSensorSimulator {
 		exploredTiles[ (y-1)][ (x)]=1;
 		exploredTiles[ (y)][ (x-1)]=1;
 		exploredTiles[ (y)][ (x)]=1;
+
+
+		Position [][] lineOfSensors = getLineOfSensor(x,y,direction);
+
+
+		for(Position[] sensors:lineOfSensors){
+			for(Position sensor:sensors){
+				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
+					exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
+					if(obstacles[sensor.getPosY()][(sensor.getPosX())]==1){
+						break;
+					}
+				}else{
+					break;
+				}
+			}
+		}
+		map.setExploredTiles(exploredTiles);
+	}
+
+	@Override
+	public String getSensorType() {
+		return RobotSensorSimulatorFactory.SENSOR_TYPE_3;
+	}
+
+	@Override
+	public Position[][] getLineOfSensor(int x, int y, float direction) {
 
 		Position lineOfSensor1[] = new Position[3];
 		Position lineOfSensor2[] = new Position[3];
@@ -154,25 +181,6 @@ public class RobotSensorSimulatorType3 extends RobotSensorSimulator {
 				break;*/
 			}
 		}
-
-
-		for(Position[] sensors:lineOfSensors){
-			for(Position sensor:sensors){
-				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
-					exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
-					if(obstacles[sensor.getPosY()][(sensor.getPosX())]==1){
-						break;
-					}
-				}else{
-					break;
-				}
-			}
-		}
-		map.setExploredTiles(exploredTiles);
-	}
-
-	@Override
-	public String getSensorType() {
-		return RobotSensorSimulatorFactory.SENSOR_TYPE_3;
+		return lineOfSensors;
 	}
 }
