@@ -21,10 +21,12 @@ import Data.WayPoint;
 import GUI.FXMLController;
 import GUI.MapGUI;
 import GUI.MapObstacleGUI;
+import RPiInterface.RobotSensorSimulatorFactory;
 import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
 import algorithm.Test;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -33,6 +35,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -118,13 +122,13 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	private void robotPosXChanged(){
 		Robot robot =Robot.getInstance();
-		int coordinateX = Integer.parseInt(robotXpos.getText());
+		float coordinateX = Float.parseFloat(robotXpos.getText());
 		robot.setPosX(coordinateX);
 	}
 	@FXML
 	private void robotPosYChanged(){
 		Robot robot =Robot.getInstance();
-		int coordinateY = Integer.parseInt(robotYpos.getText());
+		float coordinateY = Float.parseFloat(robotYpos.getText());
 		robot.setPosY(coordinateY);
 	}
 	@FXML
@@ -167,6 +171,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		robot.setDirection(0);
 		Map map = Map.getInstance();
 		WayPoint.getInstance().setPosition(null);
+		
+
 	}
 	
 	@Override
@@ -174,6 +180,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		MapGUI mapGui = new MapGUI();
 		Robot.getInstance().addListener(this);
 		mapPane.setCenter(mapGui);
+		sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
+		
 	}
 
 	@Override
@@ -271,5 +279,21 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	   stage.setTitle("Obstacles");
 	   stage.setScene(scene2);
 	   stage.show();
+	}
+
+	public void onKeyEvent(KeyEvent event) {
+		if(event.getEventType().equals(KeyEvent.KEY_PRESSED)){
+			Robot robot = Robot.getInstance();
+	        if(event.getCode() == KeyCode.UP) {
+	        	onClickMoveForward();
+	        }
+	        if(event.getCode() == KeyCode.RIGHT) {
+	    		robot.rotate(90);
+	        }
+	        if(event.getCode() == KeyCode.LEFT) {
+	    		robot.rotate(-90);
+	        }
+			
+		}
 	}
 }

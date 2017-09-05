@@ -25,6 +25,7 @@ public class Robot {
 		Thread sensorSimulatorThread = new Thread(sensorSimulator);
 		sensorSimulatorThread.start();
 		*/
+		setSensorSimulatorType(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
 	}
 	
 	
@@ -54,8 +55,8 @@ public class Robot {
 		updateListener();
 	}
 
-	private float posX=-1f;
-	private float posY=-1f;
+	private float posX=1f;
+	private float posY=1f;
 	private float direction =0;
 
 

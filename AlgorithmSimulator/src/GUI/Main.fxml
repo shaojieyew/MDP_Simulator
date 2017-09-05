@@ -68,6 +68,7 @@
 					              <FXCollections fx:factory="observableArrayList">
 					                <String fx:value="type1" />
 					                <String fx:value="type2" />
+					                <String fx:value="type3" />
 					              </FXCollections>
 					            </items>
 					      </ComboBox>

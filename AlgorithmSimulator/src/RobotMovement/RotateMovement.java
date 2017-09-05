@@ -45,7 +45,12 @@ public class RotateMovement implements Runnable{
 					e.printStackTrace();
 			}
 		}
-		r.setDirection(Math.round(Robot.getInstance().getDirection()));
+		float direction = Math.round(Robot.getInstance().getDirection());
+		if(direction<0){
+			direction=direction+360;
+		}
+		System.out.println(direction);
+		r.setDirection(direction);
 		r.robotSemaphore.release();
 		r.setMoving(false);
 	}

@@ -9,6 +9,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
 
@@ -24,8 +26,21 @@ public class Main extends Application {
             FXMLController controller = (FXMLController)mainLoader.getController();
             controller.setStageAndSetupListeners(primaryStage); 
             
+
+    		EventHandler<KeyEvent> keyListener = new EventHandler<KeyEvent>() {
+    		    @Override
+    		    public void handle(KeyEvent event) {
+    		    	if(controller instanceof MainController){
+    		    		MainController main = (MainController) controller;
+    		    		main.onKeyEvent(event);
+    		    	}
+    		    }
+    		};
+    		
+            
 			//Setup CSS Style for the FXML
 			Scene scene = new Scene(mainLayout);
+			scene.addEventFilter(KeyEvent.ANY, keyListener);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("MDP 14 Simulator");
 			//Show the stage; application window
