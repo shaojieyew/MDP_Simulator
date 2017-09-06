@@ -1,6 +1,8 @@
 package Data;
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 import RPiInterface.RobotSensorSimulator;
@@ -8,6 +10,7 @@ import RPiInterface.RobotSensorSimulatorFactory;
 import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
 import RobotMovement.ForwardMovement;
+import RobotMovement.RobotMovement;
 import RobotMovement.RotateMovement;
 
 public class Robot {
@@ -19,6 +22,11 @@ public class Robot {
 		return robot;
 	}
 
+	ArrayList<RobotMovement> instructions=new ArrayList<RobotMovement>();  
+	
+	public ArrayList<RobotMovement> getInstructions() {
+		return instructions;
+	}
 	public Robot(){
 		/*
 		RobotSensorSimulator sensorSimulator = new RobotSensorSimulatorType1();
@@ -106,25 +114,39 @@ public class Robot {
 	}
 	
 
-	public ForwardMovement forwardProcessor=null;
-	public RotateMovement rotateMovementProcessor=null;
-	public void moveForward(float cm){
-			direction = direction%360;
-		    double radians = Math.toRadians(direction);
-			float x =  ((cm/10f)*(float)Math.sin(radians));
-			float y =  ((cm/10f)*(float)Math.cos(radians));
-			forwardProcessor = new ForwardMovement(x,y, framePer10CM,  milisecondPer10CM);
-			Thread forwardMovementThread = new Thread(forwardProcessor);
-			forwardMovementThread.start();
+	public void moveForward(float distance) {
+			ForwardMovement forwardProcessor = new ForwardMovement(distance , framePer10CM,  milisecondPer10CM);
+			instructions.add(forwardProcessor);
+			if(instructions.size()==1){
+				Thread forwardMovementThread = new Thread(forwardProcessor);
+				forwardMovementThread.start();
+			}
 	}
 
-	public Semaphore robotSemaphore = new Semaphore(1);
-	public void rotate(float degree){
-			direction = direction%360;
-			rotateMovementProcessor = new RotateMovement(degree,framePerRotate, milisecondPerRotate);
-			Thread rotateMovementThread = new Thread(rotateMovementProcessor);
-			rotateMovementThread.start();
+	public void rotate(float degree) {
+			RotateMovement rotateMovementProcessor = new RotateMovement(degree,framePerRotate, milisecondPerRotate);
+			
+			instructions.add(rotateMovementProcessor);
+			if(instructions.size()==1){
+				Thread forwardMovementThread = new Thread(rotateMovementProcessor);
+				forwardMovementThread.start();
+			}
 	}
+	public void runNextInstruction(){
+		instructions.remove(0);
+		if(instructions.size()>0){
+			RobotMovement movement = instructions.get(0);
+			if(movement!=null){
+				Thread forwardMovementThread = new Thread(movement);
+				forwardMovementThread.start();
+			}else{
+				setMoving(false);
+			}
+		}else{
+			setMoving(false);
+		}
+	}
+	
 	
 	private  ArrayList<RobotListener> arr = new ArrayList<RobotListener>();
 	public  void addListener(RobotListener listener){
@@ -134,12 +156,6 @@ public class Robot {
 		for(RobotListener a: arr){
 			a.updateRobot();
 		}
-	}
-	public void stopMovement() {
-		if(forwardProcessor!=null)
-			forwardProcessor.stop();
-		if(rotateMovementProcessor!=null)
-			rotateMovementProcessor.stop();
 	}
 
 }

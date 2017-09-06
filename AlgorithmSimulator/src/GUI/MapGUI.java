@@ -78,16 +78,19 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 			for(Position pos: positions){
 				int x = pos.getPosX();
 				int y = pos.getPosY();
-				if(tiles[y][x]==null){
-					tiles[y][x] = new Rectangle();
-					tiles[y][x].widthProperty().bind(widthProperty().divide(15));
-					tiles[y][x].heightProperty().bind(heightProperty().divide(20));
-					tiles[y][x].xProperty().bind(widthProperty().divide(15).multiply(x));
-					tiles[y][x].yProperty().bind(heightProperty().subtract(heightProperty().divide(20).multiply(y+1)));
+				int exploredValue = Map.getInstance().getExploredTiles()[y][x];
+				if(exploredValue==1){
+					if(tiles[y][x]==null){
+						tiles[y][x] = new Rectangle();
+						tiles[y][x].widthProperty().bind(widthProperty().divide(15));
+						tiles[y][x].heightProperty().bind(heightProperty().divide(20));
+						tiles[y][x].xProperty().bind(widthProperty().divide(15).multiply(x));
+						tiles[y][x].yProperty().bind(heightProperty().subtract(heightProperty().divide(20).multiply(y+1)));
+					}
+					tiles[y][x].setFill(Color.LIGHTGRAY);
+					getChildren().remove(tiles[y][x]);
+					getChildren().add(tiles[y][x]);
 				}
-				tiles[y][x].setFill(Color.LIGHTGRAY);
-				getChildren().remove(tiles[y][x]);
-				getChildren().add(tiles[y][x]);
 			}
 		}
 	}
@@ -99,16 +102,19 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 			int y = wp.getPosY();
 			if(x<0||y<0||x>14||y>19)
 				return ;
-			if(tiles[y][x]==null){
-				tiles[y][x] = new Rectangle();
-				tiles[y][x].widthProperty().bind(widthProperty().divide(15));
-				tiles[y][x].heightProperty().bind(heightProperty().divide(20));
-				tiles[y][x].xProperty().bind(widthProperty().divide(15).multiply(x));
-				tiles[y][x].yProperty().bind(heightProperty().subtract(heightProperty().divide(20).multiply(y+1)));
+			int exploredValue = Map.getInstance().getExploredTiles()[y][x];
+			if(exploredValue==1){
+				if(tiles[y][x]==null){
+					tiles[y][x] = new Rectangle();
+					tiles[y][x].widthProperty().bind(widthProperty().divide(15));
+					tiles[y][x].heightProperty().bind(heightProperty().divide(20));
+					tiles[y][x].xProperty().bind(widthProperty().divide(15).multiply(x));
+					tiles[y][x].yProperty().bind(heightProperty().subtract(heightProperty().divide(20).multiply(y+1)));
+				}
+				tiles[y][x].setFill(Color.LIGHTSKYBLUE);
+				getChildren().remove(tiles[y][x]);
+				getChildren().add(tiles[y][x]);
 			}
-			tiles[y][x].setFill(Color.LIGHTSKYBLUE);
-			getChildren().remove(tiles[y][x]);
-			getChildren().add(tiles[y][x]);
 		}
 	}
 	protected void loadRobot(){

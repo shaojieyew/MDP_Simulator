@@ -5,35 +5,34 @@ import java.text.DecimalFormat;
 import Data.Robot;
 import javafx.application.Platform;
 
-public class ForwardMovement implements Runnable{
-	float moveX;
-	float moveY;
+public class ForwardMovement extends RobotMovement {
+	float distance;
 	int framePer10CM;
 	int milisecondPer10CM;
-    private volatile boolean exit = false;
-	public ForwardMovement(float moveX, float moveY, int framePer10CM, int milisecondPer10CM) {
+	public ForwardMovement(float distance, int framePer10CM, int milisecondPer10CM) {
 		super();
-		this.moveX = moveX;
-		this.moveY = moveY;
+		this.distance=distance;
 		this.framePer10CM = framePer10CM;
 		this.milisecondPer10CM = milisecondPer10CM;
 	}
+
 	@Override
-	public void run() {
-		 Robot r = Robot.getInstance();
-		try {
-			r.robotSemaphore.acquire();
-			r.setMoving(true);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+	protected void implementation() {
+		Robot r = Robot.getInstance();
+		float direction = r.getDirection()%360;
+		//System.out.println("forward "+distance+"cm" +" facing "+direction);
+
+		//System.out.println("#############MOVE_FORWARD_ "+distance);
+	    double radians = Math.toRadians(direction);
+		float moveX =  ((distance/10f)*(float)Math.sin(radians));
+		float moveY =  ((distance/10f)*(float)Math.cos(radians));
+		
 		float dist = (float) Math.sqrt(Math.pow((moveX), 2)+Math.pow((moveY),2));
 		int totalframe = (int) (dist*framePer10CM);
 		float x=moveX/(float)totalframe;
 		float y=moveY/(float)totalframe;
 		for(int i =0;i<totalframe;i++){
-			if(exit){
+			if(isExit()){
 				break;
 			}
 	        try {
@@ -49,10 +48,7 @@ public class ForwardMovement implements Runnable{
 		DecimalFormat df = new DecimalFormat("#.##");
 	   	r.setPosX(Float.parseFloat(df.format(r.getPosX())));
 	   	r.setPosY(Float.parseFloat(df.format(r.getPosY())));
-		Robot.getInstance().robotSemaphore.release();
-		r.setMoving(false);
+
 	}
-    public void stop(){
-        exit = true;
-    }
+
 }

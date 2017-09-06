@@ -159,7 +159,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	
 	@FXML
 	private void onclickStop(){
-		Robot.getInstance().stopMovement();
+		//Robot.getInstance().stopMovement();
 	}
 	
 	@FXML

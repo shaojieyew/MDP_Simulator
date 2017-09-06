@@ -12,6 +12,8 @@ public class Map {
 		}
 		return map;
 	}
+	
+	
 	private static Position[] START_POSITION = {new Position(0,0),new Position(1,0),new Position(2,0),new Position(0,1),new Position(1,1),new Position(2,1),new Position(0,2),new Position(1,2),new Position(2,2)};
 	public static StartPoint STARTPOINT = new StartPoint(START_POSITION);
 	private static Position[] END_POSITION = {new Position(14,19),new Position(14,18),new Position(14,17),new Position(13,19),new Position(13,18),new Position(13,17),new Position(12,19),new Position(12,18),new Position(12,17)};
@@ -30,15 +32,18 @@ public class Map {
 	}
 	public void setExploredTiles(int[][] exploredTiles) {
 		this.exploredTiles = exploredTiles;
-		layoutUpdated();
+		onLayoutUpdated();
 	}
 	public  void setObstacle(int[][] obstacles) {
 		this.obstacles = obstacles;
-		layoutUpdated();
+		onLayoutUpdated();
 	}
 	
+	private float exploredRate=0; 
 	
-	
+	public float getExploredRate() {
+		return exploredRate;
+	}
 	//in hexdecimal, from map descriptor file to arrays
 	public void setMap(String exploredTileHex,String obstacleHex, String exploredObstacleHex) {
 		 // System.out.println (exploredTile2);
@@ -91,17 +96,20 @@ public class Map {
 				  obstacles[y][x]=0;
 			  }
 		  }
-		layoutUpdated();
+		  onLayoutUpdated();
 	}
 
-	//private static int relations1 [][][][] = new int[20][15][20][15];
-
 	private static  ArrayList<int []>[][] relations = new ArrayList[20][15];
-	//ArrayList<int []> relations2 = new ArrayList<int[]>();
-	private  void layoutUpdated(){
-		for(int x1=1;x1<14;x1++){
-			for(int y1=1;y1<19;y1++){
-				if(       exploredTiles[y1+1][x1+1]==1
+
+	private static Vertex vertices [][] = new Vertex[20][15];
+	
+	private  void onLayoutUpdated(){
+		int exploredCount=0;
+		vertices  = new Vertex[20][15];
+		for(int x1=0;x1<15;x1++){
+			for(int y1=0;y1<20;y1++){
+				if(     y1>0&&x1>0&&x1<14&&y1<19&&  
+						exploredTiles[y1+1][x1+1]==1
 						&&exploredTiles[y1][x1+1]==1
 						&&exploredTiles[y1-1][x1+1]==1
 						&&exploredTiles[y1+1][x1]==1
@@ -161,30 +169,45 @@ public class Map {
 								&&obstacles[y2+1][x2-1]==0
 								&&obstacles[y2][x2-1]==0
 								&&obstacles[y2-1][x2-1]==0	){
-							//relations[y1][x1][y2][x2]=1;
-							int []a1 = {x2,y2};
-							int []a2 = {x1,y1};
-								relations[y1][x1]= new ArrayList<int []>();
-								relations[y2][x2]= new ArrayList<int []>();
-								relations[y1][x1].add(a1);
-								relations[y2][x2].add(a2);
+							int []a2 = {x2,y2};
+
+							if(vertices[y1][x1]==null){
+						        vertices[y1][x1]=new Vertex(x1,y1);
+							}
+							if(vertices[y2][x2]==null){
+						        vertices[y2][x2]= new Vertex(x2,y2);
+							}
+							vertices[y1][x1].adjacencies.add(vertices[y2][x2]);
 						}
 					}
 				}
+
+				if(exploredTiles[y1][x1]==1){
+					exploredCount++;
+				}
 			}
 		}
-		
+		exploredRate = exploredCount/300f;
 		updateListener();
-		for(int y=0;y<relations.length;y++){
-			for(int x=0;x<relations[y].length;x++){
-				if(relations[y][x]!=null)
-				System.out.println(relations[y][x].get(0)[0]+","+relations[y][x].get(0)[1]);
+		
+		/*
+		System.out.println("=======");
+		for(int y=1;y<19;y++){
+			for(int x=1;x<14;x++){
+				if(vertices[y][x]!=null){
+					for(Vertex v: vertices[y][x].adjacencies){
+						System.out.println(x+","+y+"=>"+v.x+","+v.y);
+					}
+				}
 			}
-		}
+		}*/
 	}
 	
 	public  void addListener(MapListener listener){
 		arr.add(listener);
+	}
+	public static Vertex[][] getVertices() {
+		return vertices;
 	}
 	public  void updateListener(){
 		for(MapListener a: arr){
