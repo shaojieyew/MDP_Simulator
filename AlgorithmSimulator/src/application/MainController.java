@@ -168,10 +168,12 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		robot.setPosX(1);
 		robot.setPosY(1);
 		robot.setDirection(0);
-		Map map = Map.getInstance();
 		WayPoint.getInstance().setPosition(null);
-		
-
+		Map.getInstance().setExploredTiles(new int[20][15]);
+		if(t!=null){
+			Map.getInstance().removeListener(t);
+			robot.removeListener(t);
+		}
 	}
 	
 	@Override
@@ -254,9 +256,11 @@ public class MainController extends FXMLController  implements Initializable, Ro
             }
 		});
 	}
+	
+	Test t;
 	@FXML
 	public void onclickAlgo1() {
-		Test t = new Test();
+		t = new Test();
 		Robot.getInstance().addListener(t);
 		Map.getInstance().addListener(t);
 	}

@@ -206,11 +206,15 @@ public class Map {
 	public  void addListener(MapListener listener){
 		arr.add(listener);
 	}
+	public void removeListener(MapListener listener) {
+		arr.remove(listener);
+	}
 	public static Vertex[][] getVertices() {
 		return vertices;
 	}
 	public  void updateListener(){
-		for(MapListener a: arr){
+		for(int i =0;i<arr.size();i++){
+			MapListener a = arr.get(i);
 			a.updateMap();
 		}
 	}

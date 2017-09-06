@@ -151,6 +151,8 @@ public class Robot {
 	private  ArrayList<RobotListener> arr = new ArrayList<RobotListener>();
 	public  void addListener(RobotListener listener){
 		arr.add(listener);
+	}public  void removeListener(RobotListener listener){
+		arr.remove(listener);
 	}
 	public  void updateListener(){
 		for(RobotListener a: arr){

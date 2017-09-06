@@ -70,6 +70,16 @@ public class Test implements  MapListener, RobotListener{
 		
 		//move to best location
 		moveToLocation(currentX, currentY, direction, location[0],location[1]);
+		if(location[0]==1&&location[1]==1){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			r.removeListener(this);
+			m.removeListener(this);
+		}
 	}
 	
 	private void moveToLocation(int x1, int y1,float facing, int x2, int y2) {
