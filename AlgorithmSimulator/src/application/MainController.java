@@ -181,6 +181,10 @@ public class MainController extends FXMLController  implements Initializable, Ro
 			robot.removeListener(t);
 		}
 		robot.getSensorSimulator().stop();
+		if(robot.isExploring()){
+			robot.setExploring(false);
+		}
+		
 	}
 	
 	@Override
