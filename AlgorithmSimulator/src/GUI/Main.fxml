@@ -12,19 +12,21 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="675.0" prefWidth="660.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
    <center>
       <BorderPane fx:id="mapPane" prefHeight="656.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <right>
-            <VBox prefHeight="200.0" prefWidth="170.0" spacing="5.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="200.0" prefWidth="190.0" spacing="5.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="loadMapFileBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickLoadMapFileBtn" prefHeight="25.0" prefWidth="132.0" text="Load Map File" />
-                  <Button fx:id="generateMapStatus" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickGenerateMapStatus" prefHeight="25.0" prefWidth="132.0" text="Generate Status" />
+                  <Button fx:id="loadMapFileBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickLoadMapFileBtn" prefHeight="25.0" prefWidth="132.0" text="Load Map Descriptor" />
+                  <Button fx:id="generateMapStatus" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickGenerateMapStatus" prefHeight="25.0" prefWidth="132.0" text="Export Map Descriptor" />
                   <Button fx:id="editObstacle" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickEditObstacle" prefHeight="25.0" prefWidth="132.0" text="Edit/View Obstacle" />
                   <Button fx:id="resetBtn" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickResetSimulator" prefHeight="25.0" prefWidth="189.0" text="Reset" />
+                  <Button fx:id="hackAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onclickDiscoverAll" prefHeight="25.0" prefWidth="162.0" text="Uncover All Square" />
+                  <Button fx:id="hideAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickHideAll" prefHeight="25.0" prefWidth="162.0" text="Hide All Square" />
                   <Label text="Robot Coord:" />
                   <HBox>
                      <children>
@@ -39,28 +41,34 @@
                         <TextField fx:id="waypointYpos" onKeyReleased="#waypointPosChanged" text="1" />
                      </children>
                   </HBox>
-                  <Label text="Forward (dist cm):" />
-                  <HBox>
+                  <HBox prefHeight="14.0" prefWidth="190.0" spacing="20.0">
                      <children>
-                        <TextField fx:id="forwardTextField" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="47.0" text="10" />
-                        <Button mnemonicParsing="false" onAction="#onClickMoveForward" prefHeight="25.0" prefWidth="50.0" text="Move" />
+                        <Label text="Forward (cm):" />
+                        <Label text="Rotate(degree):" />
                      </children>
                   </HBox>
-                  <Label text="Rotate(+-degree):" />
                   <HBox>
                      <children>
-                        <TextField fx:id="rotateTextField" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="47.0" text="90" />
+                        <TextField fx:id="forwardTextField" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="39.0" text="10" />
+                        <Button mnemonicParsing="false" onAction="#onClickMoveForward" prefHeight="25.0" prefWidth="56.0" text="Move" />
+                        <TextField fx:id="rotateTextField" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="34.0" text="90" />
                         <Button mnemonicParsing="false" onAction="#onclickRotate" text="Rotate" />
                      </children>
                   </HBox>
-                  <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickStop" prefHeight="25.0" prefWidth="140.0" text="Stop" />
-                  <Label text="milsec per Sq" />
-                  <TextField fx:id="travelSpeedTextField" onKeyReleased="#onTravelSpeedChange" text="300" />
-                  <Label text="milsec per Rotate" />
-                  <TextField fx:id="rotateSpeedTextField" onKeyReleased="#onRotatSpeedChange" text="300" />
-                  <Button fx:id="hackAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onclickDiscoverAll" prefHeight="25.0" prefWidth="162.0" text="Uncover All" />
-                  <Button fx:id="hideAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickHideAll" prefHeight="25.0" prefWidth="162.0" text="Hide All" />
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox />
+                  <HBox prefHeight="23.0" prefWidth="190.0">
+                     <children>
+                        <Label prefHeight="17.0" prefWidth="125.0" text="Speed: milsec/Sq" />
+                        <TextField fx:id="travelSpeedTextField" onKeyReleased="#onTravelSpeedChange" prefHeight="25.0" prefWidth="92.0" text="1000" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="39.0" prefWidth="190.0">
+                     <children>
+                        <Label prefHeight="17.0" prefWidth="113.0" text="Speed: milsec/Rotate" />
+                        <TextField fx:id="rotateSpeedTextField" onKeyReleased="#onRotatSpeedChange" prefHeight="25.0" prefWidth="80.0" text="1000" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="42.0" prefWidth="190.0">
                      <children>
                         <Label prefHeight="17.0" prefWidth="94.0" text="Sensor Type" />
                         <ComboBox fx:id="sensorCombo" maxWidth="1.7976931348623157E308" onAction="#onSensorSelected" prefWidth="90.0" promptText="choose">
@@ -75,12 +83,14 @@
                      </children>
                   </HBox>
                  
-                  <Button fx:id="exploreBtn1" mnemonicParsing="false" onMouseClicked="#onclickAlgo1" prefHeight="25.0" prefWidth="162.0" text="Explore">
+                  <Button fx:id="exploreBtn1" mnemonicParsing="false" onMouseClicked="#onclickAlgo1" prefHeight="25.0" prefWidth="216.0" text="Start Exploration">
                      <VBox.margin>
-                        <Insets top="10.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="startEndBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="129.0" text="FastestPath" />
+                  <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickStop" prefHeight="25.0" prefWidth="140.0" text="Terminate Exploration" />
+                  <Button fx:id="startEndBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="235.0" text="Start Fastest Path" />
+                  <Label fx:id="Timer" />
                </children>
             </VBox>
          </right>

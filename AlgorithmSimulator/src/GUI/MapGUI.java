@@ -285,4 +285,16 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
 	public void onRobotStop() {
 	}
 
+	@Override
+	public void onRobotStartExploring() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRobotStopExploring() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

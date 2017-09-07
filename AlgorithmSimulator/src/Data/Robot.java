@@ -33,17 +33,32 @@ public class Robot {
 		Thread sensorSimulatorThread = new Thread(sensorSimulator);
 		sensorSimulatorThread.start();
 		*/
-		setSensorSimulatorType(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
+		//setSensorSimulatorType(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
 	}
 	
 	
 	private static final int framePer10CM = 30;
 	private static final int framePerRotate = 30;
-	private static  int milisecondPer10CM = 500;
+	private static  int milisecondPer10CM = 1000;
 
-	private static  int milisecondPerRotate = 500;
+	private static  int milisecondPerRotate = 1000;
 
+	
+	private long exploringStartTime = 0;
+	private long exploringEndTime = 0;
 	private boolean isExploring =false;
+	public boolean isExploring() {
+		return isExploring;
+	}
+	public void setExploring(boolean isExploring) {
+		if(isExploring){
+			 exploringStartTime = System.currentTimeMillis();
+		}else{
+			exploringEndTime = System.currentTimeMillis();
+		}
+		this.isExploring = isExploring;
+		updateExploringListener(isExploring);
+	}
 	private boolean isMoving =false;
 	
 	private RobotSensorSimulator sensorSimulator = null;
@@ -112,7 +127,19 @@ public class Robot {
 		this.direction = direction%360;
 		updateListener();
 	}
-	
+	public long getExploringStartTime() {
+		return exploringStartTime;
+	}
+	public void setExploringStartTime(long exploringStartTime) {
+		this.exploringStartTime = exploringStartTime;
+	}
+	public long getExploringEndTime() {
+		return exploringEndTime;
+	}
+	public void setExploringEndTime(long exploringEndTime) {
+		this.exploringEndTime = exploringEndTime;
+	}
+
 
 	public void moveForward(float distance) {
 			ForwardMovement forwardProcessor = new ForwardMovement(distance , framePer10CM,  milisecondPer10CM);
@@ -155,8 +182,19 @@ public class Robot {
 		arr.remove(listener);
 	}
 	public  void updateListener(){
-		for(RobotListener a: arr){
+		for(int i =0;i<arr.size();i++){
+			RobotListener a = arr.get(i);
 			a.updateRobot();
+		}
+	}
+	public  void updateExploringListener(boolean isExploring){
+		for(int i =0;i<arr.size();i++){
+			RobotListener a = arr.get(i);
+			if(isExploring){
+				a.onRobotStartExploring();
+			}else{
+				a.onRobotStopExploring();
+			}
 		}
 	}
 

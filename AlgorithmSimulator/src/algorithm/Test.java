@@ -18,6 +18,8 @@ public class Test implements  MapListener, RobotListener{
 	private int [][] visited = new int[20][15];
 	private int currentX = 1;
 	private int currentY = 1;
+	private int startingX = 1;
+	private int startingY = 1;
 	private float direction = 0;
 	public static final float NORTH = 0;
 	public static final float EAST = 90;
@@ -25,8 +27,14 @@ public class Test implements  MapListener, RobotListener{
 	public static final float WEST = 270;
 
 	
-	int count=1;
+	int printCount=1;
 	public Test(){
+		Robot.getInstance().setExploring(true);
+		computeAction();
+	}
+	public Test(int startAtX, int startAtY){
+		startingX=startAtX;
+		startingY=startAtY;
 		computeAction();
 	}
 
@@ -38,8 +46,8 @@ public class Test implements  MapListener, RobotListener{
 	private float checkEnvironementOf[]={NORTH,SOUTH,EAST,WEST};
 	protected void computeAction(){
 
-		System.out.println("\n===Action " +count+"=== Explration rate :"+m.getInstance().getExploredRate());
-		count++;
+		System.out.println("\n===Action " +printCount+"=== Explration rate :"+m.getInstance().getExploredRate());
+		printCount++;
 		currentX = Math.round(r.getPosX());
 		currentY= Math.round(r.getPosY());
 		direction = r.getDirection();
@@ -64,26 +72,30 @@ public class Test implements  MapListener, RobotListener{
 		visited[currentY][currentX]=1;
 
 		System.out.println("I could move to :");
-		checked =new int[20][15];
-		int[] location  = getBestNextStop(currentX,currentY,100);
+		checkedVisited =new int[20][15];
+		int[] location  = getBestNextStop(currentX,currentY,1000);
 		System.out.println("Best Location :"+location[0]+","+location[1]+","+location[2]+","+location[3]);
 		
 		//move to best location
 		moveToLocation(currentX, currentY, direction, location[0],location[1]);
-		if(location[0]==1&&location[1]==1){
+		if(location[0]==1&&location[1]==1&&okToTerminate){
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			Robot.getInstance().setExploring(false);
 			r.removeListener(this);
 			m.removeListener(this);
 		}
 	}
 	
+	boolean okToTerminate=false;
+	
+	//get Instructions To Location
 	private void moveToLocation(int x1, int y1,float facing, int x2, int y2) {
-		ArrayList<String> arr = new ArrayList<String>();
+		ArrayList<String> instructions = new ArrayList<String>();
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
 			System.out.println("Error:"+x1+","+y1);
@@ -103,45 +115,34 @@ public class Test implements  MapListener, RobotListener{
 			{
 				//float degreeBetween= degreeToRotateToDirection(direction,degree);
 				rotateToDirection(direction,degree);
-				arr.add("ROTATE_FROM_"+direction+"_TO"+degree);
+				instructions.add("ROTATE_FROM_"+direction+"_TO"+degree);
 				direction = degree;
 			}
-			arr.add("MOVE_FORWARD_"+10);
+			instructions.add("MOVE_FORWARD_"+10);
 			r.moveForward(10);
 		}
 
 	//	System.out.println("=============");
-		for(String instruction: arr){
+	//	for(String instruction: instructions){
 	//		System.out.println(instruction);
-		}
+	//	}
 	//	System.out.println("=============");
 	}
 
 
-
-	
-	/*
-	private void getTotalCost(Stack <int[]>stack, float facingDirection) {
-		for(int i =0;i<stack.size();i++){
-			int[]v1 = stack.get(i);
-			System.out.print(v1[0]+","+v1[1]+"("+0+" degree)=>");
-		}
-		System.out.println("end");
-	}*/
-
-	private  int checked[][]= new int[20][15];
-
 	private int[] getBestNextStop(int inX, int inY, int maxHop) {
-		int canExplore= howManyTileCanBeDiscovered(1,1);
-		float degree = getDegreeBetweenTwoPoint(currentX,currentY,1,1);
+		int canExplore= howManyTileCanBeDiscovered(1,1,false);
+		float degree = getDegreeBetweenTwoPoint(currentX,currentY,currentX,currentY);
 		int degreeBetween =0;
-		if(currentX!=1 || currentY!=1){
+		//if(currentX!=1 || currentY!=1){
 			 degreeBetween = (int) degreeToRotateToDirection(direction,degree);
-		}
-		int result[] = {1,1,canExplore,degreeBetween,0};
+		//}
+		int result[] = {currentX,currentY,canExplore,degreeBetween,0};
 		return getBestNextStopRecursive(inX,  inY,  maxHop, result);
 	}
-	
+
+	//BFS, check all nodes
+	private  int checkedVisited[][]= new int[20][15];
 	private int[] getBestNextStopRecursive(int inX, int inY, int maxHop, int[] inDefault) {
 		Vertex v = m.getVertices()[inY][inX];
 		if(v==null){
@@ -152,16 +153,19 @@ public class Test implements  MapListener, RobotListener{
 		for(Vertex nextNode: neighbours){
 			int x = nextNode.x;
 			int y = nextNode.y;
-			if(checked[y][x]==0){
-					checked[y][x]=1;
-					int canExplore= howManyTileCanBeDiscovered(x,y);
+			if(checkedVisited[y][x]==0){
+				checkedVisited[y][x]=1;
+					int canExplore= howManyTileCanBeDiscovered(x,y,false);
+					if(canExplore>0&&canExplore<=3){
+						canExplore =howManyTileCanBeDiscovered(x,y,true);
+					}
 					float degree = 0;
 					int degreeBetween = 0;
 					if(currentX!=x || currentY!=y){
 						degree=getDegreeBetweenTwoPoint(currentX,currentY,x,y);
 						degreeBetween=(int) degreeToRotateToDirection(direction,degree);
 					}
-					int squareAway =  getSquareAway(currentX,currentY,x,y);
+					int squareAway =  getDistanceAway(currentX,currentY,x,y);
 					int result[] = {x,y,canExplore,degreeBetween,squareAway};
 					if(maxHop==1){
 						return result;
@@ -175,49 +179,65 @@ public class Test implements  MapListener, RobotListener{
 		return optimised;
 	}
 
-	 
+	 //greedy heuristic 
 	private int[] calculateScoreOfVertexAndCompare(int[] place1, int[] place2){
-		float exploreMoreWeightage = 5;
-		int nearByWeightage = 0;
-		float endLocationWeightage = 10;
-		int[] endLocation = {13,18};
-		float startWeightage = 0;
-		int[] startLocation = {1,1};
 		float mapDiscoveredRate = m.getExploredRate();
-		
+		float exploreMoreWeightage = 1; //explore_score:1-36
+		int nearByWeightage = 0;	     //score: 1-28
+		float endLocationWeightage = 0;  //score: 1-28
+		float startWeightage = 0;        //score: 1-28
+		int distanceWeightage = 0;
+		int[] endLocation = {13,18};
+		int[] startLocation = {1,1};
 		//if end point found
 		if(m.getExploredTiles()[18][13]==1){
-			
 			endLocationWeightage=0;
-			if(mapDiscoveredRate>90){
-				startWeightage = 4;
-				exploreMoreWeightage = 1;
+			if(mapDiscoveredRate>0.9){
+				startWeightage = 0;
+				exploreMoreWeightage=1;
+				nearByWeightage=1;
 			}
+			if(mapDiscoveredRate==1){
+				startWeightage = 1000000;
+				exploreMoreWeightage=0;
+				nearByWeightage=0;
+				okToTerminate=true;
+			}
+		}
+		long currentTimeStamp = System.currentTimeMillis();
+    	long minutes = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000)/60;
+		if(minutes>=5){
+			endLocationWeightage=0;
+			startWeightage = 1000000;
+			exploreMoreWeightage=0;
+			nearByWeightage=0;
+			okToTerminate=true;
+		}
+
+		int x1 = place1[0];
+		int y1 = place1[1];
+		int x2 = place2[0];
+		int y2 = place2[1];
+		if(((place1[2]==1||place2[2]==1)&&( Math.abs(x1-x2)+Math.abs(y1-y2))>10)
+			||
+			(Math.abs(place1[2]-place2[2])<=1)
+			){
+			 distanceWeightage=10;
 		}
 		
 		float score1=0;
 		float score2=0;
-		
+		score1=calculateScore( place1,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+		score2=calculateScore( place2,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
 		//if visited then score ==0
 		//if start weightage is more than 0 ,we can go to vistied location.
-		if(visited[place1[1]][place1[0]]==0 || startWeightage >0){
-			int exploreSquareCount1 = place1[2];	
-			int squareAway1 = Math.abs(place1[0]-endLocation[0])+Math.abs(place1[1]-endLocation[1]);
-			int nearBySquareAway1 = (int) (Math.abs(place1[0]-r.getPosX())+Math.abs(place1[1]-r.getPosY()));
-			int startSquareAway1 = (int) (Math.abs(place1[0]-startLocation[0])+Math.abs(place1[1]-startLocation[0]));
-			score1 = (45-startSquareAway1)*startWeightage +(45-nearBySquareAway1)*nearByWeightage + (45-squareAway1)*endLocationWeightage 	+ 	exploreSquareCount1*exploreMoreWeightage;
-				
-		}
-		if(visited[place2[1]][place2[0]]==0 || startWeightage >0){
-			int exploreSquareCount2 = place2[2];
-			int squareAway2 = Math.abs(place2[0]-endLocation[0])+Math.abs(place2[1]-endLocation[1]);
-			int nearBySquareAway2 = (int) (Math.abs(place2[0]-r.getPosY())+Math.abs(place2[1]-r.getPosY()));
-			int startSquareAway2 = (int) (Math.abs(place2[0]-startLocation[1])+Math.abs(place2[1]-startLocation[1]));
-			score2 = (45-startSquareAway2)*startWeightage +(45-nearBySquareAway2)*nearByWeightage + (45-squareAway2)*endLocationWeightage 	+ 	exploreSquareCount2*exploreMoreWeightage;
-		}
 		
-		System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1);
-		System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2);
+		
+		if(score1!=0)
+		System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[4]);
+
+		if(score2!=0)
+			System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[4]);
 			
 		int []result;
 		if(score1>score2){
@@ -232,12 +252,39 @@ public class Test implements  MapListener, RobotListener{
 		
 		return result;
 	}
+	private float calculateScore(int place2[], int distanceWeightage,float startWeightage, float nearByWeightage, float endLocationWeightage, float exploreMoreWeightage){
+		//int x = place[0];
+		//int y = place[0];
+
+		float leanXDirection = 1;
+		float leanYDirection=1;
+		int[] endLocation = {13,18};
+		int[] startLocation = {1,1};
+		float score=0;
+		if(visited[place2[1]][place2[0]]==0 || ((visited[place2[1]][place2[0]]==1)&&(place2[0]==1&&place2[1]==1)&&startWeightage>0)){
+			int exploreSquareCount2 = place2[2];
+			int distanceAway2 = 300-(place2[4]);
+			int squareAway2 = 29-(Math.abs(place2[0]-endLocation[0])+Math.abs(place2[1]-endLocation[1]));
+			int nearBySquareAway2 = (int) (29-(Math.abs(place2[0]-r.getPosY())+Math.abs(place2[1]-r.getPosY())));
+			int startSquareAway2 = (int) (29-(Math.abs(place2[0]-startLocation[1])+Math.abs(place2[1]-startLocation[1])));
 	
-	private int getSquareAway(int x1, int y1, int x2, int y2) {
+			score =(distanceAway2*distanceWeightage)+ (startSquareAway2)*startWeightage +(nearBySquareAway2)*nearByWeightage + (squareAway2)*endLocationWeightage 	+ 	exploreSquareCount2*exploreMoreWeightage;
+			
+		}
+		return score;
+	}
+	
+	private int getDistanceAway(int x1, int y1, int x2, int y2) {
 		Vertex v1 = m.getVertices()[y1][x1];
 		Vertex v2 = m.getVertices()[y2][x2];
-		return 0;
-		//return Math.abs(x1-x2)+Math.abs(y1-y2);
+		java.util.List<Vertex> path = null;
+		if(v1!=null&&v2!=null){
+			path=Dijkstra.computePaths(v1, v2);
+		}
+		if(path==null&&path.size()>0){
+			return path.size()-1;
+		}
+		return  Math.abs(x1-x2)+Math.abs(y1-y2);
 	}
 
 	//check if the position and direction have any undiscovered tiles
@@ -313,7 +360,7 @@ public class Test implements  MapListener, RobotListener{
 	}
 	
 	//get number of tiles that are unexplored in a location
-	private int howManyTileCanBeDiscovered(int x, int y){
+	private int howManyTileCanBeDiscovered(int x, int y, boolean firstLayer){
 		int count=0;
 		float[] allDirection = {NORTH,SOUTH,EAST,WEST};
 		for(float dir: allDirection){
@@ -332,6 +379,9 @@ public class Test implements  MapListener, RobotListener{
 					}else{
 						break;
 					}
+					if(firstLayer){
+						break;
+					}
 				}
 			}
 		}
@@ -345,6 +395,16 @@ public class Test implements  MapListener, RobotListener{
 	
 	@Override
 	public void onRobotStop() {
+		
+	}
+	@Override
+	public void onRobotStartExploring() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onRobotStopExploring() {
+		// TODO Auto-generated method stub
 		
 	}
 }

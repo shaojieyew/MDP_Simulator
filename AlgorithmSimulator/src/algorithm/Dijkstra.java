@@ -14,7 +14,12 @@ public class Dijkstra
 {
     public static List<Vertex> computePaths(Vertex source,Vertex dest)
     {
-    	if(source==null){
+    	return computePaths(source, dest,0, 0);
+    }
+	
+    public static List<Vertex> computePaths(Vertex source,Vertex dest,int leanX, int leanY)
+    {
+    	if(source==null||dest==null){
     		return null;
     	}
         source.minDistance = 0.;

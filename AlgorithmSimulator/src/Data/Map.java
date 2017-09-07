@@ -81,18 +81,18 @@ public class Map {
 				  }
 				  obstacleIndex++;
 			  }
-
+			  
 			  if((x==0&&y==0)||(x==1&&y==0)||(x==2&&y==0)||
 				  (x==0&&y==1)||(x==1&&y==1)||(x==2&&y==1)||
 				  (x==0&&y==2)||(x==1&&y==2)||(x==2&&y==2)){
-				  exploredTiles[y][x]=1;
+				//  exploredTiles[y][x]=1;
 				  obstacles[y][x]=0;
 			  }
 
 			  if((x==14&&y==19)||(x==13&&y==19)||(x==12&&y==19)||
 				  (x==14&&y==18)||(x==13&&y==18)||(x==12&&y==18)||
 				  (x==14&&y==17)||(x==13&&y==17)||(x==12&&y==17)){
-				  exploredTiles[y][x]=1;
+				//  exploredTiles[y][x]=1;
 				  obstacles[y][x]=0;
 			  }
 		  }
