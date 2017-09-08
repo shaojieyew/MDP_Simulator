@@ -17,7 +17,7 @@ public class Map {
 	private static Position[] START_POSITION = {new Position(0,0),new Position(1,0),new Position(2,0),new Position(0,1),new Position(1,1),new Position(2,1),new Position(0,2),new Position(1,2),new Position(2,2)};
 	public static StartPoint STARTPOINT = new StartPoint(START_POSITION);
 	private static Position[] END_POSITION = {new Position(14,19),new Position(14,18),new Position(14,17),new Position(13,19),new Position(13,18),new Position(13,17),new Position(12,19),new Position(12,18),new Position(12,17)};
-	public static StartPoint ENDPOINT = new StartPoint(END_POSITION);
+	public static EndPoint ENDPOINT = new EndPoint(END_POSITION);
 	
 	private  ArrayList<MapListener> arr = new ArrayList<MapListener>();
 	private static int exploredTiles [][] = new int[20][15];

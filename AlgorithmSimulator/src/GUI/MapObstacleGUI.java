@@ -9,7 +9,7 @@ import Data.WayPoint;
 import Data.WayPointListener;
 import RPiInterface.RobotSensorSimulator;
 import RPiInterface.RobotSensorSimulatorFactory;
-import algorithm.Test;
+import algorithm.ExplorationType1;
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.event.EventHandler;

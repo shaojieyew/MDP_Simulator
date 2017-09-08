@@ -9,7 +9,7 @@ import Data.WayPoint;
 import Data.WayPointListener;
 import RPiInterface.RobotSensorSimulator;
 import RPiInterface.RobotSensorSimulatorFactory;
-import algorithm.Test;
+import algorithm.ExplorationType1;
 import javafx.application.Platform;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;

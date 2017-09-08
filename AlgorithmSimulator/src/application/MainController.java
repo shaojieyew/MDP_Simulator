@@ -27,7 +27,8 @@ import GUI.MapObstacleGUI;
 import RPiInterface.RobotSensorSimulatorFactory;
 import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
-import algorithm.Test;
+import algorithm.Exploration;
+import algorithm.ExplorationType1;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -172,10 +173,11 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		robot.setDirection(0);
 		WayPoint.getInstance().setPosition(null);
 		Map.getInstance().setExploredTiles(new int[20][15]);
-		if(t!=null){
-			Map.getInstance().removeListener(t);
-			robot.removeListener(t);
+		if(explorationAlgorithm!=null){
+			Map.getInstance().removeListener(explorationAlgorithm);
+			robot.removeListener(explorationAlgorithm);
 		}
+		if(robot.getSensorSimulator()!=null)
 		robot.getSensorSimulator().stop();
 		if(robot.isExploring()){
 			robot.setExploring(false);
@@ -267,18 +269,19 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		});
 	}
 	
-	Test t;
+	Exploration explorationAlgorithm;
 	@FXML
 	public void onclickAlgo1() {
 		Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
-		t = new Test();
-		Robot.getInstance().addListener(t);
-		Map.getInstance().addListener(t);
+		explorationAlgorithm = new ExplorationType1();
+		Robot.getInstance().addListener(explorationAlgorithm);
+		Map.getInstance().addListener(explorationAlgorithm);
 	}
 	@FXML
 	private void onclickStopExploration(){
-		if(t!=null)
-			t.terminate();
+		Robot.getInstance().getInstructions().clear();
+		if(explorationAlgorithm!=null)
+			explorationAlgorithm.terminate();
 	}
 	@FXML
 	public void onSensorSelected() {

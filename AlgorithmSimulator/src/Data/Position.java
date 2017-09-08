@@ -1,6 +1,6 @@
 package Data;
 
-public class Position {
+public class Position{
 	int posX;
 	int posY;
 	
@@ -25,5 +25,13 @@ public class Position {
 	public int[][] getEdges(){
 		int[][] edges = {{posX,posY},{posX+1,posY},{posX,posY+1},{posX+1,posY+1}};
 		return edges;
+	}
+
+	
+	public boolean equals(Position arg0) {
+		if(posX==arg0.getPosX() && posY==arg0.getPosY()){
+			return true;
+		}
+		return false;
 	}
 }

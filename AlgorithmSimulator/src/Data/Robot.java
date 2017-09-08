@@ -160,7 +160,9 @@ public class Robot {
 			}
 	}
 	public void runNextInstruction(){
-		instructions.remove(0);
+		if(instructions.size()>0){
+			instructions.remove(0);
+		}
 		if(instructions.size()>0){
 			RobotMovement movement = instructions.get(0);
 			if(movement!=null){
