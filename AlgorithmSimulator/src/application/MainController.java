@@ -11,6 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import Data.Map;
@@ -33,6 +36,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -64,6 +68,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private TextField waypointXpos;
 	@FXML
 	private TextField waypointYpos;
+	@FXML
+	private Label Timer;
 	@FXML
 	private TextField forwardTextField;
 	@FXML
@@ -137,7 +143,6 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		if(waypointYpos.getText().length()>0&&waypointXpos.getText().length()>0){
 			int posX = Integer.parseInt(waypointXpos.getText());
 			int posY = Integer.parseInt(waypointYpos.getText());
-			System.out.println(posX+"-"+posY);
 			wp.setPosition(new Position(posX,posY));
 		}else{
 			wp.setPosition(null);
@@ -160,7 +165,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	
 	@FXML
 	private void onclickStop(){
-		Robot.getInstance().stopMovement();
+		//Robot.getInstance().stopMovement();
 	}
 	
 	@FXML
@@ -169,10 +174,17 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		robot.setPosX(1);
 		robot.setPosY(1);
 		robot.setDirection(0);
-		Map map = Map.getInstance();
 		WayPoint.getInstance().setPosition(null);
+		Map.getInstance().setExploredTiles(new int[20][15]);
+		if(t!=null){
+			Map.getInstance().removeListener(t);
+			robot.removeListener(t);
+		}
+		robot.getSensorSimulator().stop();
+		if(robot.isExploring()){
+			robot.setExploring(false);
+		}
 		
-
 	}
 	
 	@Override
@@ -190,6 +202,9 @@ public class MainController extends FXMLController  implements Initializable, Ro
             @Override public void run() {  
             	Robot r = Robot.getInstance();
             	textArea.setText("Robot coordinate x:"+r.getPosX()+" y:"+r.getPosY()+"\n"+textArea.getText().substring(0,textArea.getText().length()>300?299:textArea.getText().length()));
+
+            	 robotXpos.setText(r.getPosX()+"");
+            	 robotYpos.setText(r.getPosY()+"");
             }
 		});
 	}
@@ -255,17 +270,18 @@ public class MainController extends FXMLController  implements Initializable, Ro
             }
 		});
 	}
+	
+	Test t;
 	@FXML
 	public void onclickAlgo1() {
-		Test t = new Test();
+		Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
+		t = new Test();
 		Robot.getInstance().addListener(t);
 		Map.getInstance().addListener(t);
-		Thread thread = new Thread(t);
-		thread.start();
 	}
 	@FXML
 	public void onSensorSelected() {
-			Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
+			//Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
 	}
 	@FXML
 	public void onclickEditObstacle() {
@@ -295,5 +311,32 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	        }
 			
 		}
+	}
+
+	Runnable timerTask=null;
+	ScheduledExecutorService timerExecutor=null;
+	@Override
+	public void onRobotStartExploring() {
+		timerTask = new Runnable() {
+		    public void run() {
+				Platform.runLater(new Runnable() {
+		            @Override public void run() {  
+		            	long currentTimeStamp = System.currentTimeMillis();
+		            	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000)%60;
+		            	long minutes = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000-seconds)/60;
+		            	Timer.setText("Exploring Time: "+minutes+":"+seconds );	
+		            }
+				});
+		        }
+		};
+
+		timerExecutor = Executors.newScheduledThreadPool(1);
+		timerExecutor.scheduleAtFixedRate(timerTask, 0, 1, TimeUnit.SECONDS);
+	}
+
+	@Override
+	public void onRobotStopExploring() {
+		if(timerExecutor!=null)
+			timerExecutor.shutdown();
 	}
 }

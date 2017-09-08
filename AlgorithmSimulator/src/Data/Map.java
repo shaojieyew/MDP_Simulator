@@ -12,6 +12,8 @@ public class Map {
 		}
 		return map;
 	}
+	
+	
 	private static Position[] START_POSITION = {new Position(0,0),new Position(1,0),new Position(2,0),new Position(0,1),new Position(1,1),new Position(2,1),new Position(0,2),new Position(1,2),new Position(2,2)};
 	public static StartPoint STARTPOINT = new StartPoint(START_POSITION);
 	private static Position[] END_POSITION = {new Position(14,19),new Position(14,18),new Position(14,17),new Position(13,19),new Position(13,18),new Position(13,17),new Position(12,19),new Position(12,18),new Position(12,17)};
@@ -30,15 +32,18 @@ public class Map {
 	}
 	public void setExploredTiles(int[][] exploredTiles) {
 		this.exploredTiles = exploredTiles;
-		layoutUpdated();
+		onLayoutUpdated();
 	}
 	public  void setObstacle(int[][] obstacles) {
 		this.obstacles = obstacles;
-		layoutUpdated();
+		onLayoutUpdated();
 	}
 	
+	private float exploredRate=0; 
 	
-	
+	public float getExploredRate() {
+		return exploredRate;
+	}
 	//in hexdecimal, from map descriptor file to arrays
 	public void setMap(String exploredTileHex,String obstacleHex, String exploredObstacleHex) {
 		 // System.out.println (exploredTile2);
@@ -69,40 +74,147 @@ public class Map {
 				  if(exploredObstacleBinary!=null){
 					  char exploredObstacleBit = exploredObstacleBinary.charAt(obstacleIndex);
 
-					  System.out.println(exploredObstacleBit);
+					  //System.out.println(exploredObstacleBit);
 					  if(exploredObstacleBit=='1'){
 						  obstacles[y][x]=1;
 					  }
 				  }
 				  obstacleIndex++;
 			  }
-
+			  
 			  if((x==0&&y==0)||(x==1&&y==0)||(x==2&&y==0)||
 				  (x==0&&y==1)||(x==1&&y==1)||(x==2&&y==1)||
 				  (x==0&&y==2)||(x==1&&y==2)||(x==2&&y==2)){
-				  exploredTiles[y][x]=1;
+				//  exploredTiles[y][x]=1;
 				  obstacles[y][x]=0;
 			  }
 
 			  if((x==14&&y==19)||(x==13&&y==19)||(x==12&&y==19)||
 				  (x==14&&y==18)||(x==13&&y==18)||(x==12&&y==18)||
 				  (x==14&&y==17)||(x==13&&y==17)||(x==12&&y==17)){
-				  exploredTiles[y][x]=1;
+				//  exploredTiles[y][x]=1;
 				  obstacles[y][x]=0;
 			  }
 		  }
-		layoutUpdated();
+		  onLayoutUpdated();
 	}
+
+	private static  ArrayList<int []>[][] relations = new ArrayList[20][15];
+
+	private static Vertex vertices [][] = new Vertex[20][15];
 	
-	private  void layoutUpdated(){
+	private  void onLayoutUpdated(){
+		int exploredCount=0;
+		vertices  = new Vertex[20][15];
+		for(int x1=0;x1<15;x1++){
+			for(int y1=0;y1<20;y1++){
+				if(     y1>0&&x1>0&&x1<14&&y1<19&&  
+						exploredTiles[y1+1][x1+1]==1
+						&&exploredTiles[y1][x1+1]==1
+						&&exploredTiles[y1-1][x1+1]==1
+						&&exploredTiles[y1+1][x1]==1
+						&&exploredTiles[y1][x1]==1
+						&&exploredTiles[y1-1][x1]==1
+						&&exploredTiles[y1+1][x1-1]==1
+						&&exploredTiles[y1][x1-1]==1
+						&&exploredTiles[y1-1][x1-1]==1
+						
+						&&obstacles[y1+1][x1+1]==0
+						&&obstacles[y1][x1+1]==0
+						&&obstacles[y1-1][x1+1]==0
+						&&obstacles[y1+1][x1]==0
+						&&obstacles[y1][x1]==0
+						&&obstacles[y1-1][x1]==0
+						&&obstacles[y1+1][x1-1]==0
+						&&obstacles[y1][x1-1]==0
+						&&obstacles[y1-1][x1-1]==0						
+						
+						){
+					int y2=y1;
+					int x2=x1;
+					for(int i=0;i<4;i++){
+						if(i==0){
+							y2=y1;
+							x2=x1+1;
+						}
+						if(i==1){
+							y2=y1+1;
+							x2=x1;
+						}
+						if(i==2){
+							y2=y1-1;
+							x2=x1;
+						}
+						if(i==3){
+							y2=y1;
+							x2=x1-1;
+						}
+						if(		x2>0&&y2>0&&x2<14&&y2<19
+								&&exploredTiles[y2+1][x2+1]==1
+								&&exploredTiles[y2][x2+1]==1
+								&&exploredTiles[y2-1][x2+1]==1
+								&&exploredTiles[y2+1][x2]==1
+								&&exploredTiles[y2][x2]==1
+								&&exploredTiles[y2-1][x2]==1
+								&&exploredTiles[y2+1][x2-1]==1
+								&&exploredTiles[y2][x2-1]==1
+								&&exploredTiles[y2-1][x2-1]==1
+								
+								&&obstacles[y2+1][x2+1]==0
+								&&obstacles[y2][x2+1]==0
+								&&obstacles[y2-1][x2+1]==0
+								&&obstacles[y2+1][x2]==0
+								&&obstacles[y2][x2]==0
+								&&obstacles[y2-1][x2]==0
+								&&obstacles[y2+1][x2-1]==0
+								&&obstacles[y2][x2-1]==0
+								&&obstacles[y2-1][x2-1]==0	){
+							int []a2 = {x2,y2};
+
+							if(vertices[y1][x1]==null){
+						        vertices[y1][x1]=new Vertex(x1,y1);
+							}
+							if(vertices[y2][x2]==null){
+						        vertices[y2][x2]= new Vertex(x2,y2);
+							}
+							vertices[y1][x1].adjacencies.add(vertices[y2][x2]);
+						}
+					}
+				}
+
+				if(exploredTiles[y1][x1]==1){
+					exploredCount++;
+				}
+			}
+		}
+		exploredRate = exploredCount/300f;
 		updateListener();
+		
+		/*
+		System.out.println("=======");
+		for(int y=1;y<19;y++){
+			for(int x=1;x<14;x++){
+				if(vertices[y][x]!=null){
+					for(Vertex v: vertices[y][x].adjacencies){
+						System.out.println(x+","+y+"=>"+v.x+","+v.y);
+					}
+				}
+			}
+		}*/
 	}
 	
 	public  void addListener(MapListener listener){
 		arr.add(listener);
 	}
+	public void removeListener(MapListener listener) {
+		arr.remove(listener);
+	}
+	public static Vertex[][] getVertices() {
+		return vertices;
+	}
 	public  void updateListener(){
-		for(MapListener a: arr){
+		for(int i =0;i<arr.size();i++){
+			MapListener a = arr.get(i);
 			a.updateMap();
 		}
 	}

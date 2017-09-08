@@ -1,6 +1,8 @@
 package Data;
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 import RPiInterface.RobotSensorSimulator;
@@ -8,6 +10,7 @@ import RPiInterface.RobotSensorSimulatorFactory;
 import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
 import RobotMovement.ForwardMovement;
+import RobotMovement.RobotMovement;
 import RobotMovement.RotateMovement;
 
 public class Robot {
@@ -19,23 +22,43 @@ public class Robot {
 		return robot;
 	}
 
+	ArrayList<RobotMovement> instructions=new ArrayList<RobotMovement>();  
+	
+	public ArrayList<RobotMovement> getInstructions() {
+		return instructions;
+	}
 	public Robot(){
 		/*
 		RobotSensorSimulator sensorSimulator = new RobotSensorSimulatorType1();
 		Thread sensorSimulatorThread = new Thread(sensorSimulator);
 		sensorSimulatorThread.start();
 		*/
-		setSensorSimulatorType(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
+		//setSensorSimulatorType(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
 	}
 	
 	
 	private static final int framePer10CM = 30;
 	private static final int framePerRotate = 30;
-	private static  int milisecondPer10CM = 500;
+	private static  int milisecondPer10CM = 1000;
 
-	private static  int milisecondPerRotate = 500;
+	private static  int milisecondPerRotate = 1000;
 
+	
+	private long exploringStartTime = 0;
+	private long exploringEndTime = 0;
 	private boolean isExploring =false;
+	public boolean isExploring() {
+		return isExploring;
+	}
+	public void setExploring(boolean isExploring) {
+		if(isExploring){
+			 exploringStartTime = System.currentTimeMillis();
+		}else{
+			exploringEndTime = System.currentTimeMillis();
+		}
+		this.isExploring = isExploring;
+		updateExploringListener(isExploring);
+	}
 	private boolean isMoving =false;
 	
 	private RobotSensorSimulator sensorSimulator = null;
@@ -104,42 +127,75 @@ public class Robot {
 		this.direction = direction%360;
 		updateListener();
 	}
+	public long getExploringStartTime() {
+		return exploringStartTime;
+	}
+	public void setExploringStartTime(long exploringStartTime) {
+		this.exploringStartTime = exploringStartTime;
+	}
+	public long getExploringEndTime() {
+		return exploringEndTime;
+	}
+	public void setExploringEndTime(long exploringEndTime) {
+		this.exploringEndTime = exploringEndTime;
+	}
+
+
+	public void moveForward(float distance) {
+			ForwardMovement forwardProcessor = new ForwardMovement(distance , framePer10CM,  milisecondPer10CM);
+			instructions.add(forwardProcessor);
+			if(instructions.size()==1){
+				Thread forwardMovementThread = new Thread(forwardProcessor);
+				forwardMovementThread.start();
+			}
+	}
+
+	public void rotate(float degree) {
+			RotateMovement rotateMovementProcessor = new RotateMovement(degree,framePerRotate, milisecondPerRotate);
+			
+			instructions.add(rotateMovementProcessor);
+			if(instructions.size()==1){
+				Thread forwardMovementThread = new Thread(rotateMovementProcessor);
+				forwardMovementThread.start();
+			}
+	}
+	public void runNextInstruction(){
+		instructions.remove(0);
+		if(instructions.size()>0){
+			RobotMovement movement = instructions.get(0);
+			if(movement!=null){
+				Thread forwardMovementThread = new Thread(movement);
+				forwardMovementThread.start();
+			}else{
+				setMoving(false);
+			}
+		}else{
+			setMoving(false);
+		}
+	}
 	
-
-	public ForwardMovement forwardProcessor=null;
-	public RotateMovement rotateMovementProcessor=null;
-	public void moveForward(float cm){
-			direction = direction%360;
-		    double radians = Math.toRadians(direction);
-			float x =  ((cm/10f)*(float)Math.sin(radians));
-			float y =  ((cm/10f)*(float)Math.cos(radians));
-			forwardProcessor = new ForwardMovement(x,y, framePer10CM,  milisecondPer10CM);
-			Thread forwardMovementThread = new Thread(forwardProcessor);
-			forwardMovementThread.start();
-	}
-
-	public Semaphore robotSemaphore = new Semaphore(1);
-	public void rotate(float degree){
-			direction = direction%360;
-			rotateMovementProcessor = new RotateMovement(degree,framePerRotate, milisecondPerRotate);
-			Thread rotateMovementThread = new Thread(rotateMovementProcessor);
-			rotateMovementThread.start();
-	}
 	
 	private  ArrayList<RobotListener> arr = new ArrayList<RobotListener>();
 	public  void addListener(RobotListener listener){
 		arr.add(listener);
+	}public  void removeListener(RobotListener listener){
+		arr.remove(listener);
 	}
 	public  void updateListener(){
-		for(RobotListener a: arr){
+		for(int i =0;i<arr.size();i++){
+			RobotListener a = arr.get(i);
 			a.updateRobot();
 		}
 	}
-	public void stopMovement() {
-		if(forwardProcessor!=null)
-			forwardProcessor.stop();
-		if(rotateMovementProcessor!=null)
-			rotateMovementProcessor.stop();
+	public  void updateExploringListener(boolean isExploring){
+		for(int i =0;i<arr.size();i++){
+			RobotListener a = arr.get(i);
+			if(isExploring){
+				a.onRobotStartExploring();
+			}else{
+				a.onRobotStopExploring();
+			}
+		}
 	}
 
 }
