@@ -130,6 +130,9 @@ public class Test implements  MapListener, RobotListener{
 	}
 
 
+	public void terminate() {
+		 okToTerminate = true;
+	}
 	private int[] getBestNextStop(int inX, int inY, int maxHop) {
 		int canExplore= howManyTileCanBeDiscovered(1,1,false);
 		float degree = getDegreeBetweenTwoPoint(currentX,currentY,currentX,currentY);
@@ -184,7 +187,7 @@ public class Test implements  MapListener, RobotListener{
 		float mapDiscoveredRate = m.getExploredRate();
 		float exploreMoreWeightage = 1; //explore_score:1-36
 		int nearByWeightage = 0;	     //score: 1-28
-		float endLocationWeightage = 0;  //score: 1-28
+		float endLocationWeightage = 1;  //score: 1-28
 		float startWeightage = 0;        //score: 1-28
 		int distanceWeightage = 0;
 		int[] endLocation = {13,18};
@@ -206,14 +209,12 @@ public class Test implements  MapListener, RobotListener{
 		}
 		long currentTimeStamp = System.currentTimeMillis();
     	long minutes = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000)/60;
-		if(minutes>=5){
-			endLocationWeightage=0;
+		if(minutes>=5||okToTerminate){
 			startWeightage = 1000000;
 			exploreMoreWeightage=0;
 			nearByWeightage=0;
 			okToTerminate=true;
 		}
-
 		int x1 = place1[0];
 		int y1 = place1[1];
 		int x2 = place2[0];

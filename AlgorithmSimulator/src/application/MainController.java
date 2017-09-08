@@ -163,10 +163,6 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		robot.rotate(rotate);
 	}
 	
-	@FXML
-	private void onclickStop(){
-		//Robot.getInstance().stopMovement();
-	}
 	
 	@FXML
 	private void onclickResetSimulator(){
@@ -278,6 +274,11 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		t = new Test();
 		Robot.getInstance().addListener(t);
 		Map.getInstance().addListener(t);
+	}
+	@FXML
+	private void onclickStopExploration(){
+		if(t!=null)
+			t.terminate();
 	}
 	@FXML
 	public void onSensorSelected() {

@@ -88,7 +88,7 @@
                         <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickStop" prefHeight="25.0" prefWidth="140.0" text="Terminate Exploration" />
+                  <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickStopExploration" prefHeight="25.0" prefWidth="140.0" text="Terminate Exploration" />
                   <Button fx:id="startEndBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="235.0" text="Start Fastest Path" />
                   <Label fx:id="Timer" />
                </children>
