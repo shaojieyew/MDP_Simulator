@@ -6,6 +6,9 @@ import Data.Robot;
 import Data.RobotListener;
 
 public abstract class Exploration implements  MapListener, RobotListener{
+	private static long autoTerminate_time=600;
+	private static float autoTerminate_explore_rate=1;
+	
 	protected static Robot r = Robot.getInstance();
 	protected static Map m = Map.getInstance();
 	private int startingX = 1;
@@ -57,9 +60,31 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	}
 	//remove all listener and end the exploration
 	public void destroy(){
+		//wait until robot stop moving
+		while(Robot.getInstance().isMoving()){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.out.print("aaa");
 		Robot.getInstance().setExploring(false);
 		r.removeListener(this);
 		m.removeListener(this);
 	}
-	
+
+	public static long getAutoTerminate_time() {
+		return autoTerminate_time;
+	}
+	public static void setAutoTerminate_time(long autoTerminate_time) {
+		Exploration.autoTerminate_time = autoTerminate_time;
+	}
+	public static float getAutoTerminate_explore_rate() {
+		return autoTerminate_explore_rate;
+	}
+	public static void setAutoTerminate_explore_rate(float autoTerminate_explore_rate) {
+		Exploration.autoTerminate_explore_rate = autoTerminate_explore_rate;
+	}
 }

@@ -6,7 +6,7 @@ import Data.Robot;
 import javafx.application.Platform;
 
 public abstract class RobotSensorSimulator implements Runnable {
-	private static int sensorInfoFreq= 1;
+	private static int sensorInfoFreq= 500;
 	boolean stop = false;
 	boolean moved = true;
 	@Override
@@ -15,12 +15,12 @@ public abstract class RobotSensorSimulator implements Runnable {
 			try {
 				Thread.sleep(sensorInfoFreq);
 				if(!Robot.getInstance().isMoving()){
-					if(moved){
+					//if(moved){
 						sensorInfoUpdate();
-						moved=false;
-					}
-				}else{
-					moved=true;
+					//	moved=false;
+					//}
+				//}else{
+					//moved=true;
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

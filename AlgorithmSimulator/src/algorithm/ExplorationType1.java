@@ -59,7 +59,7 @@ public class ExplorationType1 extends Exploration {
 		System.out.println("I have finish exploring ("+r.getPosX()+","+r.getPosX()+"), lets move on");
 		visited[currentY][currentX]=1;
 
-		System.out.println("I could move to :");
+		System.out.println("I could move to ");
 		checkedVisited =new int[20][15];
 		int[] location  = getBestNextStop(currentX,currentY,10000);
 		System.out.println("Best Location :"+location[0]+","+location[1]+","+location[2]+","+location[3]);
@@ -147,8 +147,8 @@ public class ExplorationType1 extends Exploration {
 		ArrayList<Vertex> neighbours = v.adjacencies;
 		int []optimised=inDefault;
 		for(Vertex nextNode: neighbours){
-			int x = nextNode.x;
-			int y = nextNode.y;
+			int x = (int) nextNode.x;
+			int y = (int) nextNode.y;
 			if(checkedVisited[y][x]==0){
 				checkedVisited[y][x]=1;
 					ArrayList<Position> canExplore= whatTileCanBeDiscovered(x,y,false);
@@ -181,8 +181,9 @@ public class ExplorationType1 extends Exploration {
 		float startWeightage = 0;        //score: 1-28
 		int distanceWeightage = 0;
 		
+		boolean isAllPossibleNodeVisited = allPossibleNodeVisited();
 		//if end point found
-		if(m.getExploredTiles()[18][13]==1||allPossibleNodeVisited()){
+		if(m.getExploredTiles()[18][13]==1||isAllPossibleNodeVisited){
 			endLocationWeightage=0;
 			//if map discovered rate 90% or more
 			if(mapDiscoveredRate>0.9){
@@ -191,7 +192,7 @@ public class ExplorationType1 extends Exploration {
 				distanceWeightage=1;
 			}
 			//if map discovered rate is 100%
-			if(mapDiscoveredRate==1||allPossibleNodeVisited()){
+			if(mapDiscoveredRate>=getAutoTerminate_explore_rate()||isAllPossibleNodeVisited){
 				startWeightage = 1000000;
 				exploreMoreWeightage=0;
 				distanceWeightage=0;
@@ -200,8 +201,8 @@ public class ExplorationType1 extends Exploration {
 		}
 		//check termiation or timeout
 		long currentTimeStamp = System.currentTimeMillis();
-    	long minutes = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000)/60;
-		if(minutes>=5||isOkToTerminate()){
+    	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000);
+		if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
 			startWeightage = 1000000;
 			exploreMoreWeightage=0;
 			distanceWeightage=0;
@@ -280,21 +281,18 @@ public class ExplorationType1 extends Exploration {
 		
 		
 		//if(place1[2]!=0)
-			System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
+			//System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
 		//if(place2[2]!=0)
-			System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
+			//System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
 			
 		int []result;
 		if(score1>score2){
 			result = place1;
-			System.out.println("score:"+score1);
 		}else{
 			if(score1==score2){
 				result = place1;
-				System.out.println("score:"+score1);
 			}else{
 				result = place2;
-				System.out.println("score:"+score2);
 			}
 		}
 		
@@ -384,10 +382,10 @@ public class ExplorationType1 extends Exploration {
 	}
 	
 	//get degree between 2 point
-	private float getDegreeBetweenTwoPoint(int x1,int y1,int x2, int y2){
-		if(x1==x2 && y1==y2)
+	private float getDegreeBetweenTwoPoint(float x,float y,float x2, float y2){
+		if(x==x2 && y==y2)
 			return 0;
-		   float angle = (float) Math.toDegrees(Math.atan2(y2 - y1, x2 - x1));
+		   float angle = (float) Math.toDegrees(Math.atan2(y2 - y, x2 - x));
 		    if(angle < 0){
 		        angle += 360;
 		    }

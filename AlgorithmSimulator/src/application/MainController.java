@@ -82,6 +82,11 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private TextField rotateSpeedTextField;
 
 	@FXML
+	private TextField terminateTimeTextField;
+	@FXML
+	private TextField terminateRateTextField;
+
+	@FXML
 	private TextArea textArea;
 	@FXML
 	private ComboBox sensorCombo;
@@ -328,7 +333,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		            	long currentTimeStamp = System.currentTimeMillis();
 		            	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000)%60;
 		            	long minutes = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000-seconds)/60;
-		            	Timer.setText("Exploring Time: "+minutes+":"+seconds );	
+		            	float exploredRate = Map.getInstance().getExploredRate();
+		            	Timer.setText("Time: "+minutes+":"+seconds +"  Coverage: "+exploredRate);	
 		            }
 				});
 		        }
@@ -338,6 +344,16 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		timerExecutor.scheduleAtFixedRate(timerTask, 0, 1, TimeUnit.SECONDS);
 	}
 
+
+	@FXML
+	public void onTerminateTimeTextField() {
+		Exploration.setAutoTerminate_time(Integer.parseInt(terminateTimeTextField.getText()));
+	}
+	@FXML
+	public void onTerminateRateTextField() {
+		Exploration.setAutoTerminate_explore_rate(Float.parseFloat(terminateRateTextField.getText()));
+	}
+	
 	@Override
 	public void onRobotStopExploring() {
 		if(timerExecutor!=null)

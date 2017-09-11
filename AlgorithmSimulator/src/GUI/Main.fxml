@@ -8,25 +8,31 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="630.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
    <center>
       <BorderPane fx:id="mapPane" prefHeight="656.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <right>
-            <VBox prefHeight="200.0" prefWidth="190.0" spacing="5.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="518.0" prefWidth="188.0" spacing="5.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="loadMapFileBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickLoadMapFileBtn" prefHeight="25.0" prefWidth="132.0" text="Load Map Descriptor" />
-                  <Button fx:id="generateMapStatus" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickGenerateMapStatus" prefHeight="25.0" prefWidth="132.0" text="Export Map Descriptor" />
+                  <HBox prefHeight="30.0" prefWidth="190.0">
+                     <children>
+                        <Button fx:id="hackAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onclickDiscoverAll" prefHeight="25.0" prefWidth="162.0" text="Uncover All" />
+                        <Button fx:id="hideAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickHideAll" prefHeight="25.0" prefWidth="162.0" text="Hide All " />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="3.0" />
+                     </VBox.margin>
+                  </HBox>
                   <Button fx:id="editObstacle" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickEditObstacle" prefHeight="25.0" prefWidth="132.0" text="Edit/View Obstacle" />
                   <Button fx:id="resetBtn" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickResetSimulator" prefHeight="25.0" prefWidth="189.0" text="Reset" />
-                  <Button fx:id="hackAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onclickDiscoverAll" prefHeight="25.0" prefWidth="162.0" text="Uncover All Square" />
-                  <Button fx:id="hideAllTile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickHideAll" prefHeight="25.0" prefWidth="162.0" text="Hide All Square" />
                   <Label text="Robot Coord:" />
                   <HBox>
                      <children>
@@ -88,7 +94,20 @@
                         <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickStopExploration" prefHeight="25.0" prefWidth="140.0" text="Terminate Exploration" />
+                  <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickStopExploration" prefHeight="25.0" prefWidth="140.0" text="Manual Terminate Explr" />
+                  <Label text="Automatic Terminate Condition:" />
+                  <HBox prefHeight="44.0" prefWidth="188.0">
+                     <children>
+                        <Label text="Time (sec): " />
+                        <TextField fx:id="terminateTimeTextField" onKeyReleased="#onTerminateTimeTextField"  maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="125.0" text="600" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="44.0" prefWidth="188.0">
+                     <children>
+                        <Label text="Explr Rate: " />
+                        <TextField fx:id="terminateRateTextField" onKeyReleased="#onTerminateRateTextField"  maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="126.0" text="1" />
+                     </children>
+                  </HBox>
                   <Button fx:id="startEndBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="235.0" text="Start Fastest Path" />
                   <Label fx:id="Timer" />
                </children>
@@ -96,6 +115,14 @@
          </right>
          <bottom>
             <TextArea fx:id="textArea" prefHeight="52.0" prefWidth="549.0" BorderPane.alignment="CENTER" />
-         </bottom></BorderPane>
+         </bottom>
+         <top>
+            <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <items>
+                  <Button fx:id="loadMapFileBtn" mnemonicParsing="false" onMouseClicked="#onclickLoadMapFileBtn" text="Load Map" />
+                  <Button fx:id="generateMapStatus" mnemonicParsing="false" onMouseClicked="#onclickGenerateMapStatus" text="Export Map" />
+               </items>
+            </ToolBar>
+         </top></BorderPane>
    </center>
 </BorderPane>
