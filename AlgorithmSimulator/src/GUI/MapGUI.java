@@ -18,6 +18,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
 public class MapGUI extends BorderPane implements MapListener, RobotListener, WayPointListener{
+	public static MapGUI gui;
+	public static MapGUI getInstance(){
+		return gui;
+	}
 	public MapGUI(){
 		Map.getInstance().addListener(this);
 		Robot.getInstance().addListener(this);
@@ -27,6 +31,7 @@ public class MapGUI extends BorderPane implements MapListener, RobotListener, Wa
         		loadGraphic();   
             }
 		});
+		gui= this;
 	}
 	
 	public void loadGraphic(){

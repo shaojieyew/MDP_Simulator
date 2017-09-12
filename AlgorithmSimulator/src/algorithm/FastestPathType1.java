@@ -7,40 +7,117 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import com.sun.javafx.geom.Line2D;
 
 import Data.Vertex;
+import GUI.MapGUI;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 
+import java.awt.Component;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 
 public class FastestPathType1 extends FastestPath {
+	public static ArrayList<Line> debugLine = new  ArrayList<Line>();
+	public static boolean debugPath = true;
+	public static float bufferArea = 1.1f;
 	
 	@Override
 	public void computeAction() {
-		//build all obstacles nodes
-		int obstacles[][] = m.getObstacles();
-		
+		//Initialization
+				ArrayList<ArrayList<Vertex>> outOfBound= updateOutofBound();
+				MapGUI map = MapGUI.getInstance();
+				map.getChildren().removeAll(debugLine);
+				debugLine.clear();
+				//check if start and end path is cleared
+				Vertex start = new Vertex(getStartingX()+0.5f,getStartingX()+0.5f);
+				Vertex end = new Vertex(13+0.5f,18+0.5f);
+				if(isClearPath(start,end,outOfBound)){
+					start.adjacencies.add(end);
+					end.adjacencies.add(start);
+					addDebugLine(end,start);
+				}else{
+					//setup links
+					for(ArrayList<Vertex> boundary1 : outOfBound){
+						for(Vertex v1 : boundary1){
+							System.out.println(v1.x+","+v1.y);
+							for(ArrayList<Vertex> boundary2 : outOfBound){
+								for(Vertex v2 : boundary2){
+									if(v1.x!=v2.x||v1.y!=v2.y){
+										if(v1.x==7.0 && v1.y==9 &&v2.x==7 && v2.y==14 ){
+											System.out.println(v1.x+","+v1.y+"=22222>"+v2.x+","+v2.y);
+										}
+										if(isClearPath(v1,v2,outOfBound)){
+											v1.adjacencies.add(v2);
+											System.out.println(v1.x+","+v1.y+"=>"+v2.x+","+v2.y);
+											addDebugLine(v1,v2);
+										}
+									}
+								}
+							}
+						}
+					}  
+					
+					for(ArrayList<Vertex> boundary2 : outOfBound){
+						for(Vertex v2 : boundary2){
+							if(start.x!=v2.x||start.y!=v2.y){
+								if(isClearPath(start,v2,outOfBound)){
+									start.adjacencies.add(v2);
+									v2.adjacencies.add(start);
+									addDebugLine(v2,start);
+								}
+							}
+							if(end.x!=v2.x||end.y!=v2.y){
+								if(isClearPath(end,v2,outOfBound)){
+									end.adjacencies.add(v2);
+									v2.adjacencies.add(end);
+									addDebugLine(v2,end);
+								}
+							}
+						}
+					}
+				}
+				if(debugPath)
+					map.getChildren().addAll(debugLine);
+				
+				
+				List<Vertex> path = DijkstraDistanceWeighted.computePaths(start, end);
+				System.out.println("Path: "+path);
+				
+				float direction = 0;
+				ArrayList<String> instructions = new ArrayList<String>();
+				for(int i =0;i<path.size()-1;i++){
+					Vertex v1 =path.get(i);
+					Vertex v2 =path.get(i+1);
+					float degree = getDegreeBetweenTwoPoint(v1.x,v1.y,v2.x,v2.y);
+					if(degree!= direction)
+					{
+						//float degreeBetween= degreeToRotateToDirection(direction,degree);
+						rotateToDirection(direction,degree);
+						instructions.add("ROTATE_FROM_"+direction+"_TO_"+degree);
+						direction = degree;
+					}
+					float distance = (float) Math.hypot(v1.x-v2.x, v1.y-v2.y);
+					instructions.add("MOVE_FORWARD_"+10f*distance);
+					r.moveForward(10f*distance);
+				}
+				
+				for(String s :instructions){
+					System.out.println(s);
+				}
 	}
+
 	
-	public static void main(String arg[]){
-		
-		ArrayList<ArrayList<Vertex>> outOfBound= new ArrayList< ArrayList<Vertex>>();
+	public ArrayList<ArrayList<Vertex>> updateOutofBound(){
 		int obstacles[][] = m.getObstacles();
 	    Area areas = new Area();
-
-		//obstacles[11][10]=1;
-		obstacles[5][4]=1;
-		obstacles[5][5]=1;
-		obstacles[5][6]=1;
-		obstacles[5][7]=1;
-		obstacles[5][8]=1;
-		obstacles[5][9]=1;
 		
-		obstacles[12][6]=1;
-		obstacles[12][7]=1;
-		obstacles[12][8]=1;
-		obstacles[12][9]=1;
+		//create obstacles
 		for(int x =0;x<15;x++){
 			for(int y =0;y<20;y++){
 				if(obstacles[y][x]==1){
@@ -51,57 +128,113 @@ public class FastestPathType1 extends FastestPath {
 				}
 			}
 		}
-
-		//create obstacles
-		outOfBound = areaToPolygons(areas);
-		
-		//check if start and end path is cleared
-		Vertex start = new Vertex(2,2);
-		Vertex end = new Vertex(13,18);
-		if(isClearPath(start,end,outOfBound)){
-			start.adjacencies.add(end);
-			end.adjacencies.add(start);
-		}else{
-			
-			//setup links
-			for(ArrayList<Vertex> boundary1 : outOfBound){
-				for(Vertex v1 : boundary1){
-					for(ArrayList<Vertex> boundary2 : outOfBound){
-						for(Vertex v2 : boundary2){
-							if(v1.x!=v2.x||v1.y!=v2.y){
-								if(isClearPath(v1,v2,outOfBound)){
-									v1.adjacencies.add(v2);
-									System.out.println(v1.x+","+v1.y+"=>"+v2.x+","+v2.y);
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			for(ArrayList<Vertex> boundary2 : outOfBound){
-				for(Vertex v2 : boundary2){
-					if(start.x!=v2.x||start.y!=v2.y){
-						if(isClearPath(start,v2,outOfBound)){
-							start.adjacencies.add(v2);
-							v2.adjacencies.add(start);
-						}
-					}
-					if(end.x!=v2.x||end.y!=v2.y){
-						if(isClearPath(end,v2,outOfBound)){
-							end.adjacencies.add(v2);
-							v2.adjacencies.add(end);
-						}
-					}
-				}
-			}
-		}
-		
-		
-		List<Vertex> p = DijkstraDistanceWeighted.computePaths(start, end);
-		System.out.println("Path: "+p);
+		Polygon walls = new Polygon();
+		walls.addPoint((int)((0+bufferArea)*100),(int) ((0.01+bufferArea)*100)); //1,1
+		walls.addPoint((int)((0-bufferArea)*100),(int) ((0.01+bufferArea)*100)); //-1,1
+		walls.addPoint((int)((0-(bufferArea))*100),(int) ((20+bufferArea)*100));//-1,21
+		walls.addPoint((int)((15+(bufferArea))*100),(int) ((20+bufferArea)*100)); //16,21
+		walls.addPoint((int)((15+(bufferArea))*100),(int) ((0-bufferArea)*100)); //16,-1
+		walls.addPoint((int)((0-(bufferArea))*100),(int) ((0-bufferArea)*100)); //-1,-1
+		walls.addPoint((int)((0-bufferArea)*100),(int) ((0+bufferArea)*100)); //-1,1
+		walls.addPoint((int)((15-(bufferArea))*100),(int) ((0+bufferArea)*100)); //14,1
+		walls.addPoint((int)((15-(bufferArea))*100),(int) ((20-bufferArea)*100)); //14,19
+		walls.addPoint((int)((0+(bufferArea))*100),(int) ((20-bufferArea)*100)); //1,19
+		areas.add(new Area(walls));
+		return  areaToPolygons(areas);
 	}
-
+	private static ArrayList<ArrayList<Vertex>> areaToPolygons(Area a){
+		//Polygon mask_tmp = new Polygon();
+	    PathIterator path = a.getPathIterator(null);
+	    ArrayList<ArrayList<Vertex>> allObstacles=new ArrayList< ArrayList< Vertex>>();
+		ArrayList<Vertex> boundary= new ArrayList< Vertex>();
+	    while (!path.isDone()) {
+	    	float[] point = new float[2];
+	        if(path.currentSegment(point) != PathIterator.SEG_CLOSE){
+	            // mask_tmp.addPoint((int) point[0], (int) point[1]);
+	            System.out.println((int) point[0]+","+ (int) point[1]);
+	        	Vertex v = new Vertex(point[0]/100f,point[1]/100f);
+	        	int count = boundary.size();
+	        	if(count>1){
+	        		if(boundary.get(count-1).x==boundary.get(count-2).x&&boundary.get(count-2).x==v.x){
+	        			boundary.remove(count-1);
+	        		}else{
+	        			if(boundary.get(count-1).y==boundary.get(count-2).y&&boundary.get(count-2).y==v.y){
+		        			boundary.remove(count-1);
+		        		}
+	        		}
+	        	}
+	            boundary.add(v);
+	        }else{
+	        	int count = boundary.size();
+	        	if(count>2){
+	        		if(boundary.get(0).x==boundary.get(1).x&&boundary.get(1).x==boundary.get(count-1).x){
+	        			boundary.remove(0);
+	        		}else{
+	        			if(boundary.get(0).y==boundary.get(1).y&&boundary.get(1).y==boundary.get(count-1).y){
+		        			boundary.remove(0);
+		        		}
+	        		}
+	        	}
+	        	allObstacles.add(boundary);
+	        	boundary= new ArrayList< Vertex>();
+	        }
+            path.next();
+	    }
+	    return allObstacles;
+	}
+	
+	private  Polygon getPolygonOfAnObstacle(int x, int y){
+		Polygon r1 = new Polygon();
+		r1.addPoint((int)((x-bufferArea)*100),(int) ((y-bufferArea)*100));
+		r1.addPoint((int)((x+1f+bufferArea)*100), (int)((y-bufferArea)*100));
+		r1.addPoint((int)((x+1f+bufferArea)*100), (int)((y+1f+bufferArea)*100));
+		r1.addPoint((int)((x-bufferArea)*100), (int)((y+1f+bufferArea)*100));
+		return r1;
+	}
+	private void addDebugLine(Vertex v1,Vertex v2){
+		MapGUI map =MapGUI.getInstance();
+		 javafx.scene.shape.Line line = new Line();
+		 line.setStroke(Color.web("0xff0000"));
+		 line.setStrokeWidth(1);
+		 line.startXProperty().bind(map.widthProperty().divide(15).multiply(v1.x));
+		 line.startYProperty().bind(map.heightProperty().subtract(map.heightProperty().divide(20).multiply(v1.y)));
+		 line.endXProperty().bind(map.widthProperty().divide(15).multiply(v2.x));
+		 line.endYProperty().bind(map.heightProperty().subtract(map.heightProperty().divide(20).multiply(v2.y)));
+		 debugLine.add(line);
+	}
+	
+	private static void rotateToDirection(float currentDirection, float inDirection){
+		//System.out.println("rotate from "+currentDirection+" to "+inDirection);
+		r.rotate(degreeToRotateToDirection(currentDirection,  inDirection));
+	}
+	private static float degreeToRotateToDirection(float currentDirection, float inDirection){
+		float difference = inDirection-currentDirection;
+		if(Math.abs(Math.round(difference))==180){
+			return 180;
+		}
+		if(difference<180){
+			if(Math.abs(difference)>180){
+				return difference+360;
+			}else{
+				return difference;
+			}
+		}else{
+			return (-(currentDirection+360-difference));
+		}
+	}
+	//get degree between 2 point
+	private static float getDegreeBetweenTwoPoint(float x,float y,float x2, float y2){
+		if(x==x2 && y==y2)
+			return 0;
+		   float angle = (float) Math.toDegrees(Math.atan2(y2 - y, x2 - x));
+		    if(angle < 0){
+		        angle += 360;
+		    }
+		    angle=(angle-90)%360;
+		    angle = (360-angle)%360;
+		    return angle;
+	}
+	
 
 	
 	private static boolean isClearPath(Vertex v1,Vertex v2, ArrayList<ArrayList<Vertex>> outOfBound){
@@ -129,39 +262,12 @@ public class FastestPathType1 extends FastestPath {
 	}
 	
 	
-	private static Polygon getPolygonOfAnObstacle(int x, int y){
-		Polygon r1 = new Polygon();
-		r1.addPoint((int)((x-1f)*100),(int) ((y-1f)*100));
-		r1.addPoint((int)((x+2f)*100), (int)((y-1f)*100));
-		r1.addPoint((int)((x+2f)*100), (int)((y+2f)*100));
-		r1.addPoint((int)((x-1f)*100), (int)((y+2f)*100));
-		return r1;
-	}
 	
-	private static ArrayList<ArrayList<Vertex>> areaToPolygons(Area a){
-		//Polygon mask_tmp = new Polygon();
-	    PathIterator path = a.getPathIterator(null);
-	    ArrayList<ArrayList<Vertex>> allObstacles=new ArrayList< ArrayList< Vertex>>();
-		ArrayList<Vertex> boundary= new ArrayList< Vertex>();
-	    while (!path.isDone()) {
-	    	float[] point = new float[2];
-	        if(path.currentSegment(point) != PathIterator.SEG_CLOSE){
-	            // mask_tmp.addPoint((int) point[0], (int) point[1]);
-	            //System.out.println((int) point[0]+","+ (int) point[1]);
-	        	Vertex v = new Vertex(point[0]/100f,point[1]/100f);
-	             boundary.add(v);
-	        }else{
-	        	allObstacles.add(boundary);
-	        	boundary= new ArrayList< Vertex>();
-	        }
-            path.next();
-	    }
-	    return allObstacles;
-	}
 	
 	
 	
 	public static boolean isPointOnTheLine(Point2D.Float A, Point2D.Float B, Point2D.Float P) {  
+		/*
 	    double m = (B.y - A.y) / (B.x - A.x);
 
 	    //handle special case where the line is vertical
@@ -172,6 +278,29 @@ public class FastestPathType1 extends FastestPath {
 
 	    if ((P.y - A.y) == m * (P.x - A.x)) return true;
 	    else return false;
+	    */
+		if(A.x==B.x && A.x==P.x){
+			if(A.y<=P.y&&B.y>=P.y){
+				return true;
+			}else{
+				if(A.y>=P.y&&B.y<=P.y){
+					return true;
+				}
+			}
+		}else{
+			if(A.y==B.y && A.y==P.y){
+				if(A.x<=P.x&&B.x>=P.x){
+					return true;
+				}else{
+					if(A.x>=P.x&&B.x<=P.x){
+						return true;
+					}
+				}
+			}else{
+				return false;
+			}
+		}
+		return false;
 	}
 	private static boolean linesIntersect(final double X1, final double Y1, final double X2, final double Y2,
 		      final double X3, final double Y3, final double X4, final double Y4) {

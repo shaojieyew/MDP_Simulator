@@ -27,8 +27,11 @@ import GUI.MapObstacleGUI;
 import RPiInterface.RobotSensorSimulatorFactory;
 import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
+import RobotMovement.RobotMovement;
 import algorithm.Exploration;
 import algorithm.ExplorationType1;
+import algorithm.FastestPath;
+import algorithm.FastestPathType1;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -172,6 +175,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	
 	@FXML
 	private void onclickResetSimulator(){
+
+		//set robot location
 		Robot robot = Robot.getInstance();
 		robot.setPosX(1);
 		robot.setPosY(1);
@@ -182,12 +187,16 @@ public class MainController extends FXMLController  implements Initializable, Ro
 			Map.getInstance().removeListener(explorationAlgorithm);
 			robot.removeListener(explorationAlgorithm);
 		}
+		
+		//terminate rpi simulator 
 		if(robot.getSensorSimulator()!=null)
-		robot.getSensorSimulator().stop();
+			robot.getSensorSimulator().stop();
 		if(robot.isExploring()){
 			robot.setExploring(false);
 		}
 		
+		//terminate any movement
+		robot.stopAllMovement();
 	}
 	
 	@Override
@@ -239,27 +248,9 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		//MapInfo.updateLayout();
 		File file = FilesChooser.save(getStage(), "Save Map Status", Paths.get("").toAbsolutePath().toString(), FilesChooser.FORMAT_TEXT);
 		if(file!=null){
-			String binaryExplored="11";
-			String binaryExploredObstacle="";
-			String binaryObstacle="11";
-			int exploredTile[][]=Map.getInstance().getExploredTiles();
-			int obstacles[][]=Map.getInstance().getObstacles();
-			for(int y =0;y<20;y++){
-				for(int x =0;x<15;x++){
-					binaryExplored=binaryExplored+exploredTile[y][x];
-					binaryObstacle=binaryObstacle+obstacles[y][x];
-					if(exploredTile[y][x]==1){
-						binaryExploredObstacle=binaryExploredObstacle+obstacles[y][x];
-					}
-				}
-			}
-			binaryExplored=binaryExplored+"11";
-			binaryObstacle=binaryObstacle+"11";
-			if(binaryExploredObstacle.length()%8!=0){
-				for(int i =0;i<binaryExploredObstacle.length()%8;i++){
-					binaryExploredObstacle=binaryExploredObstacle+"1";
-				}
-			}
+			String binaryExplored=Map.getInstance().getBinaryExplored();
+			String binaryExploredObstacle=Map.getInstance().getBinaryExploredObstacle();
+			String binaryObstacle=Map.getInstance().getBinaryObstacle();
 			FileUtility.writeWordsToText(HexBin.BinTohex(binaryExplored)+"\n"+HexBin.BinTohex("11111111"+binaryExploredObstacle).substring(2)+"\n"+HexBin.BinTohex(binaryObstacle), file.getAbsolutePath());
 		}
 	}
@@ -277,10 +268,11 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	Exploration explorationAlgorithm;
 	@FXML
 	public void onclickAlgo1() {
-		Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
+		Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue(), true);
 		explorationAlgorithm = new ExplorationType1();
 		Robot.getInstance().addListener(explorationAlgorithm);
 		Map.getInstance().addListener(explorationAlgorithm);
+		explorationAlgorithm.start();
 	}
 	@FXML
 	private void onclickStopExploration(){
@@ -345,6 +337,9 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	}
 
 
+	@FXML
+	public void onclickFastestPath() {
+	}
 	@FXML
 	public void onTerminateTimeTextField() {
 		Exploration.setAutoTerminate_time(Integer.parseInt(terminateTimeTextField.getText()));

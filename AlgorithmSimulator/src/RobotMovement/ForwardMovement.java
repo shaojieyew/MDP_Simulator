@@ -18,6 +18,9 @@ public class ForwardMovement extends RobotMovement {
 
 	@Override
 	protected void implementation() {
+		if(isExit()){
+			return;
+		}
 		Robot r = Robot.getInstance();
 		float direction = r.getDirection()%360;
 		//System.out.println("forward "+distance+"cm" +" facing "+direction);
@@ -48,7 +51,6 @@ public class ForwardMovement extends RobotMovement {
 		DecimalFormat df = new DecimalFormat("#.##");
 	   	r.setPosX(Float.parseFloat(df.format(r.getPosX())));
 	   	r.setPosY(Float.parseFloat(df.format(r.getPosY())));
-
 	}
 
 }

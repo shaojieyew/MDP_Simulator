@@ -25,7 +25,9 @@ public abstract class RobotMovement implements Runnable{
 		Robot r = Robot.getInstance();
 		r.setMoving(true);
 		implementation();
-		r.runNextInstruction();
+		if(!exit){
+			r.runNextInstruction();
+		}
 	}
     public void stop(){
         exit = true;

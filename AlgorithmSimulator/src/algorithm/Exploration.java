@@ -4,11 +4,17 @@ import Data.Map;
 import Data.MapListener;
 import Data.Robot;
 import Data.RobotListener;
+import RPiInterface.AlgoReturnMessage;
 
 public abstract class Exploration implements  MapListener, RobotListener{
 	private static long autoTerminate_time=600;
 	private static float autoTerminate_explore_rate=1;
-	
+
+	public static final float NORTH = 0;
+	public static final float EAST = 90;
+	public static final float SOUTH = 180;
+	public static final float WEST = 270;
+
 	protected static Robot r = Robot.getInstance();
 	protected static Map m = Map.getInstance();
 	private int startingX = 1;
@@ -20,31 +26,32 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	public void terminate() {
 		 okToTerminate = true;
 	}
-	public static final float NORTH = 0;
-	public static final float EAST = 90;
-	public static final float SOUTH = 180;
-	public static final float WEST = 270;
-	
+	public Exploration(boolean isTerminate){
+		if(isTerminate){
+			terminate();
+		}
+	}
 	
 	public Exploration(){
-		init();
-		r.setExploring(true);
-		computeAction();
 	}
 	public Exploration(int startAtX, int startAtY){
-		init();
-		r.setExploring(true);
 		startingX=startAtX;
 		startingY=startAtY;
-		computeAction();
 	}
+	
+	public AlgoReturnMessage start(){
+		init();
+		r.setExploring(true);
+		return computeAction();
+	}
+	
 	@Override
 	public void updateMap() {
 		computeAction();
 	}
 	
 	public abstract void init();
-	public abstract void computeAction();
+	public abstract AlgoReturnMessage computeAction();
 
 	public int getStartingX() {
 		return startingX;
@@ -69,7 +76,6 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				e.printStackTrace();
 			}
 		}
-		System.out.print("aaa");
 		Robot.getInstance().setExploring(false);
 		r.removeListener(this);
 		m.removeListener(this);

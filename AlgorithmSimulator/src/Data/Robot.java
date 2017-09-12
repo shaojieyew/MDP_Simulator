@@ -21,7 +21,7 @@ public class Robot {
 		}
 		return robot;
 	}
-
+	
 	ArrayList<RobotMovement> instructions=new ArrayList<RobotMovement>();  
 	
 	public ArrayList<RobotMovement> getInstructions() {
@@ -65,12 +65,12 @@ public class Robot {
 	public RobotSensorSimulator getSensorSimulator() {
 		return sensorSimulator;
 	}
-	public void setSensorSimulatorType(String value) {
+	public void setSensorSimulatorType(String value, boolean simulation) {
 		if(sensorSimulator!=null){
 			sensorSimulator.stop();
 		}
 		sensorSimulator = RobotSensorSimulatorFactory.getInstance(value);
-		if(sensorSimulator!=null){
+		if(sensorSimulator!=null && simulation){
 			Thread sensorSimulatorThread = new Thread(sensorSimulator);
 			sensorSimulatorThread.start();
 		}
@@ -80,7 +80,10 @@ public class Robot {
 	private float posX=1f;
 	private float posY=1f;
 	private float direction =0;
-
+	public static final float DIRECTION_NORTH =0;
+	public static final float DIRECTION_EAST =90;
+	public static final float DIRECTION_SOUTH =180;
+	public static final float DIRECTION_WEST =270;
 
 	public float getPosX() {
 		return posX;
@@ -139,7 +142,6 @@ public class Robot {
 		this.exploringEndTime = exploringEndTime;
 	}
 
-
 	public void moveForward(float distance) {
 			ForwardMovement forwardProcessor = new ForwardMovement(distance , framePer10CM,  milisecondPer10CM);
 			instructions.add(forwardProcessor);
@@ -151,7 +153,6 @@ public class Robot {
 
 	public void rotate(float degree) {
 			RotateMovement rotateMovementProcessor = new RotateMovement(degree,framePerRotate, milisecondPerRotate);
-			
 			instructions.add(rotateMovementProcessor);
 			if(instructions.size()==1){
 				Thread forwardMovementThread = new Thread(rotateMovementProcessor);
@@ -198,5 +199,12 @@ public class Robot {
 			}
 		}
 	}
-
+	
+	public void stopAllMovement(){
+		if(getInstructions().size()>0){
+			RobotMovement movement = getInstructions().get(0);
+			getInstructions().clear();
+			movement.stop();
+		}
+	}
 }

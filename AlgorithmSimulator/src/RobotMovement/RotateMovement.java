@@ -16,6 +16,9 @@ public class RotateMovement extends RobotMovement {
 	
 	@Override
 	protected void implementation() {
+		if(isExit()){
+			return;
+		}
 		//System.out.println("#############ROTATE "+degree+"degree");
 		Robot r = Robot.getInstance();
 			int totalframe = (int) (degree/360f*framePerRotate);

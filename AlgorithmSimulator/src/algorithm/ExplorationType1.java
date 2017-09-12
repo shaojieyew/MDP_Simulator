@@ -12,11 +12,19 @@ import Data.Position;
 import Data.Robot;
 import Data.RobotListener;
 import Data.Vertex;
+import RPiInterface.AlgoReturnMessage;
 
 public class ExplorationType1 extends Exploration {
 	public  int [][] visited = new int[20][15];
 	public  float checkEnvironementOf[];
 	int printCount=1;
+
+	//from rpi
+	public  ExplorationType1(boolean isTerminate){
+		super(isTerminate);
+	}
+	
+	//from simulator
 	public ExplorationType1(){
 		super();
 	}
@@ -32,37 +40,60 @@ public class ExplorationType1 extends Exploration {
 	}
 
 
-	public void computeAction(){
-		System.out.println("\n===Action " +printCount+"=== Explration rate :"+m.getInstance().getExploredRate());
+	public AlgoReturnMessage computeAction(){
+		//System.out.println("\n===Action " +printCount+"=== Explration rate :"+m.getInstance().getExploredRate());
 		printCount++;
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
 		float direction = r.getDirection();
-		System.out.println("Hello i am at ("+r.getPosX()+","+r.getPosY()+") facing at "+direction);
+		//System.out.println("Hello i am at ("+r.getPosX()+","+r.getPosY()+") facing at "+direction);
 	
 		//check if i can explore more here, if yes. rotate~~~
 		//check right side
 		updateVisitedList();
 		
-		if(visited[currentY][currentX]==0){
-			for(float checkDirection: checkEnvironementOf){
-				if(isAnyUndiscovered(currentX, currentY,checkDirection)){
-					System.out.println(checkDirection+" direction have undiscovered tiles");
-					//rotate to east
-					rotateToDirection(direction,checkDirection);
-					return;
+		if(!isOkToTerminate()||!startPointFound()){
+			//check if current location has 100% exploration
+			int currentDirectionIndex = 0;
+			/*for(int i =0;i<checkEnvironementOf.length;i++){
+				if(checkEnvironementOf[i]==direction){
+					currentDirectionIndex=i;
+					break;
 				}
-			}	
+			}*/
+			//if there is any uncovered, rotate to that direction
+			if(visited[currentY][currentX]==0){
+				for(int i =currentDirectionIndex ; i<currentDirectionIndex+4 ; i++){
+					float checkDirection = checkEnvironementOf[i%4];
+					if(isAnyUndiscovered(currentX, currentY,checkDirection)){
+						//System.out.println(checkDirection+" direction have undiscovered tiles");
+						//rotate to east
+						float degree = rotateToDirection(direction,checkDirection);
+						int intDegree = Math.round(degree);
+						String movement= "R"+intDegree;
+						if(intDegree<0){
+							movement= "L"+(intDegree*-1);
+						}
+						AlgoReturnMessage message  = new AlgoReturnMessage();
+						String []movments = {movement};
+						message.setMovements(movments);
+						int [] location = {currentX,currentY};
+						message.setRobotLocation(location);
+						message.setEndOfExploration(false);
+						message.setDirection(checkDirection);
+						return message;
+					}
+				}
+			}
 		}
-
 		//set visited
-		System.out.println("I have finish exploring ("+r.getPosX()+","+r.getPosX()+"), lets move on");
+		//System.out.println("I have finish exploring ("+r.getPosX()+","+r.getPosX()+"), lets move on");
 		visited[currentY][currentX]=1;
 
-		System.out.println("I could move to ");
+		//System.out.println("I could move to ");
 		checkedVisited =new int[20][15];
 		int[] location  = getBestNextStop(currentX,currentY,10000);
-		System.out.println("Best Location :"+location[0]+","+location[1]+","+location[2]+","+location[3]);
+		//System.out.println("Best Location :"+location[0]+","+location[1]+","+location[2]+","+location[3]);
 		
 		if(currentX==location[0]&&currentY==location[1]&&(currentX!=1||currentY!=1)){
 			location[0]=1;
@@ -70,53 +101,82 @@ public class ExplorationType1 extends Exploration {
 		}
 		
 		//move to best location
-		moveToLocation(currentX, currentY, direction, location[0],location[1]);
+		AlgoReturnMessage message = moveToLocation(currentX, currentY, direction, location[0],location[1]);
 		if(location[0]==1&&location[1]==1&&isOkToTerminate()){
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			message.setEndOfExploration(true);
 			destroy();
 		}
+		return message;
 	}
 	
 	
+	private boolean startPointFound() {
+		for(int x =0;x<3;x++){
+			for(int y =0;y<3;y++){
+				if(m.getExploredTiles()[y][x]!=1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	//get Instructions To Location
-	private void moveToLocation(int x1, int y1,float facing, int x2, int y2) {
+	private AlgoReturnMessage moveToLocation(int x1, int y1,float facing, int x2, int y2) {
 		ArrayList<String> instructions = new ArrayList<String>();
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
-			System.out.println("Error:"+x1+","+y1);
-			System.out.println("Error:"+x1+","+y1);
-			return;
+			//System.out.println("Error:"+x1+","+y1);
+			//System.out.println("Error:"+x1+","+y1);
+			return null;
 		}
 		Vertex e = m.getVertices()[y2][x2];
 		float direction = facing;
 		java.util.List<Vertex> path = Dijkstra.computePaths(s, e);
-		System.out.println("Path to travel: "+path);
-		System.out.println("I am facing "+direction);
+		//System.out.println("Path to travel: "+path);
+		//System.out.println("I am facing "+direction);
+		int forwardCount = 0;
 		for(int i =0;i<path.size()-1;i++){
 			Vertex v1 =path.get(i);
 			Vertex v2 =path.get(i+1);
 			float degree = getDegreeBetweenTwoPoint(v1.x,v1.y,v2.x,v2.y);
 			if(degree!= direction)
 			{
+				instructions.add("F"+forwardCount);
+				r.moveForward(forwardCount);
+				forwardCount=0;
 				//float degreeBetween= degreeToRotateToDirection(direction,degree);
-				rotateToDirection(direction,degree);
-				instructions.add("ROTATE_FROM_"+direction+"_TO"+degree);
+				float degreeToMove =rotateToDirection(direction,degree);
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
 				direction = degree;
 			}
-			instructions.add("MOVE_FORWARD_"+10);
-			r.moveForward(10);
+			forwardCount=forwardCount+10;
+			if(i==path.size()-2){
+				instructions.add("F"+forwardCount);
+				r.moveForward(forwardCount);
+			}
 		}
 
-	//	System.out.println("=============");
-	//	for(String instruction: instructions){
-	//		System.out.println(instruction);
-	//	}
-	//	System.out.println("=============");
+		
+		String []movements = new String[instructions.size()];
+		int index=0;
+		for(String instruction: instructions){
+				movements[index] = instruction;
+				index++;
+		}
+		AlgoReturnMessage message  = new AlgoReturnMessage();
+		message.setMovements(movements);
+		Vertex lastLocation = path.get(path.size()-1);
+		int [] location = {(int) lastLocation.x,(int) lastLocation.y};
+		message.setRobotLocation(location);
+		message.setEndOfExploration(false);
+		message.setDirection(direction);
+		return message;
 	}
 
 
@@ -157,7 +217,7 @@ public class ExplorationType1 extends Exploration {
 					}
 					int squareAway =  getDistanceAway(currentX,currentY,x,y);
 					if(squareAway<0){
-						System.out.println("alert");
+						//System.out.println("alert");
 					}
 					int result[] = {x,y,canExplore.size(),squareAway};
 					if(maxHop==1){
@@ -281,9 +341,9 @@ public class ExplorationType1 extends Exploration {
 		
 		
 		//if(place1[2]!=0)
-			//System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
+			////System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
 		//if(place2[2]!=0)
-			//System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
+			////System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
 			
 		int []result;
 		if(score1>score2){
@@ -361,9 +421,11 @@ public class ExplorationType1 extends Exploration {
 		return thereExistUndiscovered;
 	}
 	
-	private void rotateToDirection(float currentDirection, float inDirection){
-		//System.out.println("rotate from "+currentDirection+" to "+inDirection);
-		r.rotate(degreeToRotateToDirection(currentDirection,  inDirection));
+	private float rotateToDirection(float currentDirection, float inDirection){
+		////System.out.println("rotate from "+currentDirection+" to "+inDirection);
+		float degree = degreeToRotateToDirection(currentDirection,  inDirection);
+		r.rotate(degree);
+		return degree;
 	}
 	private float degreeToRotateToDirection(float currentDirection, float inDirection){
 		float difference = inDirection-currentDirection;

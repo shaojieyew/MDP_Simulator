@@ -1,5 +1,8 @@
 package Data;
 
+import java.awt.Polygon;
+import java.awt.geom.Area;
+import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 
 import util.HexBin;
@@ -22,7 +25,6 @@ public class Map {
 	private  ArrayList<MapListener> arr = new ArrayList<MapListener>();
 	private static int exploredTiles [][] = new int[20][15];
 	private static int obstacles [][] = new int[20][15];
-	
 
 	public  int[][] getObstacles() {
 		return obstacles;
@@ -51,7 +53,9 @@ public class Map {
 		  exploredTileBinary =exploredTileBinary.substring(2, exploredTileBinary.length()-2);
 		  
 		  String obstacleBinary = HexBin.hexToBin(obstacleHex);
-		  obstacleBinary =obstacleBinary.substring(2, obstacleBinary.length()-2);
+		  if(obstacleBinary.length()>0){
+			  obstacleBinary =obstacleBinary.substring(2, obstacleBinary.length()-2);
+		  }
 		  
 		  String exploredObstacleBinary=null;
 		  if(exploredObstacleHex!=null){
@@ -61,7 +65,10 @@ public class Map {
 		  int obstacleIndex=0;
 		  for(int i =0;i<exploredTileBinary.length();i++){
 			  char exploreBit = exploredTileBinary.charAt(i);
-			  char obstacleBit = obstacleBinary.charAt(i);
+			  char obstacleBit = '0';
+			  if(obstacleBinary.length()>0){
+				  obstacleBit = obstacleBinary.charAt(i);
+			  }
 			  int y = (i-(i%15))/15;
 			  int x = i%15;
 			  exploredTiles[y][x]=0;
@@ -202,7 +209,6 @@ public class Map {
 			}
 		}*/
 	}
-	
 	public  void addListener(MapListener listener){
 		arr.add(listener);
 	}
@@ -217,5 +223,49 @@ public class Map {
 			MapListener a = arr.get(i);
 			a.updateMap();
 		}
+	}
+	public String getBinaryExplored(){
+		String binaryExplored="11";
+		int exploredTile[][]=Map.getInstance().getExploredTiles();
+		for(int y =0;y<20;y++){
+			for(int x =0;x<15;x++){
+				binaryExplored=binaryExplored+exploredTile[y][x];
+			}
+		}
+		binaryExplored=binaryExplored+"11";
+		return binaryExplored;
+	}
+	public String getBinaryExploredObstacle(){
+		String binaryExplored="11";
+		String binaryExploredObstacle="";
+		int exploredTile[][]=Map.getInstance().getExploredTiles();
+		int obstacles[][]=Map.getInstance().getObstacles();
+		for(int y =0;y<20;y++){
+			for(int x =0;x<15;x++){
+				binaryExplored=binaryExplored+exploredTile[y][x];
+				if(exploredTile[y][x]==1){
+					binaryExploredObstacle=binaryExploredObstacle+obstacles[y][x];
+				}
+			}
+		}
+		binaryExplored=binaryExplored+"11";
+		if(binaryExploredObstacle.length()%8!=0){
+			for(int i =0;i<binaryExploredObstacle.length()%8;i++){
+				binaryExploredObstacle=binaryExploredObstacle+"1";
+			}
+		}
+		return binaryExploredObstacle;
+	}
+	
+	public String getBinaryObstacle(){
+		String binaryObstacle="11";
+		int obstacles[][]=Map.getInstance().getObstacles();
+		for(int y =0;y<20;y++){
+			for(int x =0;x<15;x++){
+				binaryObstacle=binaryObstacle+obstacles[y][x];
+			}
+		}
+		binaryObstacle=binaryObstacle+"11";
+		return binaryObstacle;
 	}
 }

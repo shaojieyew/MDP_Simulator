@@ -34,7 +34,7 @@ public abstract class RobotSensorSimulator implements Runnable {
 
 	public abstract void sensorInfoUpdate();
 	public abstract String getSensorType();
-	public abstract Position[][] getLineOfSensor(int x, int y, float direction);
+	public  abstract Position[][] getLineOfSensor(int x, int y, float direction);
 	
 	public void stop() {
 		stop=true;

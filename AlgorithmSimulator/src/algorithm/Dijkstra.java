@@ -1,15 +1,10 @@
 package algorithm;
 
-
 import java.util.PriorityQueue;
-
 import Data.Vertex;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-
-
 
 public class Dijkstra
 {

@@ -108,7 +108,7 @@
                         <TextField fx:id="terminateRateTextField" onKeyReleased="#onTerminateRateTextField"  maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="126.0" text="1" />
                      </children>
                   </HBox>
-                  <Button fx:id="startEndBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="235.0" text="Start Fastest Path" />
+                  <Button fx:id="startEndBtn" mnemonicParsing="false" prefHeight="25.0" prefWidth="235.0" text="Start Fastest Path" onMouseClicked="#onclickFastestPath"  />
                   <Label fx:id="Timer" />
                </children>
             </VBox>
