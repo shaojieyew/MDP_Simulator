@@ -13,7 +13,9 @@ import javax.swing.JPanel;
 
 import com.sun.javafx.geom.Line2D;
 
+import Data.Position;
 import Data.Vertex;
+import Data.WayPoint;
 import GUI.MapGUI;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -27,6 +29,10 @@ public class FastestPathType1 extends FastestPath {
 	public static boolean debugPath = true;
 	public static float bufferArea = 1.1f;
 	
+	public static void main(String ar[]){
+		System.out.println(degreeToRotateToDirection(90,  271));;
+	}
+	
 	@Override
 	public void computeAction() {
 		//Initialization
@@ -37,10 +43,20 @@ public class FastestPathType1 extends FastestPath {
 				//check if start and end path is cleared
 				Vertex start = new Vertex(getStartingX()+0.5f,getStartingX()+0.5f);
 				Vertex end = new Vertex(13+0.5f,18+0.5f);
-				if(isClearPath(start,end,outOfBound)){
-					start.adjacencies.add(end);
-					end.adjacencies.add(start);
-					addDebugLine(end,start);
+				Position wp = WayPoint.getInstance().getPosition();
+				Vertex waypoint;
+				if(wp!=null){
+					waypoint = new Vertex(wp.getPosX()+0.5f,wp.getPosY()+0.5f);
+				}else{
+					waypoint = end;
+				}
+				if(isClearPath(start,waypoint,outOfBound)&&isClearPath(waypoint,end,outOfBound)){
+					start.adjacencies.add(waypoint);
+					end.adjacencies.add(waypoint);
+					waypoint.adjacencies.add(start);
+					waypoint.adjacencies.add(end);
+					addDebugLine(waypoint,start);
+					addDebugLine(waypoint,end);
 				}else{
 					//setup links
 					for(ArrayList<Vertex> boundary1 : outOfBound){
@@ -72,6 +88,13 @@ public class FastestPathType1 extends FastestPath {
 									addDebugLine(v2,start);
 								}
 							}
+							if(waypoint.x!=v2.x||waypoint.y!=v2.y){
+								if(isClearPath(waypoint,v2,outOfBound)){
+									waypoint.adjacencies.add(v2);
+									v2.adjacencies.add(waypoint);
+									addDebugLine(v2,waypoint);
+								}
+							}
 							if(end.x!=v2.x||end.y!=v2.y){
 								if(isClearPath(end,v2,outOfBound)){
 									end.adjacencies.add(v2);
@@ -82,12 +105,28 @@ public class FastestPathType1 extends FastestPath {
 						}
 					}
 				}
+				if(isClearPath(start,waypoint,outOfBound)){
+					start.adjacencies.add(waypoint);
+					waypoint.adjacencies.add(start);
+					addDebugLine(waypoint,start);
+				}
+				if(isClearPath(waypoint,end,outOfBound)){
+					end.adjacencies.add(waypoint);
+					waypoint.adjacencies.add(end);
+					addDebugLine(waypoint,end);
+				}
+				
+				
 				if(debugPath)
 					map.getChildren().addAll(debugLine);
 				
 				
-				List<Vertex> path = DijkstraDistanceWeighted.computePaths(start, end);
-				System.out.println("Path: "+path);
+				List<Vertex> path = DijkstraDistanceWeighted.computePaths(start, waypoint);
+				System.out.println("Path 1: "+path);
+				if(end.x!=waypoint.x&&end.y!=waypoint.y){
+					path = DijkstraDistanceWeighted.computePaths(waypoint, end);
+					System.out.println("Path 2: "+path);
+				}
 				
 				float direction = 0;
 				ArrayList<String> instructions = new ArrayList<String>();
@@ -106,6 +145,7 @@ public class FastestPathType1 extends FastestPath {
 					instructions.add("MOVE_FORWARD_"+10f*distance);
 					r.moveForward(10f*distance);
 				}
+
 				
 				for(String s :instructions){
 					System.out.println(s);
@@ -115,12 +155,13 @@ public class FastestPathType1 extends FastestPath {
 	
 	public ArrayList<ArrayList<Vertex>> updateOutofBound(){
 		int obstacles[][] = m.getObstacles();
+		int exploredTiles[][] = m.getExploredTiles();
 	    Area areas = new Area();
 		
 		//create obstacles
 		for(int x =0;x<15;x++){
 			for(int y =0;y<20;y++){
-				if(obstacles[y][x]==1){
+				if(exploredTiles[y][x]==0||obstacles[y][x]==1){
 					//ArrayList<Polygon> temp = new ArrayList<Polygon>();
 					Polygon poly = getPolygonOfAnObstacle(x,y);
 				    Area a1 = new Area(poly);
@@ -219,7 +260,8 @@ public class FastestPathType1 extends FastestPath {
 				return difference;
 			}
 		}else{
-			return (-(currentDirection+360-difference));
+			//return (-(currentDirection+360-difference));
+			return (-(360-difference));
 		}
 	}
 	//get degree between 2 point

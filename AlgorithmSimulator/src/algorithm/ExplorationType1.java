@@ -439,7 +439,9 @@ public class ExplorationType1 extends Exploration {
 				return difference;
 			}
 		}else{
-			return (-(currentDirection+360-difference));
+			//return (-(currentDirection+360-difference));
+			
+			return (-(360-difference));
 		}
 	}
 	
