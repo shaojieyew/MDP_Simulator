@@ -130,9 +130,11 @@ public class ExplorationType1 extends Exploration {
 			//System.out.println("Error:"+x1+","+y1);
 			return null;
 		}
-		Vertex e = m.getVertices()[y2][x2];
+		Vertex[][] vertices =  m.getVertices();
+		Vertex e =vertices[y2][x2];
 		float direction = facing;
-		java.util.List<Vertex> path = Dijkstra.computePaths(s, e);
+		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
+		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
 		//System.out.println("Path to travel: "+path);
 		//System.out.println("I am facing "+direction);
 		int forwardCount = 0;
@@ -384,11 +386,13 @@ public class ExplorationType1 extends Exploration {
 	}
 	
 	private int getDistanceAway(int x1, int y1, int x2, int y2) {
-		Vertex v1 = m.getVertices()[y1][x1];
-		Vertex v2 = m.getVertices()[y2][x2];
+		Vertex[][]vertices = m.getVertices();
+		Vertex v1 = vertices[y1][x1];
+		Vertex v2 = vertices[y2][x2];
 		java.util.List<Vertex> path = null;
 		if(v1!=null&&v2!=null){
-			path=Dijkstra.computePaths(v1, v2);
+			DijkstraMinimunRotation d = new DijkstraMinimunRotation();
+			path=d.computePaths(v1, v2,vertices);
 		}
 		if(path!=null&&path.size()>0){
 			return path.size()-1;

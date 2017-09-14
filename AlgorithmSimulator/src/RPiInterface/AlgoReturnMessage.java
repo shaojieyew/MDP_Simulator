@@ -7,7 +7,14 @@ public class AlgoReturnMessage {
 	private int[] robotLocation;
 	private boolean endOfExploration;
 	private float direction;
+	private String status;
 	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public float getDirection() {
 		return direction;
 	}
@@ -54,7 +61,8 @@ public class AlgoReturnMessage {
 		if(movementString.length()>0){
 			movementString=movementString.substring(0, movementString.length()-1);
 		}
-		str = exploredTile+"|"+exploredObstacle+"|"+movementString+"|"+robotLocation[0]+","+robotLocation[1]+","+Math.round(direction);
+		str =status+"|"+ exploredTile+"|"+exploredObstacle+"|"+movementString+"|"+robotLocation[0]+","+robotLocation[1]+","+Math.round(direction);
+		
 		if(endOfExploration){
 			str=str+"|1";
 		}else{

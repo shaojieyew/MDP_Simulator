@@ -32,6 +32,7 @@ import algorithm.Exploration;
 import algorithm.ExplorationType1;
 import algorithm.FastestPath;
 import algorithm.FastestPathType1;
+import algorithm.FastestPathType2;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -339,6 +340,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 
 	@FXML
 	public void onclickFastestPath() {
+		FastestPath fp = new FastestPathType1();
+		fp.start();
 	}
 	@FXML
 	public void onTerminateTimeTextField() {

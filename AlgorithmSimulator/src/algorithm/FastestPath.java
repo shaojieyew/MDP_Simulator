@@ -5,6 +5,7 @@ import Data.MapListener;
 import Data.Robot;
 import Data.RobotListener;
 import Data.WayPoint;
+import RPiInterface.AlgoReturnMessage;
 
 public abstract class FastestPath {
 	protected static Robot r = Robot.getInstance();
@@ -14,16 +15,17 @@ public abstract class FastestPath {
 	protected static int startingY = 1;
 	
 	public FastestPath(){
-		computeAction();
 	}
 	public FastestPath(int startAtX, int startAtY){
-		r.setExploring(true);
 		startingX=startAtX;
 		startingY=startAtY;
-		computeAction();
+	}
+
+	public AlgoReturnMessage start(){
+		return computeAction();
 	}
 	
-	public abstract void computeAction();
+	public abstract AlgoReturnMessage computeAction();
 
 	public int getStartingX() {
 		return startingX;
@@ -37,5 +39,7 @@ public abstract class FastestPath {
 	public void setStartingY(int startingY) {
 		this.startingY = startingY;
 	}
+	
+	
 	
 }

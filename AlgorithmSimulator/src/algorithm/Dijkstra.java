@@ -8,12 +8,29 @@ import java.util.Collections;
 
 public class Dijkstra
 {
-    public static List<Vertex> computePaths(Vertex source,Vertex dest)
-    {
-    	return computePaths(source, dest,0, 0);
-    }
-	
-    public static List<Vertex> computePaths(Vertex source,Vertex dest,int leanX, int leanY)
+	public List<Vertex> computePaths(Vertex source, Vertex dest, Vertex[][] vertices){
+		for(Vertex []vs: vertices){
+			for(Vertex v: vs){
+				if(v!=null){
+					v.previous=null;
+					v.minDistance=Double.POSITIVE_INFINITY;
+				}
+			}
+		}
+		return computePaths( source, dest);
+	}
+	public List<Vertex> computePaths(Vertex source, Vertex dest, ArrayList<ArrayList<Vertex>> vertices){
+		for(ArrayList<Vertex>vs: vertices){
+			for(Vertex v: vs){
+				if(v!=null){
+					v.previous=null;
+					v.minDistance=Double.POSITIVE_INFINITY;
+				}
+			}
+		}
+		return computePaths( source, dest);
+	}
+    protected  List<Vertex> computePaths(Vertex source,Vertex dest)
     {
     	if(source==null||dest==null){
     		return null;
@@ -29,18 +46,6 @@ public class Dijkstra
             for (Vertex v : u.adjacencies)
             {	
                 double weight = 1;
-            	if(v.x==source.x){
-            		weight = weight/2.0;
-            	}
-            	if(v.x==dest.x){
-            		weight = weight/2.0;
-            	}
-            	if(v.y==source.y){
-            		weight = weight/2.0;
-            	}
-            	if(v.y==dest.y){
-            		weight = weight/2.0;
-            	}
                 double distanceThroughU = u.minDistance + weight;
         if (distanceThroughU < v.minDistance) {
             vertexQueue.remove(v);
@@ -56,7 +61,8 @@ public class Dijkstra
 	    return path;
     }
 
-    public static List<Vertex> getShortestPathTo(Vertex target)
+    
+    public  List<Vertex> getShortestPathTo(Vertex target)
     {
         List<Vertex> path = new ArrayList<Vertex>();
         for (Vertex vertex = target; vertex != null; vertex = vertex.previous)
@@ -104,6 +110,6 @@ public class Dijkstra
         H.adjacencies.add(E);
         H.adjacencies.add(I);
         H.adjacencies.add(G);
-        System.out.println("Path: " + computePaths(C,G));
+       // System.out.println("Path: " + computePaths(C,G));
     }
 }

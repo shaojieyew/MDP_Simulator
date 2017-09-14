@@ -11,10 +11,10 @@ import java.util.Collections;
 
 
 
-public class DijkstraDistanceWeighted extends Dijkstra
+public class DijkstraMinimunRotation extends Dijkstra
 {
 	@Override
-    protected  List<Vertex> computePaths(Vertex source,Vertex dest)
+	protected  List<Vertex> computePaths(Vertex source,Vertex dest)
     {
     	if(source==null||dest==null){
     		return null;
@@ -29,7 +29,19 @@ public class DijkstraDistanceWeighted extends Dijkstra
             // Visit each edge exiting u
             for (Vertex v : u.adjacencies)
             {	
-                double weight = Math.hypot(v.x-u.x, v.y-u.y);
+                double weight = 1;
+            	if(v.x==source.x){
+            		weight = weight/2.0;
+            	}
+            	if(v.x==dest.x){
+            		weight = weight/2.0;
+            	}
+            	if(v.y==source.y){
+            		weight = weight/2.0;
+            	}
+            	if(v.y==dest.y){
+            		weight = weight/2.0;
+            	}
                 double distanceThroughU = u.minDistance + weight;
         if (distanceThroughU < v.minDistance) {
             vertexQueue.remove(v);
