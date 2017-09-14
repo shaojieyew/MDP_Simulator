@@ -344,6 +344,11 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		fp.start();
 	}
 	@FXML
+	public void onclickFastestPath2() {
+		FastestPath fp = new FastestPathType2();
+		fp.start();
+	}
+	@FXML
 	public void onTerminateTimeTextField() {
 		Exploration.setAutoTerminate_time(Integer.parseInt(terminateTimeTextField.getText()));
 	}

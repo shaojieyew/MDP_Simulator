@@ -8,6 +8,7 @@ import algorithm.Exploration;
 import algorithm.ExplorationType1;
 import algorithm.FastestPath;
 import algorithm.FastestPathType1;
+import algorithm.FastestPathType2;
 import util.HexBin;
 
 public class SimulateRPIInterface extends RPiInterface implements Runnable{
@@ -41,13 +42,13 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 		int robotLocationX = 1; 			//by grid
 		int robotLocationY = 1; 			//by grid
 		float robotDirection = Robot.DIRECTION_NORTH; 
-		int wayPointX = 7;					//by grid
-		int wayPointY = 11;					//by grid
+		int wayPointX = 1;					//by grid
+		int wayPointY = 18;					//by grid
 		int sensorInfo[] = {3,5,1,2,0};		//block away from robot
 		//String exploredTile="ffe07fc0ff81ff03fe07fc0ff81ff03fe07ff8ffe1ffe07fc0dc01b800600000000000000003";
 		//String exploredObstacle="00000000000100000000000001000200027f";
 		String exploredTile="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
-		String exploredObstacle="00040000000044000c040c000c0006000440000c001000000101040c1830200040000000000f";
+		String exploredObstacle="000000000000000000000000000000000000000000000000000000001c00c00000000000000f";
 		
 		
 		//1. set map & obstacles
@@ -85,7 +86,7 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 		case "FP":
 			//process algo
 			Robot.getInstance().setSensorSimulatorType("type1", false);
-			FastestPath fpAlgo = new FastestPathType1();
+			FastestPath fpAlgo = new FastestPathType2();
 			message = fpAlgo.start();
 			//prepare return message
 			hexExplored=HexBin.BinTohex(Map.getInstance().getBinaryExplored());

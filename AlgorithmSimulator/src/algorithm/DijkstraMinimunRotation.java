@@ -53,7 +53,7 @@ public class DijkstraMinimunRotation extends Dijkstra
             }
         }
 
-	    List<Vertex> path = getShortestPathTo(dest);
+	    List<Vertex> path = getShortestPathTo(source,dest);
 	    return path;
     }
 }

@@ -31,17 +31,16 @@ public class DijkstraDistanceWeighted extends Dijkstra
             {	
                 double weight = Math.hypot(v.x-u.x, v.y-u.y);
                 double distanceThroughU = u.minDistance + weight;
-        if (distanceThroughU < v.minDistance) {
-            vertexQueue.remove(v);
-
-            v.minDistance = distanceThroughU ;
-            v.previous = u;
-            vertexQueue.add(v);
-        }
+		        if (distanceThroughU < v.minDistance) {
+		            vertexQueue.remove(v);
+		            	v.minDistance = distanceThroughU ;
+		            	v.previous = u;
+		            vertexQueue.add(v);
+		        }
             }
         }
 
-	    List<Vertex> path = getShortestPathTo(dest);
+	    List<Vertex> path = getShortestPathTo(source,dest);
 	    return path;
     }
 }
