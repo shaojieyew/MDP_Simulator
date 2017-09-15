@@ -1,6 +1,10 @@
 package RPiInterface;
 
-public class AlgoReturnMessage {
+public class Message {
+	//public static final 
+	public static final String MESSAGE_HEADER_ALL="0";
+	public static final String MESSAGE_HEADER_ARDUINO="1";
+	public static final String MESSAGE_HEADER_ANDROID="2";
 	private String exploredTile;
 	private String exploredObstacle;
 	private String[] movements;
@@ -52,7 +56,7 @@ public class AlgoReturnMessage {
 		this.endOfExploration = endOfExploration;
 	}
 	
-	public String toString(){
+	public String getMessage(String header){
 		String str = "";
 		String movementString="";
 		for(String movement: movements){
@@ -61,12 +65,27 @@ public class AlgoReturnMessage {
 		if(movementString.length()>0){
 			movementString=movementString.substring(0, movementString.length()-1);
 		}
-		str =status+"|"+ exploredTile+"|"+exploredObstacle+"|"+movementString+"|"+robotLocation[0]+","+robotLocation[1]+","+Math.round(direction);
-		
-		if(endOfExploration){
-			str=str+"|1";
-		}else{
-			str=str+"|0";
+		switch (header){
+		case "0": 
+			str =header+"|"+status+"|"+ exploredTile+"|"+exploredObstacle+"|"+movementString+"|"+robotLocation[0]+","+robotLocation[1]+","+Math.round(direction);
+			
+			if(endOfExploration){
+				str=str+"|1";
+			}else{
+				str=str+"|0";
+			}
+			break;
+		case "1": 
+			str =header+"|"+movementString;
+			break;
+		case "2": 
+			str =header+"|"+status+"|"+ exploredTile+"|"+exploredObstacle+"|"+movementString+"|"+robotLocation[0]+","+robotLocation[1]+","+Math.round(direction);
+			if(endOfExploration){
+				str=str+"|1";
+			}else{
+				str=str+"|0";
+			}
+			break;
 		}
 		return str;
 	}

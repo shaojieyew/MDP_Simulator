@@ -18,7 +18,7 @@ import Data.Position;
 import Data.Vertex;
 import Data.WayPoint;
 import GUI.MapGUI;
-import RPiInterface.AlgoReturnMessage;
+import RPiInterface.Message;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -32,7 +32,7 @@ public class FastestPathType1 extends FastestPath {
 	public static float bufferArea = 1.1f;
 	
 	@Override
-	public AlgoReturnMessage computeAction() {		
+	public Message computeAction() {		
 		
 		// ***Create the obstacles by taking user input and eliminate the impossible robot positions
 		// I have asked for user input, but you already have obstacles
@@ -108,7 +108,7 @@ public class FastestPathType1 extends FastestPath {
 				movements[index] = instruction;
 				index++;
 		}
-		AlgoReturnMessage message  = new AlgoReturnMessage();
+		Message message  = new Message();
 		message.setMovements(movements);
 		Vertex lastLocation = path.get(path.size()-1);
 		int [] location = {(int) lastLocation.x,(int) lastLocation.y};

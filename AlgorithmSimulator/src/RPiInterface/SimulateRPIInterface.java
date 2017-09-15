@@ -37,7 +37,7 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 		System.out.println("Received from RPi: "+string);
 		
 		//Message data
-		String status = "FP"; 				//EX-exploring, FP-fastestpath. status to run different algorithm
+		String status = "EX"; 				//EX-exploring, FP-fastestpath. status to run different algorithm
 		boolean terminateExploring = false; //status to end exploration, when android input terminate
 		int robotLocationX = 1; 			//by grid
 		int robotLocationY = 1; 			//by grid
@@ -45,10 +45,10 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 		int wayPointX = 1;					//by grid
 		int wayPointY = 18;					//by grid
 		int sensorInfo[] = {3,5,1,2,0};		//block away from robot
-		//String exploredTile="ffe07fc0ff81ff03fe07fc0ff81ff03fe07ff8ffe1ffe07fc0dc01b800600000000000000003";
-		//String exploredObstacle="00000000000100000000000001000200027f";
-		String exploredTile="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
-		String exploredObstacle="000000000000000000000000000000000000000000000000000000001c00c00000000000000f";
+		String exploredTile="ffe07fc0ff81ff03fe07fc0ff81ff03fe07ff8ffe1ffe07fc0dc01b800600000000000000003";
+		String exploredObstacle="00000000000100000000000001000200027f";
+		//String exploredTile="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+		//String exploredObstacle="000000000000000000000000000000000000000000000000000000001c00c00000000000000f";
 		
 		
 		//1. set map & obstacles
@@ -64,7 +64,7 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 		computeSensor(robotLocationX,robotLocationY,robotDirection,sensorInfo);
 		
 		//5. compute algo
-		AlgoReturnMessage message;
+		Message message;
 		String hexExplored;
 		String hexExploredObstacle;
 		switch(status){
@@ -80,7 +80,8 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 			message.setExploredObstacle(hexExploredObstacle);
 			message.setStatus(status);
 			//send out message
-			outputMessage(message.toString());
+			outputMessage(message.getMessage(Message.MESSAGE_HEADER_ARDUINO));
+			outputMessage(message.getMessage(Message.MESSAGE_HEADER_ANDROID));
 			break;
 
 		case "FP":
@@ -95,7 +96,8 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 			message.setExploredObstacle(hexExploredObstacle);
 			message.setStatus(status);
 			//send out message
-			outputMessage(message.toString());
+			outputMessage(message.getMessage(Message.MESSAGE_HEADER_ARDUINO));
+			outputMessage(message.getMessage(Message.MESSAGE_HEADER_ANDROID));
 			break;
 		}
 	}

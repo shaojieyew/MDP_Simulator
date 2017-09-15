@@ -4,7 +4,7 @@ import Data.Map;
 import Data.MapListener;
 import Data.Robot;
 import Data.RobotListener;
-import RPiInterface.AlgoReturnMessage;
+import RPiInterface.Message;
 
 public abstract class Exploration implements  MapListener, RobotListener{
 	private static long autoTerminate_time=600;
@@ -39,7 +39,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		startingY=startAtY;
 	}
 	
-	public AlgoReturnMessage start(){
+	public Message start(){
 		init();
 		r.setExploring(true);
 		return computeAction();
@@ -51,7 +51,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	}
 	
 	public abstract void init();
-	public abstract AlgoReturnMessage computeAction();
+	public abstract Message computeAction();
 
 	public int getStartingX() {
 		return startingX;

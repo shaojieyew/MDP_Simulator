@@ -11,6 +11,8 @@ public abstract class RPiInterface {
 	public abstract void outputMessage(String string);
 	
 	
+	
+	
 	public void setMap(String exploredTile,	String exploredObstacle){
 		Map.getInstance().setMap(exploredTile,null,exploredObstacle);
 	}

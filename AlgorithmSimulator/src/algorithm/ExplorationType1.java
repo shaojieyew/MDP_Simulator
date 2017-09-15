@@ -12,7 +12,7 @@ import Data.Position;
 import Data.Robot;
 import Data.RobotListener;
 import Data.Vertex;
-import RPiInterface.AlgoReturnMessage;
+import RPiInterface.Message;
 
 public class ExplorationType1 extends Exploration {
 	public  int [][] visited = new int[20][15];
@@ -40,7 +40,7 @@ public class ExplorationType1 extends Exploration {
 	}
 
 
-	public AlgoReturnMessage computeAction(){
+	public Message computeAction(){
 		//System.out.println("\n===Action " +printCount+"=== Explration rate :"+m.getInstance().getExploredRate());
 		printCount++;
 		int currentX = Math.round(r.getPosX());
@@ -74,7 +74,7 @@ public class ExplorationType1 extends Exploration {
 						if(intDegree<0){
 							movement= "L"+(intDegree*-1);
 						}
-						AlgoReturnMessage message  = new AlgoReturnMessage();
+						Message message  = new Message();
 						String []movments = {movement};
 						message.setMovements(movments);
 						int [] location = {currentX,currentY};
@@ -101,7 +101,7 @@ public class ExplorationType1 extends Exploration {
 		}
 		
 		//move to best location
-		AlgoReturnMessage message = moveToLocation(currentX, currentY, direction, location[0],location[1]);
+		Message message = moveToLocation(currentX, currentY, direction, location[0],location[1]);
 		if(location[0]==1&&location[1]==1&&isOkToTerminate()){
 			message.setEndOfExploration(true);
 			destroy();
@@ -122,7 +122,7 @@ public class ExplorationType1 extends Exploration {
 	}
 
 	//get Instructions To Location
-	private AlgoReturnMessage moveToLocation(int x1, int y1,float facing, int x2, int y2) {
+	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {
 		ArrayList<String> instructions = new ArrayList<String>();
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
@@ -171,7 +171,7 @@ public class ExplorationType1 extends Exploration {
 				movements[index] = instruction;
 				index++;
 		}
-		AlgoReturnMessage message  = new AlgoReturnMessage();
+		Message message  = new Message();
 		message.setMovements(movements);
 		Vertex lastLocation = path.get(path.size()-1);
 		int [] location = {(int) lastLocation.x,(int) lastLocation.y};

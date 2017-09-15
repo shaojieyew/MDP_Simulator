@@ -17,7 +17,7 @@ import Data.Position;
 import Data.Vertex;
 import Data.WayPoint;
 import GUI.MapGUI;
-import RPiInterface.AlgoReturnMessage;
+import RPiInterface.Message;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -32,7 +32,7 @@ public class FastestPathType2 extends FastestPath {
 	
 	
 	@Override
-	public AlgoReturnMessage computeAction() {
+	public Message computeAction() {
 		//Initialization
 				ArrayList<ArrayList<Vertex>> outOfBound= updateOutofBound();
 				MapGUI map = MapGUI.getInstance();
@@ -180,7 +180,7 @@ public class FastestPathType2 extends FastestPath {
 						movements[index] = instruction;
 						index++;
 				}
-				AlgoReturnMessage message  = new AlgoReturnMessage();
+				Message message  = new Message();
 				message.setMovements(movements);
 				Vertex lastLocation = path.get(path.size()-1);
 				int [] location = {(int) lastLocation.x,(int) lastLocation.y};
