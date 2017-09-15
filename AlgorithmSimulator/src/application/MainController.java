@@ -30,6 +30,7 @@ import RPiInterface.RobotSensorSimulatorType2;
 import RobotMovement.RobotMovement;
 import algorithm.Exploration;
 import algorithm.ExplorationType1;
+import algorithm.ExplorationType2;
 import algorithm.FastestPath;
 import algorithm.FastestPathType1;
 import algorithm.FastestPathType2;

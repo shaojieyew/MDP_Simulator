@@ -14,21 +14,21 @@ import Data.RobotListener;
 import Data.Vertex;
 import RPiInterface.Message;
 
-public class ExplorationType1 extends Exploration {
+public class ExplorationType2 extends Exploration {
 	public  int [][] visited = new int[20][15];
 	public  float checkEnvironementOf[];
 	int printCount=1;
 
 	//from rpi
-	public  ExplorationType1(boolean isTerminate){
+	public  ExplorationType2(boolean isTerminate){
 		super(isTerminate);
 	}
 	
 	//from simulator
-	public ExplorationType1(){
+	public ExplorationType2(){
 		super();
 	}
-	public ExplorationType1(int startAtX, int startAtY){
+	public ExplorationType2(int startAtX, int startAtY){
 		super(startAtX,startAtY);
 	}
 
@@ -300,17 +300,37 @@ public class ExplorationType1 extends Exploration {
 				}
 			}
 		}
+		
+		int distanceWeightage1 = distanceWeightage;
+		int distanceWeightage2 = distanceWeightage;
 		//if mutually exclusive then visit the nearer one
 		if((totalCount!=0&&(similarCount==0))){
-			distanceWeightage=10;
+			distanceWeightage1=10;
+			distanceWeightage2=10;
 			exploreMoreWeightage=0;
+			int unexploredCluster1=0;
+			int unexploredCluster2=0;
+			if(canExplore1.size()>0)
+				 unexploredCluster1 = getTotalUnexploredTileConnected(canExplore1.get(0));
+			if(canExplore2.size()>0)
+				 unexploredCluster2 = getTotalUnexploredTileConnected(canExplore2.get(0));
+			
+			if(unexploredCluster2<unexploredCluster1&&((float)unexploredCluster2/(float)unexploredCluster1)<0.45){
+				distanceWeightage2=11;
+				//exploreMoreWeightage=5;
+			}	
+
+			if(unexploredCluster2>unexploredCluster1&&((float)unexploredCluster1/(float)unexploredCluster2)<0.45){
+				distanceWeightage1=11;
+				//exploreMoreWeightage=5;
+			}
 		}
 		
 		//get score of 2 location and compare
 		float score1=0;
 		float score2=0;
-		score1=calculateScore( place1,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
-		score2=calculateScore( place2,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+		score1=calculateScore( place1,  distanceWeightage1, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+		score2=calculateScore( place2,  distanceWeightage2, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
 		
 		if(startWeightage>0){
 			if(place1[0]==1&&place1[1]==1){
@@ -362,6 +382,44 @@ public class ExplorationType1 extends Exploration {
 		
 		return result;
 	}
+	
+	int visitedTemp [][] = new int[20][15];
+	private int getTotalUnexploredTileConnected(Position pos){
+		visitedTemp = new int[20][15];
+		visitedTemp[pos.getPosY()][pos.getPosX()]=1;
+		int x = pos.getPosX();
+		int y = pos.getPosY();
+		return getTotalUnexploredTileConnected(x,y, 1);
+	}
+	private int getTotalUnexploredTileConnected(int x, int y, int count){
+		int xTop = x;
+		int yTop = y+1;
+		int xBottom = x;
+		int yBottom = y-1;
+		int xLeft = x-1;
+		int yLeft = y;
+		int xRight = x+1;
+		int yRight = y;
+
+		if(xTop>=0&&xTop<15&&yTop>=0&&yTop<20&&m.getExploredTiles()[yTop][xTop]==0&&visitedTemp[yTop][xTop]!=1){
+			visitedTemp[yTop][xTop]=1;
+			count = getTotalUnexploredTileConnected(xTop, yTop ,count+1);
+		}
+		if(xBottom>=0&&xBottom<15&&yBottom>=0&&yBottom<20&&m.getExploredTiles()[yBottom][xBottom]==0&&visitedTemp[yBottom][xBottom]!=1){
+			visitedTemp[yBottom][xBottom]=1;
+			count = getTotalUnexploredTileConnected(xBottom, yBottom ,count+1);
+		}
+		if(xLeft>=0&&xLeft<15&&yLeft>=0&&yLeft<20&&m.getExploredTiles()[yLeft][xLeft]==0&&visitedTemp[yLeft][xLeft]!=1){
+			visitedTemp[yLeft][xLeft]=1;
+			count = getTotalUnexploredTileConnected(xLeft, yLeft ,count+1);
+		}
+		if(xRight>=0&&xRight<15&&yRight>=0&&yRight<20&&m.getExploredTiles()[yRight][xRight]==0&&visitedTemp[yRight][xRight]!=1){
+			visitedTemp[yRight][xRight]=1;
+			count = getTotalUnexploredTileConnected(xRight, yRight ,count+1);
+		}
+		return count;
+	}
+	
 	private float calculateScore(int place2[], int distanceWeightage,float startWeightage, float nearByWeightage, float endLocationWeightage, float exploreMoreWeightage){
 		//int x = place[0];
 		//int y = place[0];
@@ -386,6 +444,8 @@ public class ExplorationType1 extends Exploration {
 		}
 		return score;
 	}
+	
+	
 	
 	private int getDistanceAway(int x1, int y1, int x2, int y2) {
 		Vertex[][]vertices = m.getVertices();

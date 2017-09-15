@@ -86,7 +86,6 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 
 		case "FP":
 			//process algo
-			Robot.getInstance().setSensorSimulatorType("type1", false);
 			FastestPath fpAlgo = new FastestPathType2();
 			message = fpAlgo.start();
 			//prepare return message
