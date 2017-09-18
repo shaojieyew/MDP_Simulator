@@ -1,5 +1,11 @@
 package RPiInterface;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import Data.Map;
@@ -15,8 +21,25 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 	//simulate start server connection with rpi
 	@Override
 	public void startConnection() {
-		Thread sensorSimulatorThread = new Thread(this);
-		sensorSimulatorThread.start();
+		try {
+			InetAddress ip=InetAddress.getByName("172.22.212.255");
+			DatagramSocket socket = new DatagramSocket();
+			byte[] send_data=new byte[1024];
+	        String string=new String("Marathe Ajinkya Avinash,TE1,172.21.145.224");
+	        send_data=string.getBytes();
+	        DatagramPacket request=new DatagramPacket(send_data,send_data.length,ip,8088);
+            socket.send(request);
+            socket.close();
+
+
+
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	//simulate rpi message
