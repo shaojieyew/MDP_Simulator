@@ -135,6 +135,8 @@
                <items>
                   <Button fx:id="loadMapFileBtn" mnemonicParsing="false" onMouseClicked="#onclickLoadMapFileBtn" text="Load Map" />
                   <Button fx:id="generateMapStatus" mnemonicParsing="false" onMouseClicked="#onclickGenerateMapStatus" text="Export Map" />
+                  <TextField fx:id="textfield_address_port" text="127.0.0.1:8088" />
+                  <Button fx:id="connectToRpiBtn" mnemonicParsing="false" onAction="#onclickConnect" text="Connect" />
                </items>
             </ToolBar>
          </top></BorderPane>

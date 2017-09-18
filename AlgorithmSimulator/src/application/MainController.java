@@ -24,6 +24,8 @@ import Data.WayPoint;
 import GUI.FXMLController;
 import GUI.MapGUI;
 import GUI.MapObstacleGUI;
+import RPiInterface.RPiInterface;
+import RPiInterface.RealRPIInterface;
 import RPiInterface.RobotSensorSimulatorFactory;
 import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
@@ -63,6 +65,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	private Button startEndBtn;
 	@FXML
+	private Button connectToRpiBtn;
+	@FXML
 	private Button resetBtn;
 	@FXML
 	private Button exploreBtn;
@@ -90,6 +94,9 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private TextField terminateTimeTextField;
 	@FXML
 	private TextField terminateRateTextField;
+	@FXML
+	private TextField textfield_address_port;
+	
 
 	@FXML
 	private TextArea textArea;
@@ -356,6 +363,29 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	public void onTerminateRateTextField() {
 		Exploration.setAutoTerminate_explore_rate(Float.parseFloat(terminateRateTextField.getText()));
+	}
+	RPiInterface rpi = null;
+	@FXML
+	public void onclickConnect() {
+		if(rpi!=null){
+			rpi.disconnect();
+		}
+		String address = textfield_address_port.getText();
+		rpi = new RealRPIInterface();
+		if(rpi instanceof RealRPIInterface){
+			((RealRPIInterface) rpi).setM(this);
+		}
+		rpi.startConnection(address);
+	}
+	public void connectionFailed(){
+
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				connectToRpiBtn.setText("Reconnect");
+			}
+		});
 	}
 	
 	@Override

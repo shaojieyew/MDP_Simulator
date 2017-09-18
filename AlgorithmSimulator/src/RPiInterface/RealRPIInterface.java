@@ -1,5 +1,12 @@
 package RPiInterface;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import Data.Map;
@@ -9,26 +16,70 @@ import algorithm.ExplorationType1;
 import algorithm.FastestPath;
 import algorithm.FastestPathType1;
 import algorithm.FastestPathType2;
+import application.MainController;
 import util.HexBin;
 
-public class SimulateRPIInterface2 extends RPiInterface implements Runnable{
-	//simulate start server connection with rpi
+public class RealRPIInterface extends RPiInterface implements Runnable{
+	Socket socket;
+	PrintWriter out;
+	String address="127.0.0.1";
+	int port=8088;
+	
+	MainController m;
+	public void setM(MainController m) {
+		this.m = m;
+	}
 	@Override
 	public void startConnection() {
 		Thread sensorSimulatorThread = new Thread(this);
 		sensorSimulatorThread.start();
 	}
+	@Override
+	public void disconnect() {
+		if(socket!=null){
+			try {
+				socket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	public void startConnection(String addressPort) {
+		try{
+			address = addressPort.split(":")[0];
+			port = Integer.parseInt(addressPort.split(":")[1]);
+		}catch(Exception ex){
+			
+		}
+		startConnection();
+	}
 
-	//simulate rpi message
 	@Override
 	public void run() {
-		System.out.print("Listening to RPi: ");
-		Scanner sc = new Scanner(System.in);
-		String input = "";
-		while(!input.equals("esc")){
-			input = sc.nextLine();
-			inputMessage(input);
-		}
+		try {
+			socket = new Socket(address,port);
+			BufferedReader in =new BufferedReader( new InputStreamReader(socket.getInputStream()));
+			//while(true){
+			//	out.println(string);
+			//}
+			String inputVar=in.readLine();
+			while(inputVar!=null){
+				inputMessage(inputVar);
+				inputVar=in.readLine();
+			}
+
+		} catch (ConnectException e1) {
+			//e1.printStackTrace();
+			m.connectionFailed();
+		} catch (UnknownHostException e1) {
+			//e1.printStackTrace();
+			m.connectionFailed();
+		} catch (IOException e1) {
+			m.connectionFailed();
+			//e1.printStackTrace();
+		} 
+		
 	}
 	
 	//on received message, process
@@ -68,8 +119,8 @@ public class SimulateRPIInterface2 extends RPiInterface implements Runnable{
 		sensorInfo[2] = Integer.parseInt(sensorInfoString.split(",")[2]);
 		sensorInfo[3] = Integer.parseInt(sensorInfoString.split(",")[3]);
 		sensorInfo[4] = Integer.parseInt(sensorInfoString.split(",")[4]);
-		
 		*/
+		
 		
 		//F10,R90,F20,L180
 		//1. set map & obstacles
@@ -126,6 +177,13 @@ public class SimulateRPIInterface2 extends RPiInterface implements Runnable{
 	//sending message to Rpi
 	@Override
 	public void outputMessage(String string) {
-		System.out.println("Sent to RPi: "+string);
+		try {
+			out = new PrintWriter(socket.getOutputStream(), true);
+			System.out.println("Sent to RPi: "+string);
+			out.println(string);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

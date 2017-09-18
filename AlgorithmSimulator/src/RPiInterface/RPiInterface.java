@@ -7,8 +7,10 @@ import Data.WayPoint;
 
 public abstract class RPiInterface {
 	public abstract void startConnection();
+	public abstract void startConnection(String address);
 	public abstract void inputMessage(String string);
 	public abstract void outputMessage(String string);
+	public abstract void disconnect();
 	
 	
 	

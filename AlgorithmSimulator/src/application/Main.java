@@ -3,7 +3,7 @@ package application;
 import GUI.FXMLController;
 import GUI.MapObstacleGUI;
 import RPiInterface.RPiInterface;
-import RPiInterface.SimulateRPIInterface;
+import RPiInterface.RealRPIInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -54,9 +54,6 @@ public class Main extends Application {
 	                System.exit(0);
 	            }
 			});
-			
-			RPiInterface rpi = new SimulateRPIInterface();
-			rpi.startConnection();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

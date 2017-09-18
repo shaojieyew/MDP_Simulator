@@ -19,6 +19,10 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 		sensorSimulatorThread.start();
 	}
 
+	@Override
+	public void startConnection(String address) {
+		startConnection() ;
+	}
 	//simulate rpi message
 	@Override
 	public void run() {
@@ -128,4 +132,11 @@ public class SimulateRPIInterface extends RPiInterface implements Runnable{
 	public void outputMessage(String string) {
 		System.out.println("Sent to RPi: "+string);
 	}
+
+	@Override
+	public void disconnect() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
