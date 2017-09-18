@@ -11,7 +11,7 @@ import algorithm.FastestPathType1;
 import algorithm.FastestPathType2;
 import util.HexBin;
 
-public class SimulateRPIInterface extends RPiInterface implements Runnable{
+public class SimulateRPIInterface2 extends RPiInterface implements Runnable{
 	//simulate start server connection with rpi
 	@Override
 	public void startConnection() {

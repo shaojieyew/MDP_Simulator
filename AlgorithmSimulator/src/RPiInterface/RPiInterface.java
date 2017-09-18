@@ -16,7 +16,7 @@ public abstract class RPiInterface {
 	public void setMap(String exploredTile,	String exploredObstacle){
 		Map.getInstance().setMap(exploredTile,null,exploredObstacle);
 	}
-	public void setRobotLocation(int robotLocationX,	int robotLocationY, float robotDirection){
+	public void setRobotLocation(float robotLocationX,	float robotLocationY, float robotDirection){
 		Robot robot = Robot.getInstance();
 		robot.stopAllMovement();
 		robot.setPosX(robotLocationX);
@@ -31,12 +31,12 @@ public abstract class RPiInterface {
 	}
 	
 	
-	public void computeSensor(int robotLocationX,int robotLocationY,float robotDirection,int sensorInfo []) {
+	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,int sensorInfo []) {
 		Map map = Map.getInstance();
 		int exploredTiles[][] = map.getExploredTiles();
 		int obstacles[][] = map.getObstacles();
 		RobotSensorSimulatorType1 simulator1 = new RobotSensorSimulatorType1();
-		Position[][] lineOfSensors = simulator1.getLineOfSensor(robotLocationX, robotLocationY, robotDirection);
+		Position[][] lineOfSensors = simulator1.getLineOfSensor((int)robotLocationX, (int)robotLocationY, robotDirection);
 		int sensorIndex = 0;
 		for(Position[] sensors:lineOfSensors){
 			int sensorBlock = 1;
