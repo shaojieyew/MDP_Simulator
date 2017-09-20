@@ -158,4 +158,12 @@ public class FastestPathType1 extends FastestPath {
 			return (-(360-difference));
 		}
 	}
+
+
+
+	@Override
+	public String geType() {
+		// TODO Auto-generated method stub
+		return FastestPathFactory.FP1;
+	}
 }

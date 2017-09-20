@@ -31,9 +31,13 @@ import RPiInterface.RobotSensorSimulatorType1;
 import RPiInterface.RobotSensorSimulatorType2;
 import RobotMovement.RobotMovement;
 import algorithm.Exploration;
+import algorithm.ExplorationFactory;
 import algorithm.ExplorationType1;
 import algorithm.ExplorationType2;
+import algorithm.ExplorationWallerType1;
+import algorithm.ExplorationWallerType2;
 import algorithm.FastestPath;
+import algorithm.FastestPathFactory;
 import algorithm.FastestPathType1;
 import algorithm.FastestPathType2;
 import javafx.application.Platform;
@@ -102,6 +106,10 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private TextArea textArea;
 	@FXML
 	private ComboBox sensorCombo;
+	@FXML
+	private ComboBox explrCombo;
+	@FXML
+	private ComboBox fpCombo;
 	
 	@FXML
 	private void onclickLoadMapFileBtn(){
@@ -214,8 +222,14 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		Robot.getInstance().addListener(this);
 		mapPane.setCenter(mapGui);
 		sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
-		
+		explrCombo.setValue(ExplorationFactory.EX_WALL2);
+		fpCombo.setValue(FastestPathFactory.FP1);
+
+		ExplorationFactory.setSelectedType(ExplorationFactory.EX_WALL2);
+		FastestPathFactory.setSelectedType(FastestPathFactory.FP1);
 	}
+	
+	
 
 	@Override
 	public void updateRobot() {
@@ -278,7 +292,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	public void onclickAlgo1() {
 		Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue(), true);
-		explorationAlgorithm = new ExplorationType1();
+		explorationAlgorithm = ExplorationFactory.getInstance((String)explrCombo.getValue());
 		Robot.getInstance().addListener(explorationAlgorithm);
 		Map.getInstance().addListener(explorationAlgorithm);
 		explorationAlgorithm.start();
@@ -292,6 +306,14 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	public void onSensorSelected() {
 			//Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
+	}
+	@FXML
+	public void onExplrCombo() {
+		ExplorationFactory.setSelectedType((String) explrCombo.getValue());
+	}
+	@FXML
+	public void onFpCombo() {
+		FastestPathFactory.setSelectedType((String) fpCombo.getValue());
 	}
 	@FXML
 	public void onclickEditObstacle() {
@@ -348,12 +370,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 
 	@FXML
 	public void onclickFastestPath() {
-		FastestPath fp = new FastestPathType1();
-		fp.start();
-	}
-	@FXML
-	public void onclickFastestPath2() {
-		FastestPath fp = new FastestPathType2();
+		FastestPath fp =  FastestPathFactory.getInstance((String)fpCombo.getValue());
 		fp.start();
 	}
 	@FXML

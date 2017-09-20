@@ -14,14 +14,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="630.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="630.0" prefWidth="706.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
    <center>
       <BorderPane fx:id="mapPane" prefHeight="656.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <right>
-            <VBox prefHeight="518.0" prefWidth="188.0" spacing="5.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="538.0" prefWidth="225.0" spacing="5.0" BorderPane.alignment="CENTER">
                <children>
                   <HBox prefHeight="30.0" prefWidth="190.0">
                      <children>
@@ -58,7 +58,7 @@
                      <children>
                         <TextField fx:id="forwardTextField" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="39.0" text="10" />
                         <Button mnemonicParsing="false" onAction="#onClickMoveForward" prefHeight="25.0" prefWidth="56.0" text="Move" />
-                        <TextField fx:id="rotateTextField" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="34.0" text="90" />
+                        <TextField fx:id="rotateTextField" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="42.0" text="90" />
                         <Button mnemonicParsing="false" onAction="#onclickRotate" text="Rotate" />
                      </children>
                   </HBox>
@@ -71,57 +71,74 @@
                   </HBox>
                   <HBox prefHeight="39.0" prefWidth="190.0">
                      <children>
-                        <Label prefHeight="17.0" prefWidth="113.0" text="Speed: milsec/Rotate" />
-                        <TextField fx:id="rotateSpeedTextField" onKeyReleased="#onRotatSpeedChange" prefHeight="25.0" prefWidth="80.0" text="1000" />
+                        <Label prefHeight="17.0" prefWidth="126.0" text="Speed: milsec/Rotate" />
+                        <TextField fx:id="rotateSpeedTextField" onKeyReleased="#onRotatSpeedChange" prefHeight="25.0" prefWidth="92.0" text="1000" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">
                      <children>
-                        <Label prefHeight="17.0" prefWidth="94.0" text="Sensor Type" />
+                        <Label prefHeight="17.0" prefWidth="126.0" text="Sensor Type" />
                         <ComboBox fx:id="sensorCombo" maxWidth="1.7976931348623157E308" onAction="#onSensorSelected" prefWidth="90.0" promptText="choose">
 					            <items>
 					              <FXCollections fx:factory="observableArrayList">
-					                <String fx:value="type1" />
-					                <String fx:value="type2" />
-					                <String fx:value="type3" />
+                                 <String fx:value="type1" />
+                                 <String fx:value="type2" />
+                                 <String fx:value="type3" />
 					              </FXCollections>
 					            </items>
 					      </ComboBox>
                      </children>
                   </HBox>
-                 
-                  <Button fx:id="exploreBtn1" mnemonicParsing="false" onMouseClicked="#onclickAlgo1" prefHeight="25.0" prefWidth="216.0" text="Start Exploration">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Button>
+                  <HBox prefHeight="42.0" prefWidth="190.0">
+                     <children>
+                        <Label prefHeight="17.0" prefWidth="62.0" text="Expl Type" />
+                        <ComboBox fx:id="explrCombo" maxWidth="1.7976931348623157E308" onAction="#onExplrCombo" prefHeight="25.0" prefWidth="103.0" promptText="choose">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+					                <String fx:value="greedy1" />
+					                <String fx:value="greedy2" />
+					                <String fx:value="hugwall1" />
+					                <String fx:value="hugwall2" />
+                              </FXCollections>
+                           </items>
+                        </ComboBox>
+                        <Button mnemonicParsing="false" onAction="#onclickAlgo1" prefHeight="25.0" prefWidth="65.0" text="Start">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font></Button>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0" />
                   <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickStopExploration" prefHeight="25.0" prefWidth="140.0" text="Manual Terminate Explr" />
                   <Label text="Automatic Terminate Condition:" />
                   <HBox prefHeight="44.0" prefWidth="188.0">
                      <children>
-                        <Label text="Time (sec): " />
+                        <Label prefHeight="17.0" prefWidth="88.0" text="Time (sec): " />
                         <TextField fx:id="terminateTimeTextField" maxWidth="1.7976931348623157E308" onKeyReleased="#onTerminateTimeTextField" prefHeight="25.0" prefWidth="125.0" text="600" />
                      </children>
                   </HBox>
                   <HBox prefHeight="44.0" prefWidth="188.0">
                      <children>
-                        <Label text="Explr Rate: " />
+                        <Label prefHeight="17.0" prefWidth="89.0" text="Explr Rate: " />
                         <TextField fx:id="terminateRateTextField" maxWidth="1.7976931348623157E308" onKeyReleased="#onTerminateRateTextField" prefHeight="25.0" prefWidth="126.0" text="1" />
                      </children>
                   </HBox>
                   <Label fx:id="Timer" />
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox prefHeight="42.0" prefWidth="190.0">
                      <children>
-                        <Button fx:id="startEndBtn" mnemonicParsing="false" onMouseClicked="#onclickFastestPath" prefHeight="25.0" prefWidth="132.0" text="Start Fastest Path Type 1">
+                        <Label prefHeight="17.0" prefWidth="62.0" text="FP type" />
+                        <ComboBox fx:id="fpCombo" maxWidth="1.7976931348623157E308" onAction="#onFpCombo" prefHeight="25.0" prefWidth="104.0" promptText="choose">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="fp1" />
+                                 <String fx:value="fp2" />
+                              </FXCollections>
+                           </items>
+                        </ComboBox>
+                        <Button mnemonicParsing="false" onAction="#onclickFastestPath" prefHeight="25.0" prefWidth="54.0" text="Start">
                            <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="startEndBtn1" mnemonicParsing="false" onMouseClicked="#onclickFastestPath2" prefHeight="25.0" prefWidth="52.0" text="type2">
-                           <font>
-                              <Font size="11.0" />
-                           </font>
-                        </Button>
+                              <Font name="System Bold" size="12.0" />
+                           </font></Button>
                      </children>
                   </HBox>
                </children>

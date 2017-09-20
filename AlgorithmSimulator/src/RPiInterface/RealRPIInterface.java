@@ -12,6 +12,7 @@ import java.util.Scanner;
 import Data.Map;
 import Data.Robot;
 import algorithm.Exploration;
+import algorithm.ExplorationFactory;
 import algorithm.ExplorationType1;
 import algorithm.FastestPath;
 import algorithm.FastestPathType1;
@@ -97,7 +98,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 		float robotDirection = Robot.DIRECTION_EAST; 
 		int wayPointX = 1;					//by grid
 		int wayPointY = 18;					//by grid
-		int sensorInfo[] = {0,0,0,0,0};		//block away from robot
+		int sensorInfo[] = {0,0,0,0,0,0};		//block away from robot
 		String exploredTile="ffe07fc0ff81ff03fe07fc0ff81ff03fe07ff8ffe1ffe07fc0dc01b800600000000000000003";
 		String exploredObstacle="00000000000100000000000001000200027f";
 		//String exploredTile="ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
@@ -143,7 +144,10 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 		case "EX":
 			//process algo
 			Robot.getInstance().setSensorSimulatorType("type1", false);
-			Exploration explorationAlgorithm = new ExplorationType1(terminateExploring);
+			Exploration explorationAlgorithm = ExplorationFactory.getInstance();
+			if(terminateExploring){
+				explorationAlgorithm.terminate();
+			}
 			message= explorationAlgorithm.start();
 			//prepare return message
 			hexExplored=HexBin.BinTohex(Map.getInstance().getBinaryExplored());

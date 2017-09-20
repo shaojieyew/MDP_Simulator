@@ -39,7 +39,8 @@ public abstract class FastestPath {
 	public void setStartingY(int startingY) {
 		this.startingY = startingY;
 	}
-	
+
+	public abstract String geType();
 	
 	
 }

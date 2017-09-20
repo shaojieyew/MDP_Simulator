@@ -1,6 +1,5 @@
 package algorithm;
-/*greedy/hueristic for most unexplored*/
-
+/*follow left wall*/
 
 import java.awt.List;
 import java.util.ArrayList;
@@ -15,21 +14,21 @@ import Data.RobotListener;
 import Data.Vertex;
 import RPiInterface.Message;
 
-public class ExplorationType1 extends Exploration {
+public class ExplorationWallerType1 extends Exploration {
 	public  int [][] visited = new int[20][15];
 	public  float checkEnvironementOf[];
 	int printCount=1;
 
 	//from rpi
-	public  ExplorationType1(boolean isTerminate){
+	public  ExplorationWallerType1(boolean isTerminate){
 		super(isTerminate);
 	}
 	
 	//from simulator
-	public ExplorationType1(){
+	public ExplorationWallerType1(){
 		super();
 	}
-	public ExplorationType1(int startAtX, int startAtY){
+	public ExplorationWallerType1(int startAtX, int startAtY){
 		super(startAtX,startAtY);
 	}
 
@@ -42,28 +41,28 @@ public class ExplorationType1 extends Exploration {
 
 
 	public Message computeAction(){
-		//System.out.println("\n===Action " +printCount+"=== Explration rate :"+m.getInstance().getExploredRate());
-		printCount++;
+		float mapDiscoveredRate = m.getExploredRate();
+		long currentTimeStamp = System.currentTimeMillis();
+    	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000);
+		if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
+			finishHuggingWall=true;
+			terminate();
+		}
+		
+		Message message = null;
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
 		float direction = r.getDirection();
-		//System.out.println("Hello i am at ("+r.getPosX()+","+r.getPosY()+") facing at "+direction);
-	
-		//check if i can explore more here, if yes. rotate~~~
-		//check right side
+		int result[] ;
 		updateVisitedList();
 		
 		if(!isOkToTerminate()||!startPointFound()){
-			//check if current location has 100% exploration
 			int currentDirectionIndex = 0;
-			/*for(int i =0;i<checkEnvironementOf.length;i++){
-				if(checkEnvironementOf[i]==direction){
-					currentDirectionIndex=i;
-					break;
-				}
-			}*/
-			//if there is any uncovered, rotate to that direction
 			if(visited[currentY][currentX]==0){
+				if(!newVisit){
+					newVisit = true;
+					newVisitDirection = direction;
+				}
 				int count = 0;
 				int checkDirection = 0;
 				int toRotate = 360;
@@ -83,49 +82,170 @@ public class ExplorationType1 extends Exploration {
 					}
 				}
 					if(isAnyUndiscovered(currentX, currentY,checkDirection)){
-						//System.out.println(checkDirection+" direction have undiscovered tiles");
-						//rotate to east
 						float degree = rotateToDirection(direction,checkDirection);
 						int intDegree = Math.round(degree);
 						String movement= "R"+intDegree;
 						if(intDegree<0){
 							movement= "L"+(intDegree*-1);
 						}
-						Message message  = new Message();
+						message  = new Message();
 						String []movments = {movement};
 						message.setMovements(movments);
 						int [] location = {currentX,currentY};
 						message.setRobotLocation(location);
 						message.setEndOfExploration(false);
 						message.setDirection(checkDirection);
+						//return message;
 						return message;
 					}
 				}
-			}
-		
-		//set visited
-		//System.out.println("I have finish exploring ("+r.getPosX()+","+r.getPosX()+"), lets move on");
-		visited[currentY][currentX]=1;
-
-		//System.out.println("I could move to ");
-		checkedVisited =new int[20][15];
-		int[] location  = getBestNextStop(currentX,currentY,10000);
-		//System.out.println("Best Location :"+location[0]+","+location[1]+","+location[2]+","+location[3]);
-		
-		if(currentX==location[0]&&currentY==location[1]&&(currentX!=1||currentY!=1)){
-			location[0]=1;
-			location[1]=1;
+			
 		}
 		
-		//move to best location
-		Message message = moveToLocation(currentX, currentY, direction, location[0],location[1]);
-		if(location[0]==1&&location[1]==1&&isOkToTerminate()){
-			message.setEndOfExploration(true);
-			destroy();
+		if(!finishHuggingWall){
+			if(newVisit){
+				newVisit = false;
+				rotateToDirection(direction,newVisitDirection);
+				direction= newVisitDirection;
+			}
+			message = getNextWallHugLocation(currentX,currentY,(int)direction, new ArrayList<String>());
+			if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1){
+				finishHuggingWall = true;
+			}
+		}
+		if(finishHuggingWall){
+			checkedVisited =new int[20][15];
+			result  = getBestNextStop(currentX,currentY,10000);
+			if(currentX==result[0]&&currentY==result[1]&&(currentX!=1||currentY!=1)){
+				result[0]=1;
+				result[1]=1;
+			}
+			
+			//move to best location
+			message = moveToLocation(currentX, currentY, direction, result[0],result[1]);
+			if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+				message.setEndOfExploration(true);
+				cleanUpVar();
+				destroy();
+			}
+		}
+		return message;
+	}
+
+	public static boolean turnedLeft =false;
+	public static boolean turnedRight =false;
+	public static boolean testTurnedLeft =false;
+	public static boolean testTurnedRight =false;
+	public static boolean newVisit =false;
+	public static float newVisitDirection =0;
+	public static boolean finishHuggingWall =false;
+	@Override
+	public void updateMap(){
+		computeAction();
+	}
+
+	public void cleanUpVar(){
+		 testTurnedLeft =false;
+		 testTurnedRight =false;
+		 newVisit =false;
+		 newVisitDirection =0;
+		 finishHuggingWall =false;
+	}
+	/*
+	 if (turnedleft previously and forward no wall)
+		  go forwards 1 cell
+	 elseif (no wall at left)
+		  turn 90deg left
+		elseif (no wall forwards)
+		  go forwards 1 cell
+		else
+		  turn 90deg right
+	 * */
+
+	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
+		int robotsNorth = (int) ((NORTH+direction)%360);
+		int robotsEast = (int) ((EAST+direction)%360);
+		int robotsWest = (int) ((WEST+direction)%360);
+		int nMoveable = isDirectionMoveable(robotsNorth, x, y);
+		int wMoveable = isDirectionMoveable(robotsWest, x, y);
+		int previousBlocked = getLeftBlocks(direction,x, y);
+		Message message;
+		int [] result = {x,y,direction};
+		if(visited[y][x]==0||(x==1 && y==1&&endPointFound())){
+			String []movements = new String[instructions.size()];
+			int index=0;
+			for(String instruction: instructions){
+					movements[index] = instruction;
+					index++;
+			}
+			message  = new Message();
+			message.setMovements(movements);
+			message.setRobotLocation(result);
+			message.setEndOfExploration(false);
+			message.setDirection(direction);
+			return message;
+		}
+		int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
+		if(testTurnedLeft&&nMoveable!=0){
+			testTurnedLeft=false;
+			r.moveForward(10*steps);
+			instructions.add("F"+10*steps);
+			result= computeForwardLocation(direction, x, y, steps);
+			message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+		}else{
+			if(wMoveable!=0){
+				testTurnedLeft=true;
+				float degreeToMove =rotateToDirection(direction,robotsWest);
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+				message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
+			}else{
+				if(steps!=0){
+					if(testTurnedRight){
+						testTurnedRight=false;
+					}
+					r.moveForward(10*steps);
+					instructions.add("F"+10*steps);
+					result= computeForwardLocation(direction, x, y, steps);
+					message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+				}else{
+					testTurnedRight=true;
+					float degreeToMove =rotateToDirection(direction,robotsEast);
+					int intDegree = Math.round(degreeToMove);
+					String rmovement= "R"+intDegree;
+					if(intDegree<0){
+						rmovement= "L"+(intDegree*-1);
+					}
+					instructions.add(rmovement);
+					message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
+				}
+			}
 		}
 		return message;
 	}
 	
+	private int[] computeForwardLocation(int direction, int x, int y, int steps){
+		switch(direction){
+		case 0:
+			y=y+steps;
+			break;
+		case 90:
+			x=x+steps;
+			break;
+		case 180:
+			y=y-steps;
+			break;
+		case 270:
+			x=x-steps;
+			break;
+		}
+		int result[]={x,y};
+		return result;
+	}
 	
 	private boolean startPointFound() {
 		for(int x =0;x<3;x++){
@@ -138,6 +258,87 @@ public class ExplorationType1 extends Exploration {
 		return true;
 	}
 
+	private boolean endPointFound() {
+		for(int x =12;x<15;x++){
+			for(int y =17;y<20;y++){
+				if(m.getExploredTiles()[y][x]!=1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
+		ArrayList<String> instructions = new ArrayList<String>();
+		Vertex s = m.getVertices()[y1][x1];
+		if(s==null){
+			//System.out.println("Error:"+x1+","+y1);
+			//System.out.println("Error:"+x1+","+y1);
+			return null;
+		}
+		Vertex[][] vertices =  m.getVertices();
+		Vertex e =vertices[y2][x2];
+		float direction = facing;
+		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
+		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
+		//System.out.println("Path to travel: "+path);
+		//System.out.println("I am facing "+direction);
+		int forwardCount = 0;
+		for(int i =0;i<path.size()-1;i++){
+			Vertex v1 =path.get(i);
+			Vertex v2 =path.get(i+1);
+			float degree = getDegreeBetweenTwoPoint(v1.x,v1.y,v2.x,v2.y);
+			if(degree!= direction)
+			{
+				if(forwardCount!=0){
+					instructions.add("F"+forwardCount);
+					r.moveForward(forwardCount);
+				}
+				forwardCount=0;
+				//float degreeBetween= degreeToRotateToDirection(direction,degree);
+				float degreeToMove =rotateToDirection(direction,degree);
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+				direction = degree;
+			}
+			forwardCount=forwardCount+10;
+			if(i==path.size()-2){
+				instructions.add("F"+forwardCount);
+				r.moveForward(forwardCount);
+			}
+		}
+		if(direction!=endDirection){
+			float degreeToMove =rotateToDirection(direction,endDirection);
+			int intDegree = Math.round(degreeToMove);
+			String rmovement= "R"+intDegree;
+			if(intDegree<0){
+				rmovement= "L"+(intDegree*-1);
+			}
+			instructions.add(rmovement);
+			direction = endDirection;
+		}
+
+		
+		String []movements = new String[instructions.size()];
+		int index=0;
+		for(String instruction: instructions){
+				movements[index] = instruction;
+				index++;
+		}
+		Message message  = new Message();
+		message.setMovements(movements);
+		Vertex lastLocation = path.get(path.size()-1);
+		int [] location = {(int) lastLocation.x,(int) lastLocation.y};
+		message.setRobotLocation(location);
+		message.setEndOfExploration(false);
+		message.setDirection(direction);
+		return message;
+	}
 	//get Instructions To Location
 	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {
 		ArrayList<String> instructions = new ArrayList<String>();
@@ -182,7 +383,6 @@ public class ExplorationType1 extends Exploration {
 				r.moveForward(forwardCount);
 			}
 		}
-
 		
 		String []movements = new String[instructions.size()];
 		int index=0;
@@ -317,37 +517,17 @@ public class ExplorationType1 extends Exploration {
 				}
 			}
 		}
-		
-		int distanceWeightage1 = distanceWeightage;
-		int distanceWeightage2 = distanceWeightage;
 		//if mutually exclusive then visit the nearer one
 		if((totalCount!=0&&(similarCount==0))){
-			distanceWeightage1=10;
-			distanceWeightage2=10;
+			distanceWeightage=10;
 			exploreMoreWeightage=0;
-			int unexploredCluster1=0;
-			int unexploredCluster2=0;
-			if(canExplore1.size()>0)
-				 unexploredCluster1 = getTotalUnexploredTileConnected(canExplore1.get(0));
-			if(canExplore2.size()>0)
-				 unexploredCluster2 = getTotalUnexploredTileConnected(canExplore2.get(0));
-			
-			if(unexploredCluster2<unexploredCluster1&&((float)unexploredCluster2/(float)unexploredCluster1)<0.45){
-				distanceWeightage2=11;
-				//exploreMoreWeightage=5;
-			}	
-
-			if(unexploredCluster2>unexploredCluster1&&((float)unexploredCluster1/(float)unexploredCluster2)<0.45){
-				distanceWeightage1=11;
-				//exploreMoreWeightage=5;
-			}
 		}
 		
 		//get score of 2 location and compare
 		float score1=0;
 		float score2=0;
-		score1=calculateScore( place1,  distanceWeightage1, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
-		score2=calculateScore( place2,  distanceWeightage2, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+		score1=calculateScore( place1,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+		score2=calculateScore( place2,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
 		
 		if(startWeightage>0){
 			if(place1[0]==1&&place1[1]==1){
@@ -578,6 +758,146 @@ public class ExplorationType1 extends Exploration {
 		return arrays;
 	}
 	
+
+	public int isDirectionMoveable(float direction, int x, int y){
+		int[][]obstacles = m.getObstacles();
+		int[][]explored = m.getExploredTiles();
+		int maxMoveable = 3;
+		int dir = (int)direction;
+		switch (dir){
+		case 0: 
+			for(int i =0;i<maxMoveable;i++){
+				if(y+2+i>=20){
+					return i;
+				}
+				if(explored[y+2+i][x+1]==0||(explored[y+2+i][x+1]==1&&obstacles[y+2+i][x+1]==1)){
+					return i;
+				}
+				if(explored[y+2+i][x]==0||(explored[y+2+i][x]==1&&obstacles[y+2+i][x]==1)){
+					return i;
+				}
+				if(explored[y+2+i][x-1]==0||(explored[y+2+i][x-1]==1&&obstacles[y+2+i][x-1]==1)){
+					return i;
+				}
+			}
+			break;
+		case 90: 
+			for(int i =0;i<maxMoveable;i++){
+				if(x+2+i>=15){
+					return i;
+				}
+				if(explored[y-1][x+i+2]==0||(explored[y-1][x+i+2]==1&&obstacles[y-1][x+i+2]==1)){
+					return i;
+				}
+				if(explored[y][x+i+2]==0||(explored[y][x+i+2]==1&&obstacles[y][x+i+2]==1)){
+					return i;
+				}
+				if(explored[y+1][x+i+2]==0||(explored[y+1][x+i+2]==1&&obstacles[y+1][x+i+2]==1)){
+					return i;
+				}
+			}
+			break;
+		case 180: 
+			for(int i =0;i<maxMoveable;i++){
+				if(y-2-i<0){
+					return i;
+				}
+				if(explored[y-2-i][x-1]==0||(explored[y-2-i][x-1]==1&&obstacles[y-2-i][x-1]==1)){
+					return i;
+				}
+				if(explored[y-2-i][x]==0||(explored[y-2-i][x]==1&&obstacles[y-2-i][x]==1)){
+					return i;
+				}
+				if(explored[y-2-i][x+1]==0||(explored[y-2-i][x+1]==1&&obstacles[y-2-i][x+1]==1)){
+					return i;
+				}
+			}
+			break;
+		case 270: 
+			for(int i =0;i<maxMoveable;i++){
+				if(x-2-i<0){
+					return i;
+				}
+				if(explored[y+1][x-i-2]==0||(explored[y+1][x-i-2]==1&&obstacles[y+1][x-i-2]==1)){
+					return i;
+				}
+				if(explored[y][x-i-2]==0||(explored[y][x-i-2]==1&&obstacles[y][x-i-2]==1)){
+					return i;
+				}
+				if(explored[y-1][x-i-2]==0||(explored[y-1][x-i-2]==1&&obstacles[y-1][x-i-2]==1)){
+					return i;
+				}
+			}
+			break;
+		}
+		return maxMoveable;
+	}
+	public int getLeftBlocks(float direction, int x, int y){
+		int[][]obstacles = m.getObstacles();
+		int[][]explored = m.getExploredTiles();
+		int dir = (int)direction;
+		switch (dir){
+		case 0: 
+			if(x-2<0){
+				return 3;
+			}
+			if(explored[y+1][x-2]==0||(explored[y+1][x-2]==1&&obstacles[y+1][x-2]==1)){
+				return 3;
+			}
+			if(explored[y][x-2]==0||(explored[y][x-2]==1&&obstacles[y][x-2]==1)){
+				return 2;
+			}
+			if(explored[y-1][x-2]==0||(explored[y-1][x-2]==1&&obstacles[y-1][x-2]==1)){
+				return 1;
+			}
+			break;
+		case 90: 
+			if(y+2>=20){
+				return 3;
+			}
+			if(explored[y+2][x+1]==0||(explored[y+2][x+1]==1&&obstacles[y+2][x+1]==1)){
+				return 3;
+			}
+			if(explored[y+2][x]==0||(explored[y+2][x]==1&&obstacles[y+2][x]==1)){
+				return 2;
+			}
+			if(explored[y+2][x-1]==0||(explored[y+2][x-1]==1&&obstacles[y+2][x-1]==1)){
+				return 1;
+			}
+			break;
+		case 180: 
+			if(x+2>=15){
+				return 3;
+			}
+			if(explored[y-1][x+2]==0||(explored[y-1][x+2]==1&&obstacles[y-1][x+2]==1)){
+				return 3;
+			}
+			if(explored[y][x+2]==0||(explored[y][x+2]==1&&obstacles[y][x+2]==1)){
+				return 2;
+			}
+			if(explored[y+1][x+2]==0||(explored[y+1][x+2]==1&&obstacles[y+1][x+2]==1)){
+				return 1;
+			}
+			break;
+		case 270: 
+			if(y-2<0){
+				return 3;
+			}
+			if(explored[y-2][x-1]==0||(explored[y-2][x-1]==1&&obstacles[y-2][x-1]==1)){
+				return 3;
+			}
+			if(explored[y-2][x]==0||(explored[y-2][x]==1&&obstacles[y-2][x]==1)){
+				return 2;
+			}
+			if(explored[y-2][x+1]==0||(explored[y-2][x+1]==1&&obstacles[y-2][x+1]==1)){
+				return 1;
+			}
+			break;
+		}
+		return 3;
+	}
+	
+	
 	@Override
 	public void updateRobot() {
 		
@@ -601,6 +921,6 @@ public class ExplorationType1 extends Exploration {
 
 	@Override
 	public String geType() {
-		return ExplorationFactory.EX_GREEDY1;
+		return ExplorationFactory.EX_WALL1;
 	}
 }

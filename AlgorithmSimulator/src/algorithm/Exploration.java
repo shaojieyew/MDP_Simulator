@@ -2,9 +2,11 @@ package algorithm;
 
 import Data.Map;
 import Data.MapListener;
+import Data.Position;
 import Data.Robot;
 import Data.RobotListener;
 import RPiInterface.Message;
+import RPiInterface.RobotSensorSimulatorFactory;
 
 public abstract class Exploration implements  MapListener, RobotListener{
 	private static long autoTerminate_time=600;
@@ -93,4 +95,59 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	public static void setAutoTerminate_explore_rate(float autoTerminate_explore_rate) {
 		Exploration.autoTerminate_explore_rate = autoTerminate_explore_rate;
 	}
+
+	public abstract String geType();
+	
+	
+	
+
+	protected boolean isAnyUndiscovered(int currentX,int currentY, float inDirection){
+		Position[][] lineOfSensors = r.getSensorSimulator().getLineOfSensor(currentX, currentY, inDirection);
+		boolean thereExistUndiscovered = false;
+		for(Position[] sensors:lineOfSensors){
+			if(thereExistUndiscovered)
+				break;
+			for(Position sensor:sensors){
+				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
+					if(m.getExploredTiles()[sensor.getPosY()][(sensor.getPosX())]==0){
+						thereExistUndiscovered = true;
+						break;
+					}else{
+						if(m.getObstacles()[sensor.getPosY()][(sensor.getPosX())]==1){
+							break;
+						}
+					}
+				}else{
+					break;
+				}
+			}
+		}
+		return thereExistUndiscovered;
+	}
+	
+	protected int howManyUndiscovered(int currentX,int currentY, float inDirection){
+		int count=0;
+		Position[][] lineOfSensors = r.getSensorSimulator().getLineOfSensor(currentX, currentY, inDirection);
+		boolean thereExistUndiscovered = false;
+		for(Position[] sensors:lineOfSensors){
+			if(thereExistUndiscovered)
+				break;
+			for(Position sensor:sensors){
+				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
+					if(m.getExploredTiles()[sensor.getPosY()][(sensor.getPosX())]==0){
+						count++;
+					}else{
+						if(m.getObstacles()[sensor.getPosY()][(sensor.getPosX())]==1){
+							break;
+						}
+					}
+				}else{
+					break;
+				}
+			}
+		}
+			System.out.println(count);
+		return count;
+	}
+	
 }

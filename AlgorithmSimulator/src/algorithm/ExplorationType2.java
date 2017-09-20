@@ -1,5 +1,5 @@
 package algorithm;
-
+/*greedy/hueristic for nearest when there are 2 mutual exclusive groups of unexplored*/
 
 import java.awt.List;
 import java.util.ArrayList;
@@ -63,8 +63,24 @@ public class ExplorationType2 extends Exploration {
 			}*/
 			//if there is any uncovered, rotate to that direction
 			if(visited[currentY][currentX]==0){
+				int count = 0;
+				int checkDirection = 0;
+				int toRotate = 360;
 				for(int i =currentDirectionIndex ; i<currentDirectionIndex+4 ; i++){
-					float checkDirection = checkEnvironementOf[i%4];
+					float directionToCheck = checkEnvironementOf[i%4];
+					int temp = howManyUndiscovered(currentX, currentY,directionToCheck);
+					if(temp>count){
+						count = temp;
+						checkDirection = (int) directionToCheck;
+					}else{
+						if(temp==count){
+							float degree = degreeToRotateToDirection(direction,  directionToCheck);
+							if(Math.abs(degree)<toRotate){
+								checkDirection = (int) directionToCheck;
+							}
+						}
+					}
+				}
 					if(isAnyUndiscovered(currentX, currentY,checkDirection)){
 						//System.out.println(checkDirection+" direction have undiscovered tiles");
 						//rotate to east
@@ -83,7 +99,7 @@ public class ExplorationType2 extends Exploration {
 						message.setDirection(checkDirection);
 						return message;
 					}
-				}
+				
 			}
 		}
 		//set visited
@@ -300,37 +316,17 @@ public class ExplorationType2 extends Exploration {
 				}
 			}
 		}
-		
-		int distanceWeightage1 = distanceWeightage;
-		int distanceWeightage2 = distanceWeightage;
 		//if mutually exclusive then visit the nearer one
 		if((totalCount!=0&&(similarCount==0))){
-			distanceWeightage1=10;
-			distanceWeightage2=10;
+			distanceWeightage=10;
 			exploreMoreWeightage=0;
-			int unexploredCluster1=0;
-			int unexploredCluster2=0;
-			if(canExplore1.size()>0)
-				 unexploredCluster1 = getTotalUnexploredTileConnected(canExplore1.get(0));
-			if(canExplore2.size()>0)
-				 unexploredCluster2 = getTotalUnexploredTileConnected(canExplore2.get(0));
-			
-			if(unexploredCluster2<unexploredCluster1&&((float)unexploredCluster2/(float)unexploredCluster1)<0.45){
-				distanceWeightage2=11;
-				//exploreMoreWeightage=5;
-			}	
-
-			if(unexploredCluster2>unexploredCluster1&&((float)unexploredCluster1/(float)unexploredCluster2)<0.45){
-				distanceWeightage1=11;
-				//exploreMoreWeightage=5;
-			}
 		}
 		
 		//get score of 2 location and compare
 		float score1=0;
 		float score2=0;
-		score1=calculateScore( place1,  distanceWeightage1, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
-		score2=calculateScore( place2,  distanceWeightage2, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+		score1=calculateScore( place1,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+		score2=calculateScore( place2,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
 		
 		if(startWeightage>0){
 			if(place1[0]==1&&place1[1]==1){
@@ -382,44 +378,6 @@ public class ExplorationType2 extends Exploration {
 		
 		return result;
 	}
-	
-	int visitedTemp [][] = new int[20][15];
-	private int getTotalUnexploredTileConnected(Position pos){
-		visitedTemp = new int[20][15];
-		visitedTemp[pos.getPosY()][pos.getPosX()]=1;
-		int x = pos.getPosX();
-		int y = pos.getPosY();
-		return getTotalUnexploredTileConnected(x,y, 1);
-	}
-	private int getTotalUnexploredTileConnected(int x, int y, int count){
-		int xTop = x;
-		int yTop = y+1;
-		int xBottom = x;
-		int yBottom = y-1;
-		int xLeft = x-1;
-		int yLeft = y;
-		int xRight = x+1;
-		int yRight = y;
-
-		if(xTop>=0&&xTop<15&&yTop>=0&&yTop<20&&m.getExploredTiles()[yTop][xTop]==0&&visitedTemp[yTop][xTop]!=1){
-			visitedTemp[yTop][xTop]=1;
-			count = getTotalUnexploredTileConnected(xTop, yTop ,count+1);
-		}
-		if(xBottom>=0&&xBottom<15&&yBottom>=0&&yBottom<20&&m.getExploredTiles()[yBottom][xBottom]==0&&visitedTemp[yBottom][xBottom]!=1){
-			visitedTemp[yBottom][xBottom]=1;
-			count = getTotalUnexploredTileConnected(xBottom, yBottom ,count+1);
-		}
-		if(xLeft>=0&&xLeft<15&&yLeft>=0&&yLeft<20&&m.getExploredTiles()[yLeft][xLeft]==0&&visitedTemp[yLeft][xLeft]!=1){
-			visitedTemp[yLeft][xLeft]=1;
-			count = getTotalUnexploredTileConnected(xLeft, yLeft ,count+1);
-		}
-		if(xRight>=0&&xRight<15&&yRight>=0&&yRight<20&&m.getExploredTiles()[yRight][xRight]==0&&visitedTemp[yRight][xRight]!=1){
-			visitedTemp[yRight][xRight]=1;
-			count = getTotalUnexploredTileConnected(xRight, yRight ,count+1);
-		}
-		return count;
-	}
-	
 	private float calculateScore(int place2[], int distanceWeightage,float startWeightage, float nearByWeightage, float endLocationWeightage, float exploreMoreWeightage){
 		//int x = place[0];
 		//int y = place[0];
@@ -445,8 +403,6 @@ public class ExplorationType2 extends Exploration {
 		return score;
 	}
 	
-	
-	
 	private int getDistanceAway(int x1, int y1, int x2, int y2) {
 		Vertex[][]vertices = m.getVertices();
 		Vertex v1 = vertices[y1][x1];
@@ -462,30 +418,6 @@ public class ExplorationType2 extends Exploration {
 		return  Math.abs(x1-x2)+Math.abs(y1-y2);
 	}
 
-	//check if the position and direction have any undiscovered tiles
-	private boolean isAnyUndiscovered(int currentX,int currentY, float inDirection){
-		Position[][] lineOfSensors = r.getSensorSimulator().getLineOfSensor(currentX, currentY, inDirection);
-		boolean thereExistUndiscovered = false;
-		for(Position[] sensors:lineOfSensors){
-			if(thereExistUndiscovered)
-				break;
-			for(Position sensor:sensors){
-				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
-					if(m.getExploredTiles()[sensor.getPosY()][(sensor.getPosX())]==0){
-						thereExistUndiscovered = true;
-						break;
-					}else{
-						if(m.getObstacles()[sensor.getPosY()][(sensor.getPosX())]==1){
-							break;
-						}
-					}
-				}else{
-					break;
-				}
-			}
-		}
-		return thereExistUndiscovered;
-	}
 	
 	private float rotateToDirection(float currentDirection, float inDirection){
 		////System.out.println("rotate from "+currentDirection+" to "+inDirection);
@@ -602,5 +534,10 @@ public class ExplorationType2 extends Exploration {
 	public void onRobotStopExploring() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public String geType() {
+		return ExplorationFactory.EX_GREEDY2;
 	}
 }

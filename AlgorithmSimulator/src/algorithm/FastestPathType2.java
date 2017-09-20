@@ -441,4 +441,9 @@ public class FastestPathType2 extends FastestPath {
 	      }
 	      return inPolygon;
 	}
+	@Override
+	public String geType() {
+		// TODO Auto-generated method stub
+		return FastestPathFactory.FP2;
+	}
 }
