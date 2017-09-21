@@ -118,12 +118,17 @@ public class ExplorationWallerType2 extends Exploration {
 		
 		
 		if(!finishHuggingWall){
+			/*
 			if(newVisit){
 				newVisit = false;
 				rotateToDirection(direction,newVisitDirection);
 				direction= newVisitDirection;
+			}*/
+			float tempDirection = direction;
+			if(newVisit){
+				 tempDirection= (int) newVisitDirection;
 			}
-			result = getNextWallHugLocation(currentX,currentY,(int)direction);
+			result = getNextWallHugLocation(currentX,currentY,(int)tempDirection);
 			if(result[0]==1&&result[1]==1){
 				finishHuggingWall = true;
 			}
@@ -174,6 +179,7 @@ public class ExplorationWallerType2 extends Exploration {
 		  turn 90deg right
 	 * */
 
+	
 	private int[] getNextWallHugLocation( int x, int y,int direction){
 		int robotsNorth = (int) ((NORTH+direction)%360);
 		int robotsEast = (int) ((EAST+direction)%360);
@@ -254,6 +260,18 @@ public class ExplorationWallerType2 extends Exploration {
 
 	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
 		ArrayList<String> instructions = new ArrayList<String>();
+		if(newVisit){
+			newVisit = false;
+			float degreeToMove = rotateToDirection(facing,newVisitDirection);
+			facing= newVisitDirection;
+			
+			int intDegree = Math.round(degreeToMove);
+			String rmovement= "R"+intDegree;
+			if(intDegree<0){
+				rmovement= "L"+(intDegree*-1);
+			}
+			instructions.add(rmovement);
+		}
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
 			//System.out.println("Error:"+x1+","+y1);
@@ -472,6 +490,8 @@ public class ExplorationWallerType2 extends Exploration {
 			distanceWeightage=0;
 			terminate();
 		}
+		
+		/*
 		int x1 = place1[0];
 		int y1 = place1[1];
 		int x2 = place2[0];
@@ -505,7 +525,7 @@ public class ExplorationWallerType2 extends Exploration {
 			distanceWeightage=10;
 			exploreMoreWeightage=0;
 		}
-		
+		*/
 		//get score of 2 location and compare
 		float score1=0;
 		float score2=0;

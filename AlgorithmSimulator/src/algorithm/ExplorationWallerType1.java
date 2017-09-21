@@ -103,12 +103,20 @@ public class ExplorationWallerType1 extends Exploration {
 		}
 		
 		if(!finishHuggingWall){
+			ArrayList<String> instructions = new ArrayList<String>();
 			if(newVisit){
 				newVisit = false;
-				rotateToDirection(direction,newVisitDirection);
+
+				float degreeToMove =rotateToDirection(direction,newVisitDirection);
 				direction= newVisitDirection;
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
 			}
-			message = getNextWallHugLocation(currentX,currentY,(int)direction, new ArrayList<String>());
+			message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);
 			if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1){
 				finishHuggingWall = true;
 			}
@@ -122,7 +130,7 @@ public class ExplorationWallerType1 extends Exploration {
 			}
 			
 			//move to best location
-			message = moveToLocation(currentX, currentY, direction, result[0],result[1]);
+			message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1]);
 			if(result[0]==1&&result[1]==1&&isOkToTerminate()){
 				message.setEndOfExploration(true);
 				cleanUpVar();
