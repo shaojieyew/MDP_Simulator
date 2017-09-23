@@ -1,5 +1,6 @@
 package algorithm;
-/*follow left wall*/
+
+/*follow left wall, with minimum rotation*/
 
 import java.awt.List;
 import java.util.ArrayList;
@@ -14,29 +15,38 @@ import Data.RobotListener;
 import Data.Vertex;
 import RPiInterface.Message;
 
-public class ExplorationWallerType1 extends Exploration {
+public class ExplorationWallerType3 extends Exploration {
+	public  int [][] visited = new int[20][15];
+	public  float checkEnvironementOf[];
+	int printCount=1;
 
-	public static boolean turnedLeft =false;
-	public static boolean turnedRight =false;
 	public static boolean testTurnedLeft =false;
 	public static boolean testTurnedRight =false;
 	public static boolean newVisit =false;
 	public static float newVisitDirection =0;
 	public static boolean finishHuggingWall =false;
-	public  int [][] visited = new int[20][15];
-	public  float checkEnvironementOf[];
-	int printCount=1;
-
+	public static int[] positionBeforeStrayAway =null;
+	public static final int strayAwayDistanceThreshold =6;
+	public static final int strayAwayDifferences =6;
+	
+	public void cleanUpVar(){
+		 testTurnedLeft =false;
+		 testTurnedRight =false;
+		 newVisit =false;
+		 newVisitDirection =0;
+		 finishHuggingWall =false;
+	}
+	
 	//from rpi
-	public  ExplorationWallerType1(boolean isTerminate){
+	public  ExplorationWallerType3(boolean isTerminate){
 		super(isTerminate);
 	}
 	
 	//from simulator
-	public ExplorationWallerType1(){
+	public ExplorationWallerType3(){
 		super();
 	}
-	public ExplorationWallerType1(int startAtX, int startAtY){
+	public ExplorationWallerType3(int startAtX, int startAtY){
 		super(startAtX,startAtY);
 	}
 
@@ -52,7 +62,8 @@ public class ExplorationWallerType1 extends Exploration {
 		float mapDiscoveredRate = m.getExploredRate();
 		long currentTimeStamp = System.currentTimeMillis();
     	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000);
-		if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
+		//set goal to termination/start point
+    	if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
 			finishHuggingWall=true;
 			terminate();
 		}
@@ -63,7 +74,7 @@ public class ExplorationWallerType1 extends Exploration {
 		float direction = r.getDirection();
 		int result[] ;
 		updateVisitedList();
-		
+		//if startpoint is not explored or goal is not startpoint/termination, continue to explore nearby blocks 
 		if(!isOkToTerminate()||!startPointFound()){
 			int currentDirectionIndex = 0;
 			if(visited[currentY][currentX]==0){
@@ -107,29 +118,49 @@ public class ExplorationWallerType1 extends Exploration {
 						return message;
 					}
 				}
-			
-		}
+			}
+		
 		
 		if(!finishHuggingWall){
-			ArrayList<String> instructions = new ArrayList<String>();
+			float tempDirection = direction;
 			if(newVisit){
-				newVisit = false;
-
-				float degreeToMove =rotateToDirection(direction,newVisitDirection);
-				direction= newVisitDirection;
-				int intDegree = Math.round(degreeToMove);
-				String rmovement= "R"+intDegree;
-				if(intDegree<0){
-					rmovement= "L"+(intDegree*-1);
-				}
-				instructions.add(rmovement);
+				 tempDirection= (int) newVisitDirection;
 			}
-			message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);
-			if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1){
+			if(positionBeforeStrayAway!=null){
+				result = getNextWallHugLocation(positionBeforeStrayAway[0],positionBeforeStrayAway[1],positionBeforeStrayAway[2]);
+				positionBeforeStrayAway=null;
+			}else{
+				result = getNextWallHugLocation(currentX,currentY,(int)tempDirection);
+			}
+
+			int count1 =whatTileCanBeDiscovered(result[0],result[1],false).size();
+			if(result[0]!=currentX||result[1]!=currentY){
+				int tempResult[] = getBestNextStop(result[0], result[1], strayAwayDistanceThreshold);
+				positionBeforeStrayAway=null;
+				if((result[0]!=tempResult[0]||result[1]!=tempResult[1])&&(tempResult[0]!=currentX||tempResult[1]!=currentY)){
+					int count2 =whatTileCanBeDiscovered(tempResult[0],tempResult[1],false).size();
+					if(count2-count1>strayAwayDifferences){
+						//int temp[]= {currentX,currentY,(int)tempDirection};
+						positionBeforeStrayAway = result;
+						result = tempResult;
+					}
+				}
+			}
+			
+			if(result[0]==1&&result[1]==1&&positionBeforeStrayAway==null){
 				finishHuggingWall = true;
 			}
-			return message;
+
+			if(!finishHuggingWall){
+				message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
+				if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+					message.setEndOfExploration(true);
+					destroy();
+				}
+				return message;
+			}
 		}
+
 		if(finishHuggingWall){
 			checkedVisited =new int[20][15];
 			result  = getBestNextStop(currentX,currentY,10000);
@@ -137,29 +168,23 @@ public class ExplorationWallerType1 extends Exploration {
 				result[0]=1;
 				result[1]=1;
 			}
-			
-			//move to best location
-			message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1]);
+			message = moveToLocation(currentX, currentY, direction, result[0],result[1]);
 			if(result[0]==1&&result[1]==1&&isOkToTerminate()){
 				message.setEndOfExploration(true);
 				cleanUpVar();
 				destroy();
 			}
+			return message ;
 		}
+
 		return message;
 	}
-	
+
 	@Override
 	public void updateMap(){
-		computeAction();
-	}
 
-	public void cleanUpVar(){
-		 testTurnedLeft =false;
-		 testTurnedRight =false;
-		 newVisit =false;
-		 newVisitDirection =0;
-		 finishHuggingWall =false;
+		computeAction();
+		
 	}
 	/*
 	 if (turnedleft previously and forward no wall)
@@ -172,70 +197,42 @@ public class ExplorationWallerType1 extends Exploration {
 		  turn 90deg right
 	 * */
 
-	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
+	
+	private int[] getNextWallHugLocation( int x, int y,int direction){
 		int robotsNorth = (int) ((NORTH+direction)%360);
 		int robotsEast = (int) ((EAST+direction)%360);
 		int robotsWest = (int) ((WEST+direction)%360);
 		int nMoveable = isDirectionMoveable(robotsNorth, x, y);
 		int wMoveable = isDirectionMoveable(robotsWest, x, y);
 		int previousBlocked = getLeftBlocks(direction,x, y);
-		Message message;
 		int [] result = {x,y,direction};
 		if(visited[y][x]==0||(x==1 && y==1&&endPointFound())){
-			String []movements = new String[instructions.size()];
-			int index=0;
-			for(String instruction: instructions){
-					movements[index] = instruction;
-					index++;
-			}
-			message  = new Message();
-			message.setMovements(movements);
-			message.setRobotLocation(result);
-			message.setEndOfExploration(false);
-			message.setDirection(direction);
-			return message;
+			return result;
 		}
 		int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
 		if(testTurnedLeft&&nMoveable!=0){
 			testTurnedLeft=false;
-			r.moveForward(10*steps);
-			instructions.add("F"+10*steps);
+			//r.moveForward(10*nMoveable);
 			result= computeForwardLocation(direction, x, y, steps);
-			message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+			result=getNextWallHugLocation(result[0],result[1],direction);
 		}else{
 			if(wMoveable!=0){
 				testTurnedLeft=true;
-				float degreeToMove =rotateToDirection(direction,robotsWest);
-				int intDegree = Math.round(degreeToMove);
-				String rmovement= "R"+intDegree;
-				if(intDegree<0){
-					rmovement= "L"+(intDegree*-1);
-				}
-				instructions.add(rmovement);
-				message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
+				result=getNextWallHugLocation(result[0],result[1],robotsWest);
 			}else{
 				if(steps!=0){
 					if(testTurnedRight){
 						testTurnedRight=false;
 					}
-					r.moveForward(10*steps);
-					instructions.add("F"+10*steps);
 					result= computeForwardLocation(direction, x, y, steps);
-					message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+					result=getNextWallHugLocation(result[0],result[1],direction);
 				}else{
 					testTurnedRight=true;
-					float degreeToMove =rotateToDirection(direction,robotsEast);
-					int intDegree = Math.round(degreeToMove);
-					String rmovement= "R"+intDegree;
-					if(intDegree<0){
-						rmovement= "L"+(intDegree*-1);
-					}
-					instructions.add(rmovement);
-					message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
+					result=getNextWallHugLocation(result[0],result[1],robotsEast);
 				}
 			}
 		}
-		return message;
+		return result;
 	}
 	
 	private int[] computeForwardLocation(int direction, int x, int y, int steps){
@@ -280,7 +277,7 @@ public class ExplorationWallerType1 extends Exploration {
 	}
 
 	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
-		ArrayList<String> instructions = new ArrayList<String>();
+
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
 			//System.out.println("Error:"+x1+","+y1);
@@ -289,11 +286,29 @@ public class ExplorationWallerType1 extends Exploration {
 		}
 		Vertex[][] vertices =  m.getVertices();
 		Vertex e =vertices[y2][x2];
-		float direction = facing;
 		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
 		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
-		//System.out.println("Path to travel: "+path);
-		//System.out.println("I am facing "+direction);
+
+		ArrayList<String> instructions = new ArrayList<String>();
+		if(newVisit){
+			newVisit = false;
+			float degree = 0;
+			if(path.size()>1){
+				degree = getDegreeBetweenTwoPoint(x1,y1,path.get(1).x,path.get(1).y);
+			}
+			if(degree!=facing){
+				float degreeToMove = rotateToDirection(facing,newVisitDirection);
+				facing= newVisitDirection;
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+			}
+		}
+		float direction = facing;
+		
 		int forwardCount = 0;
 		for(int i =0;i<path.size()-1;i++){
 			Vertex v1 =path.get(i);
@@ -466,22 +481,16 @@ public class ExplorationWallerType1 extends Exploration {
 	 //greedy heuristic 
 	private int[] calculateScoreOfVertexAndCompare(int[] place1, int[] place2){
 		float mapDiscoveredRate = m.getExploredRate();
-		float exploreMoreWeightage = 1; //explore_score:1-36
+		float exploreMoreWeightage = 20; //explore_score:1-36
 		int nearByWeightage = 0;	     //score: 1-28
-		float endLocationWeightage = 1;  //score: 1-28
+		float endLocationWeightage = 0;  //score: 1-28
 		float startWeightage = 0;        //score: 1-28
-		int distanceWeightage = 0;
+		int distanceWeightage = 10;
 		
 		boolean isAllPossibleNodeVisited = allPossibleNodeVisited();
 		//if end point found
 		if(m.getExploredTiles()[18][13]==1||isAllPossibleNodeVisited){
 			endLocationWeightage=0;
-			//if map discovered rate 90% or more
-			if(mapDiscoveredRate>0.9){
-				startWeightage = 0;
-				exploreMoreWeightage=1;
-				distanceWeightage=1;
-			}
 			//if map discovered rate is 100%
 			if(mapDiscoveredRate>=getAutoTerminate_explore_rate()||isAllPossibleNodeVisited){
 				startWeightage = 1000000;
@@ -499,6 +508,8 @@ public class ExplorationWallerType1 extends Exploration {
 			distanceWeightage=0;
 			terminate();
 		}
+		
+		/*
 		int x1 = place1[0];
 		int y1 = place1[1];
 		int x2 = place2[0];
@@ -532,7 +543,7 @@ public class ExplorationWallerType1 extends Exploration {
 			distanceWeightage=10;
 			exploreMoreWeightage=0;
 		}
-		
+		*/
 		//get score of 2 location and compare
 		float score1=0;
 		float score2=0;
@@ -669,8 +680,8 @@ public class ExplorationWallerType1 extends Exploration {
 		return  Math.abs(x1-x2)+Math.abs(y1-y2);
 	}
 
-	
-	
+	//check if the position and direction have any undiscovered tiles
+
 	private float rotateToDirection(float currentDirection, float inDirection){
 		////System.out.println("rotate from "+currentDirection+" to "+inDirection);
 		float degree = degreeToRotateToDirection(currentDirection,  inDirection);
@@ -928,9 +939,8 @@ public class ExplorationWallerType1 extends Exploration {
 		
 	}
 
-
 	@Override
 	public String geType() {
-		return ExplorationFactory.EX_WALL1;
+		return ExplorationFactory.EX_WALL3;
 	}
 }

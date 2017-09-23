@@ -99,6 +99,7 @@
 					                <String fx:value="greedy2" />
 					                <String fx:value="hugwall1" />
 					                <String fx:value="hugwall2" />
+					                <String fx:value="hugwall3" />
                               </FXCollections>
                            </items>
                         </ComboBox>

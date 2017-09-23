@@ -59,7 +59,8 @@ public class ExplorationWallerType2 extends Exploration {
 		float mapDiscoveredRate = m.getExploredRate();
 		long currentTimeStamp = System.currentTimeMillis();
     	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000);
-		if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
+		//set goal to termination/start point
+    	if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
 			finishHuggingWall=true;
 			terminate();
 		}
@@ -70,7 +71,7 @@ public class ExplorationWallerType2 extends Exploration {
 		float direction = r.getDirection();
 		int result[] ;
 		updateVisitedList();
-		
+		//if startpoint is not explored or goal is not startpoint/termination, continue to explore nearby blocks 
 		if(!isOkToTerminate()||!startPointFound()){
 			int currentDirectionIndex = 0;
 			if(visited[currentY][currentX]==0){
@@ -118,12 +119,6 @@ public class ExplorationWallerType2 extends Exploration {
 		
 		
 		if(!finishHuggingWall){
-			/*
-			if(newVisit){
-				newVisit = false;
-				rotateToDirection(direction,newVisitDirection);
-				direction= newVisitDirection;
-			}*/
 			float tempDirection = direction;
 			if(newVisit){
 				 tempDirection= (int) newVisitDirection;
@@ -259,19 +254,7 @@ public class ExplorationWallerType2 extends Exploration {
 	}
 
 	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
-		ArrayList<String> instructions = new ArrayList<String>();
-		if(newVisit){
-			newVisit = false;
-			float degreeToMove = rotateToDirection(facing,newVisitDirection);
-			facing= newVisitDirection;
-			
-			int intDegree = Math.round(degreeToMove);
-			String rmovement= "R"+intDegree;
-			if(intDegree<0){
-				rmovement= "L"+(intDegree*-1);
-			}
-			instructions.add(rmovement);
-		}
+
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
 			//System.out.println("Error:"+x1+","+y1);
@@ -280,11 +263,27 @@ public class ExplorationWallerType2 extends Exploration {
 		}
 		Vertex[][] vertices =  m.getVertices();
 		Vertex e =vertices[y2][x2];
-		float direction = facing;
 		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
 		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
-		//System.out.println("Path to travel: "+path);
-		//System.out.println("I am facing "+direction);
+
+		ArrayList<String> instructions = new ArrayList<String>();
+		if(newVisit){
+			newVisit = false;
+			float degree = getDegreeBetweenTwoPoint(x1,y1,path.get(1).x,path.get(1).y);
+			System.out.println(x1+","+y1+"=>"+","+path.get(1)+" - "+degree+" deg  <-->"+newVisitDirection);
+			if(degree!=facing){
+				float degreeToMove = rotateToDirection(facing,newVisitDirection);
+				facing= newVisitDirection;
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+			}
+		}
+		float direction = facing;
+		
 		int forwardCount = 0;
 		for(int i =0;i<path.size()-1;i++){
 			Vertex v1 =path.get(i);

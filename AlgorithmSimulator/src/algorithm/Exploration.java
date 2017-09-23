@@ -146,7 +146,6 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				}
 			}
 		}
-			System.out.println(count);
 		return count;
 	}
 	
