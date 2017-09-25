@@ -100,6 +100,7 @@
 					                <String fx:value="hugwall1" />
 					                <String fx:value="hugwall2" />
 					                <String fx:value="hugwall3" />
+					                <String fx:value="hugwall4" />
                               </FXCollections>
                            </items>
                         </ComboBox>

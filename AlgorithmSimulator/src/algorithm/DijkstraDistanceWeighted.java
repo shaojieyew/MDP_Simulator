@@ -29,7 +29,7 @@ public class DijkstraDistanceWeighted extends Dijkstra
             // Visit each edge exiting u
             for (Vertex v : u.adjacencies)
             {	
-                double weight = Math.hypot(v.x-u.x, v.y-u.y);
+                double weight = Math.hypot(v.x-u.x, v.y-u.y) +0.2;
                 double distanceThroughU = u.minDistance + weight;
 		        if (distanceThroughU < v.minDistance) {
 		            vertexQueue.remove(v);
