@@ -105,27 +105,28 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 		//String exploredObstacle="000000000000000000000000000000000000000000000000000000001c00c00000000000000f";
 		
 		
-		/*
+		
 		status = parameters[0];
-		String robotLocation = parameters[1];
-		robotLocationX = Float.parseFloat(robotLocation.split(",")[0]);
-		robotLocationY = Float.parseFloat(robotLocation.split(",")[1]);
-		robotDirection = Float.parseFloat(robotLocation.split(",")[2]);
-		String waypointLocation = parameters[2];
-		wayPointX = Integer.parseInt(waypointLocation.split(",")[0]);
-		wayPointY = Integer.parseInt(waypointLocation.split(",")[1]);
-		String sensorInfoString = parameters[3];
-		sensorInfo[0] = Integer.parseInt(sensorInfoString.split(",")[0]);
-		sensorInfo[1] = Integer.parseInt(sensorInfoString.split(",")[1]);
-		sensorInfo[2] = Integer.parseInt(sensorInfoString.split(",")[2]);
-		sensorInfo[3] = Integer.parseInt(sensorInfoString.split(",")[3]);
-		sensorInfo[4] = Integer.parseInt(sensorInfoString.split(",")[4]);
-		*/
+		String robotLocation[] = parameters[1].split(",");
+		robotLocationX = Float.parseFloat(robotLocation[0]);
+		robotLocationY = Float.parseFloat(robotLocation[1]);
+		robotDirection = Float.parseFloat(robotLocation[2]);
+		String sensorInfoString[] = parameters[2].split(",");
+		sensorInfo[0] = Integer.parseInt(sensorInfoString[0]);
+		sensorInfo[1] = Integer.parseInt(sensorInfoString[1]);
+		sensorInfo[2] = Integer.parseInt(sensorInfoString[2]);
+		sensorInfo[3] = Integer.parseInt(sensorInfoString[3]);
+		sensorInfo[4] = Integer.parseInt(sensorInfoString[4]);
+		String waypointLocation[]= parameters[3].split(",");
+		wayPointX = Integer.parseInt(waypointLocation[0]);
+		wayPointY = Integer.parseInt(waypointLocation[1]);
+		
+		
 		
 		
 		//F10,R90,F20,L180
 		//1. set map & obstacles
-		setMap(exploredTile,exploredObstacle);
+		//setMap(exploredTile,exploredObstacle);
 		
 		//2. set robot 
 		setRobotLocation(robotLocationX,robotLocationY,robotDirection);
@@ -157,7 +158,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			message.setStatus(status);
 			//send out message
 			outputMessage(message.getMessage(Message.MESSAGE_HEADER_ARDUINO));
-			outputMessage(message.getMessage(Message.MESSAGE_HEADER_ANDROID));
+			//outputMessage(message.getMessage(Message.MESSAGE_HEADER_ANDROID));
 			break;
 
 		case "FP":
