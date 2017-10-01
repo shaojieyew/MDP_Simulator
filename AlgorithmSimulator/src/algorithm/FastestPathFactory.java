@@ -19,7 +19,7 @@ public class FastestPathFactory {
 	public static void setSelectedType(String selectedType) {
 		FastestPathFactory.selectedType = selectedType;
 	}
-	public FastestPath getInstance(){
+	public static FastestPath getInstance(){
 		return getInstance (selectedType);
 	}
 }

@@ -26,7 +26,9 @@ public abstract class RPiInterface {
 		robot.setDirection(robotDirection);
 	}
 	public void setWayPoint(int x, int y){
-		WayPoint.getInstance().setPosition(new Position(x,y));
+		removeWayPoint();
+		if(x>0 && y>0)
+			WayPoint.getInstance().setPosition(new Position(x,y));
 	}
 	public void removeWayPoint(){
 		WayPoint.getInstance().setPosition(null);
@@ -37,6 +39,17 @@ public abstract class RPiInterface {
 		Map map = Map.getInstance();
 		int exploredTiles[][] = map.getExploredTiles();
 		int obstacles[][] = map.getObstacles();
+		exploredTiles[(int) robotLocationY-1][(int) robotLocationX-1]=1;
+		exploredTiles[(int) robotLocationY-1][(int) robotLocationX]=1;
+		exploredTiles[(int) robotLocationY-1][(int) robotLocationX+1]=1;
+		exploredTiles[(int) robotLocationY][(int) robotLocationX-1]=1;
+		exploredTiles[(int) robotLocationY][(int) robotLocationX]=1;
+		exploredTiles[(int) robotLocationY][(int) robotLocationX+1]=1;
+		exploredTiles[(int) robotLocationY+1][(int) robotLocationX-1]=1;
+		exploredTiles[(int) robotLocationY+1][(int) robotLocationX]=1;
+		exploredTiles[(int) robotLocationY+1][(int) robotLocationX+1]=1;
+		
+		
 		RobotSensorSimulatorType1 simulator1 = new RobotSensorSimulatorType1();
 		Position[][] lineOfSensors = simulator1.getLineOfSensor((int)robotLocationX, (int)robotLocationY, robotDirection);
 		int sensorIndex = 0;
@@ -56,5 +69,8 @@ public abstract class RPiInterface {
 			}
 			sensorIndex++;
 		}
+
+		map.setExploredTiles(exploredTiles);
+		map.setObstacle(obstacles);
 	}
 }
