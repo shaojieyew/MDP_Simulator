@@ -101,7 +101,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 		float robotDirection = Robot.getInstance().getDirection(); ; 
 		int wayPointX = -1;					//by grid
 		int wayPointY = -1;					//by grid
-		int sensorInfo[] = {0,0,0,0,0,0};	//block away from robot;
+		float[] sensorInfo = {0,0,0,0,0,0};	//block away from robot;
 		
 		
 		action_status = parameters[0];

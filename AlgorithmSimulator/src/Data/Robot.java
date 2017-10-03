@@ -159,6 +159,11 @@ public class Robot {
 				forwardMovementThread.start();
 			}
 	}
+	
+	public void calibrate (){
+		moveForward(1);
+		moveForward(-1);
+	}
 	public void runNextInstruction(){
 		if(instructions.size()>0){
 			instructions.remove(0);

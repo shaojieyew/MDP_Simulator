@@ -34,8 +34,47 @@ public abstract class RPiInterface {
 		WayPoint.getInstance().setPosition(null);
 	}
 	
+	/*
+	 	  0	3 1
+	  	  | | |
+	  __ 4
+	           2 __ 
+	  __ 5
+	  
+	 */
 	
-	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,int sensorInfo []) {
+	public static float sensorOffset[]={0f,0f,0f,0f,0f,0f};
+	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,float sensorDistance []) {
+		int sensorInfo[] = new int[6];
+		int sensorIndex = 0;
+		for(float distance : sensorDistance){
+			if(distance<0){
+				sensorInfo[sensorIndex] = 1;
+				sensorIndex++;
+				continue;
+			}
+			if(distance==0){
+				sensorInfo[sensorIndex] = 0;
+				sensorIndex++;
+				continue;
+			}
+			if((distance-sensorOffset[sensorIndex]<=5)){
+				sensorInfo[sensorIndex] = 1;
+			}else{
+				if((distance-sensorOffset[sensorIndex]<=15)){
+					sensorInfo[sensorIndex] = 2;
+				}else{
+					if((distance-sensorOffset[sensorIndex]<=25)){
+						sensorInfo[sensorIndex] = 3;
+					}else{
+						sensorInfo[sensorIndex] = 0;
+					}
+				}
+			}
+			sensorIndex++;
+			continue;
+		}
+		
 		Map map = Map.getInstance();
 		int exploredTiles[][] = map.getExploredTiles();
 		int obstacles[][] = map.getObstacles();
@@ -52,7 +91,7 @@ public abstract class RPiInterface {
 		
 		RobotSensorSimulatorType1 simulator1 = new RobotSensorSimulatorType1();
 		Position[][] lineOfSensors = simulator1.getLineOfSensor((int)robotLocationX, (int)robotLocationY, robotDirection);
-		int sensorIndex = 0;
+		sensorIndex = 0;
 		for(Position[] sensors:lineOfSensors){
 			int sensorBlock = 1;
 			for(Position sensor:sensors){

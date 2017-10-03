@@ -98,7 +98,53 @@ public abstract class Exploration implements  MapListener, RobotListener{
 
 	public abstract String geType();
 	
-	
+
+	protected boolean canCalibrate(int currentX,int currentY, float inDirection){
+		inDirection=inDirection%360;
+		if(currentX<=1&&inDirection==WEST){
+			return true;
+		}
+		if(currentX>=13&&inDirection==EAST){
+			return true;
+		}
+		if(currentY<=1&&inDirection==SOUTH){
+			return true;
+		}
+		if(currentY>=18&&inDirection==NORTH){
+			return true;
+		}
+		int [][]obstacles= m.getObstacles();
+		int [][]explored= m.getExploredTiles();
+		if(inDirection ==NORTH ){
+			if(explored[currentY+2][currentX-1]==1 && explored[currentY+2][currentX+1]==1){
+				if(obstacles[currentY+2][currentX-1]==1 && obstacles[currentY+2][currentX+1]==1){
+					return true;
+				}
+			}
+		}
+		if(inDirection ==SOUTH ){
+			if(explored[currentY-2][currentX-1]==1 && explored[currentY-2][currentX+1]==1){
+				if(obstacles[currentY-2][currentX-1]==1 && obstacles[currentY-2][currentX+1]==1){
+					return true;
+				}
+			}
+		}
+		if(inDirection ==EAST ){
+			if(explored[currentY+1][currentX+2]==1 && explored[currentY-1][currentX+2]==1){
+				if(obstacles[currentY+1][currentX+2]==1 && obstacles[currentY-1][currentX+2]==1){
+					return true;
+				}
+			}
+		}
+		if(inDirection ==WEST ){
+			if(explored[currentY+1][currentX-2]==1 && explored[currentY-1][currentX-2]==1){
+				if(obstacles[currentY+1][currentX-2]==1 && obstacles[currentY-1][currentX-2]==1){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	
 
 	protected boolean isAnyUndiscovered(int currentX,int currentY, float inDirection){

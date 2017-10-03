@@ -54,7 +54,8 @@ public class ExplorationWallerType2 extends Exploration {
 		this.checkEnvironementOf =checkEnvironementOf;
 	}
 
-
+	//for calibration
+	public static int distanceTraveledAfterCalibrate = 0;
 	public Message computeAction(){
 		float mapDiscoveredRate = m.getExploredRate();
 		long currentTimeStamp = System.currentTimeMillis();
@@ -69,6 +70,50 @@ public class ExplorationWallerType2 extends Exploration {
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
 		float direction = r.getDirection();
+
+		//for calibration
+		if(distanceTraveledAfterCalibrate>80){
+			distanceTraveledAfterCalibrate=0;
+			String []movments = {};
+			if(canCalibrate(currentX,currentY,direction)){
+				String []instructions = {"C"};
+				r.calibrate();
+				movments= instructions;
+			}else{
+				if(canCalibrate(currentX,currentY,direction+90)){
+					String []instructions = {"R90","C","L90"};
+					rotateToDirection(direction,direction+90);
+					r.calibrate();
+					rotateToDirection(direction,direction-90);
+					movments= instructions;
+				}else{
+					if(canCalibrate(currentX,currentY,direction-90)){
+						String []instructions = {"L90","C","R90"};
+						rotateToDirection(direction,direction-90);
+						r.calibrate();
+						rotateToDirection(direction,direction+90);
+						movments= instructions;
+					}else{
+						if(canCalibrate(currentX,currentY,direction+180)){
+							String []instructions = {"R180","C","L180"};
+							rotateToDirection(direction,direction+180);
+							r.calibrate();
+							rotateToDirection(direction,direction-180);
+							movments= instructions;
+						}
+					}
+				}
+			}
+			message  = new Message();
+			message.setMovements(movments);
+			int [] location = {currentX,currentY};
+			message.setRobotLocation(location);
+			message.setEndOfExploration(false);
+			message.setDirection(direction);
+			return message;
+		}
+		
+		
 		int result[] ;
 		updateVisitedList();
 		//if startpoint is not explored or goal is not startpoint/termination, continue to explore nearby blocks 
@@ -270,7 +315,7 @@ public class ExplorationWallerType2 extends Exploration {
 		if(newVisit){
 			newVisit = false;
 			float degree = getDegreeBetweenTwoPoint(x1,y1,path.get(1).x,path.get(1).y);
-			System.out.println(x1+","+y1+"=>"+","+path.get(1)+" - "+degree+" deg  <-->"+newVisitDirection);
+			//System.out.println(x1+","+y1+"=>"+","+path.get(1)+" - "+degree+" deg  <-->"+newVisitDirection);
 			if(degree!=facing){
 				float degreeToMove = rotateToDirection(facing,newVisitDirection);
 				facing= newVisitDirection;
@@ -293,6 +338,8 @@ public class ExplorationWallerType2 extends Exploration {
 			{
 				if(forwardCount!=0){
 					instructions.add("F"+forwardCount);
+					//for calibration
+					distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 					r.moveForward(forwardCount);
 				}
 				forwardCount=0;
@@ -309,6 +356,8 @@ public class ExplorationWallerType2 extends Exploration {
 			forwardCount=forwardCount+10;
 			if(i==path.size()-2){
 				instructions.add("F"+forwardCount);
+				//for calibration
+				distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 				r.moveForward(forwardCount);
 			}
 		}
@@ -364,6 +413,8 @@ public class ExplorationWallerType2 extends Exploration {
 			{
 				if(forwardCount!=0){
 					instructions.add("F"+forwardCount);
+					//for calibration
+					distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 					r.moveForward(forwardCount);
 				}
 				forwardCount=0;
@@ -380,6 +431,8 @@ public class ExplorationWallerType2 extends Exploration {
 			forwardCount=forwardCount+10;
 			if(i==path.size()-2){
 				instructions.add("F"+forwardCount);
+				//for calibration
+				distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 				r.moveForward(forwardCount);
 			}
 		}
