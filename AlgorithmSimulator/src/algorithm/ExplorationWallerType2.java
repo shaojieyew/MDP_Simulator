@@ -71,6 +71,7 @@ public class ExplorationWallerType2 extends Exploration {
 		int currentY =Math.round(r.getPosY());
 		float direction = r.getDirection();
 
+		/*
 		//for calibration
 		if(distanceTraveledAfterCalibrate>80){
 			distanceTraveledAfterCalibrate=0;
@@ -111,7 +112,7 @@ public class ExplorationWallerType2 extends Exploration {
 			message.setEndOfExploration(false);
 			message.setDirection(direction);
 			return message;
-		}
+		}*/
 		
 		
 		int result[] ;
