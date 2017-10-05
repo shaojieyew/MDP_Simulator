@@ -67,33 +67,33 @@ public class RobotSensorSimulatorType1 extends RobotSensorSimulator {
 		for(int i =0;i<3;i++){
 			switch ((int)direction){
 			case 0:
-				lineOfSensor0[i]=new Position(x-1,y+2+i);
+				lineOfSensor1[i]=new Position(x-1,y+2+i);
 				lineOfSensor3[i]=new Position(x,y+2+i);
-				lineOfSensor1[i]=new Position(x+1,y+2+i);
+				lineOfSensor0[i]=new Position(x+1,y+2+i);
 				lineOfSensor5[i]=new Position(x-2-i,y-1);
 				lineOfSensor4[i]=new Position(x-2-i,y+1);
 				lineOfSensor2[i]=new Position(x+2+i,y);
 				break;
 			case 90:
-				lineOfSensor0[i]=new Position(x+2+i,y+1);
+				lineOfSensor1[i]=new Position(x+2+i,y+1);
 				lineOfSensor3[i]=new Position(x+2+i,y);
-				lineOfSensor1[i]=new Position(x+2+i,y-1);
+				lineOfSensor0[i]=new Position(x+2+i,y-1);
 				lineOfSensor5[i]=new Position(x-1,y+2+i);
 				lineOfSensor4[i]=new Position(x+1,y+2+i);
 				lineOfSensor2[i]=new Position(x,y-2-i);
 				break;
 			case 180:
-				lineOfSensor0[i]=new Position(x+1,y-2-i);
+				lineOfSensor1[i]=new Position(x+1,y-2-i);
 				lineOfSensor3[i]=new Position(x,y-2-i);
-				lineOfSensor1[i]=new Position(x-1,y-2-i);
+				lineOfSensor0[i]=new Position(x-1,y-2-i);
 				lineOfSensor5[i]=new Position(x+2+i,y+1);
 				lineOfSensor4[i]=new Position(x+2+i,y-1);
 				lineOfSensor2[i]=new Position(x-2-i,y);
 				break;
 			case 270:
-				lineOfSensor0[i]=new Position(x-2-i,y-1);
+				lineOfSensor1[i]=new Position(x-2-i,y-1);
 				lineOfSensor3[i]=new Position(x-2-i,y);
-				lineOfSensor1[i]=new Position(x-2-i,y+1);
+				lineOfSensor0[i]=new Position(x-2-i,y+1);
 				lineOfSensor5[i]=new Position(x+1,y-2-i);
 				lineOfSensor4[i]=new Position(x-1,y-2-i);
 				lineOfSensor2[i]=new Position(x,y+2+i);
