@@ -131,18 +131,23 @@ public class ExplorationWallerType2 extends Exploration {
 				for(int i =currentDirectionIndex ; i<currentDirectionIndex+4 ; i++){
 					float directionToCheck = checkEnvironementOf[i%4];
 					int temp = howManyUndiscovered(currentX, currentY,directionToCheck);
+					//System.out.println(direction+" facing =  "+directionToCheck+" , "+ temp);
+					float degree = degreeToRotateToDirection(direction,  directionToCheck);
 					if(temp>count){
 						count = temp;
 						checkDirection = (int) directionToCheck;
+						toRotate = (int) degree;
 					}else{
 						if(temp==count){
-							float degree = degreeToRotateToDirection(direction,  directionToCheck);
 							if(Math.abs(degree)<toRotate){
+								//System.out.println(toRotate+" vs "+ degree);
 								checkDirection = (int) directionToCheck;
+								toRotate = (int) degree;
 							}
 						}
 					}
 				}
+				//System.out.println(checkDirection);
 					if(isAnyUndiscovered(currentX, currentY,checkDirection)){
 						float degree = rotateToDirection(direction,checkDirection);
 						int intDegree = Math.round(degree);
@@ -175,10 +180,12 @@ public class ExplorationWallerType2 extends Exploration {
 			}
 
 			if(!finishHuggingWall){
-				message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
 				if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+					message = moveToLocation(currentX, currentY, direction, result[0],result[1],(int)NORTH);
 					message.setEndOfExploration(true);
 					destroy();
+				}else{
+					message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
 				}
 				return message;
 			}
@@ -191,11 +198,13 @@ public class ExplorationWallerType2 extends Exploration {
 				result[0]=1;
 				result[1]=1;
 			}
-			message = moveToLocation(currentX, currentY, direction, result[0],result[1]);
 			if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+				message = moveToLocation(currentX, currentY, direction, result[0],result[1],(int)NORTH);
 				message.setEndOfExploration(true);
 				cleanUpVar();
 				destroy();
+			}else{
+				message = moveToLocation(currentX, currentY, direction, result[0],result[1]);
 			}
 			return message ;
 		}
@@ -303,8 +312,8 @@ public class ExplorationWallerType2 extends Exploration {
 
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
-			//System.out.println("Error:"+x1+","+y1);
-			//System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
 			return null;
 		}
 		Vertex[][] vertices =  m.getVertices();
@@ -316,7 +325,7 @@ public class ExplorationWallerType2 extends Exploration {
 		if(newVisit){
 			newVisit = false;
 			float degree = getDegreeBetweenTwoPoint(x1,y1,path.get(1).x,path.get(1).y);
-			//System.out.println(x1+","+y1+"=>"+","+path.get(1)+" - "+degree+" deg  <-->"+newVisitDirection);
+			////System.out.println(x1+","+y1+"=>"+","+path.get(1)+" - "+degree+" deg  <-->"+newVisitDirection);
 			if(degree!=facing){
 				float degreeToMove = rotateToDirection(facing,newVisitDirection);
 				facing= newVisitDirection;
@@ -394,8 +403,8 @@ public class ExplorationWallerType2 extends Exploration {
 		ArrayList<String> instructions = new ArrayList<String>();
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
-			//System.out.println("Error:"+x1+","+y1);
-			//System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
 			return null;
 		}
 		Vertex[][] vertices =  m.getVertices();
@@ -403,8 +412,8 @@ public class ExplorationWallerType2 extends Exploration {
 		float direction = facing;
 		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
 		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
-		//System.out.println("Path to travel: "+path);
-		//System.out.println("I am facing "+direction);
+		////System.out.println("Path to travel: "+path);
+		////System.out.println("I am facing "+direction);
 		int forwardCount = 0;
 		for(int i =0;i<path.size()-1;i++){
 			Vertex v1 =path.get(i);
@@ -492,7 +501,7 @@ public class ExplorationWallerType2 extends Exploration {
 					}
 					int squareAway =  getDistanceAway(currentX,currentY,x,y);
 					if(squareAway<0){
-						//System.out.println("alert");
+						////System.out.println("alert");
 					}
 					int result[] = {x,y,canExplore.size(),squareAway};
 					if(maxHop==1){
@@ -618,9 +627,9 @@ public class ExplorationWallerType2 extends Exploration {
 		
 		
 		//if(place1[2]!=0)
-			////System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
+			//////System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
 		//if(place2[2]!=0)
-			////System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
+			//////System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
 			
 		int []result;
 		if(score1>score2){
@@ -718,7 +727,7 @@ public class ExplorationWallerType2 extends Exploration {
 	//check if the position and direction have any undiscovered tiles
 
 	private float rotateToDirection(float currentDirection, float inDirection){
-		////System.out.println("rotate from "+currentDirection+" to "+inDirection);
+		//////System.out.println("rotate from "+currentDirection+" to "+inDirection);
 		float degree = degreeToRotateToDirection(currentDirection,  inDirection);
 		r.rotate(degree);
 		return degree;

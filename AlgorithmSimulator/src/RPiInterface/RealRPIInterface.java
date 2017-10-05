@@ -65,10 +65,12 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			//while(true){
 			//	out.println(string);
 			//}
-			String inputVar=in.readLine();
-			while(inputVar!=null){
+			String inputVar;
+			System.out.println("addresS: " + address);
+			while((inputVar=in.readLine()) != null){ 
+				//string input = in.readLine();
+				//while((inputVar=in.readLine()) != null);
 				inputMessage(inputVar);
-				inputVar=in.readLine();
 			}
 
 		} catch (ConnectException e1) {
@@ -87,6 +89,9 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 	//on received message, process
 	@Override
 	public void inputMessage(String string) {
+		if(string.length()==0){
+			return;
+		}
 		//[action status]|[explored map]|[explored obstacles]|[x,y,degree]|[s1,s2,s3,s4,s5]|[wpx,wpy]
 		//
 		string = string.trim();
