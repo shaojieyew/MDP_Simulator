@@ -115,15 +115,20 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			robotLocationX = Float.parseFloat(robotLocation[0]);
 			robotLocationY = Float.parseFloat(robotLocation[1]);
 			robotDirection = Float.parseFloat(robotLocation[2]);
+			if(robotLocationY<0){
+				robotLocationY=1;
+			}if(robotLocationX<0){
+				robotLocationX=1;
+			}
 		}
 		if(parameters[2].length()>0){
 		String sensorInfoString[] = parameters[2].split(",");
-			sensorInfo[0] = Integer.parseInt(sensorInfoString[0]);
-			sensorInfo[1] = Integer.parseInt(sensorInfoString[1]);
-			sensorInfo[2] = Integer.parseInt(sensorInfoString[2]);
-			sensorInfo[3] = Integer.parseInt(sensorInfoString[3]);
-			sensorInfo[4] = Integer.parseInt(sensorInfoString[4]);
-			sensorInfo[5] = Integer.parseInt(sensorInfoString[5]);
+			sensorInfo[0] = Float.parseFloat(sensorInfoString[0]);
+			sensorInfo[1] = Float.parseFloat(sensorInfoString[1]);
+			sensorInfo[2] = Float.parseFloat(sensorInfoString[2]);
+			sensorInfo[3] = Float.parseFloat(sensorInfoString[3]);
+			sensorInfo[4] = Float.parseFloat(sensorInfoString[4]);
+			sensorInfo[5] = Float.parseFloat(sensorInfoString[5]);
 		}
 		if(parameters.length>3&&parameters[3].length()>0){
 			String waypointLocation[]= parameters[3].split(",");
