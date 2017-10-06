@@ -35,6 +35,9 @@ public class ExplorationFactory {
 	public static void setSelectedType(String selectedType) {
 		ExplorationFactory.selectedType = selectedType;
 	}
+	public static String getSelectedType() {
+		return selectedType;
+	}
 	public static Exploration getInstance(){
 		return getInstance (selectedType);
 	}

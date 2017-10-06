@@ -61,10 +61,15 @@ public class ExplorationWallerType1 extends Exploration {
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
 		float direction = r.getDirection();
+
+		if(m.getExploredTiles()[currentY][currentX]==0){
+			return null;
+		}
 		int result[] ;
 		updateVisitedList();
 		
-		if(!isOkToTerminate()||!startPointFound()){
+		
+		if(finishHuggingWall&&(!isOkToTerminate()||!startPointFound())){
 			int currentDirectionIndex = 0;
 			if(visited[currentY][currentX]==0){
 				if(!newVisit){
@@ -181,27 +186,110 @@ public class ExplorationWallerType1 extends Exploration {
 		int previousBlocked = getLeftBlocks(direction,x, y);
 		Message message;
 		int [] result = {x,y,direction};
-		if(visited[y][x]==0||(x==1 && y==1&&endPointFound())){
-			String []movements = new String[instructions.size()];
-			int index=0;
-			for(String instruction: instructions){
-					movements[index] = instruction;
-					index++;
-			}
-			message  = new Message();
-			message.setMovements(movements);
-			message.setRobotLocation(result);
-			message.setEndOfExploration(false);
-			message.setDirection(direction);
-			return message;
-		}
 		int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
+		if(steps>0){
+			//steps = 1;
+			int explored[][] = m.getExploredTiles();
+			int obstacles[][] = m.getObstacles();
+			boolean stopstep = false;
+			int i = 1;
+			
+			for( i =1;i<=steps;i++){
+				for(int j=0;j<3;j++){
+
+					int checkX1  =0;
+					int checkY1 = 0;
+					switch(direction){
+						case 0: {
+							checkX1= x+2+j;
+							checkY1= y+i-1;
+							break;
+						}
+						case 90: {
+							checkX1= x+i-1;
+							checkY1= y-2-j;
+							break;
+						}
+						case 180: {
+							checkX1= x-2-j;
+							checkY1=y-i+1;
+							break;
+						}
+						case 270: {
+							checkX1= x-i+1;
+							checkY1= y+2+j;
+							break;
+						}
+					}
+					if(checkX1>=0&&checkX1<=14&&checkY1>=0&&checkY1<=19){
+						if(explored[checkY1][checkX1]==0){
+							stopstep = true;
+							break;
+						}else{
+							if(obstacles[checkY1][checkX1]==1){
+								break;
+							}
+						}
+					}
+				}
+				if(stopstep){
+					break;
+				}
+			}
+			int tempsteps= i<steps?i:steps;
+			stopstep= false;
+			for( i =1;i<=steps;i++){
+				for(int j=0;j<3;j++){
+
+					int checkX2  =0;
+					int checkY2 = 0;
+					switch(direction){
+						case 0: {
+							checkX2= x-2-j;
+							checkY2= y+i+1;
+							break;
+						}
+						case 90: {
+							checkX2= x+i+1;
+							checkY2= y+2+j;
+							break;
+						}
+						case 180: {
+							checkX2= x+2+j;
+							checkY2=y-i+1;
+							break;
+						}
+						case 270: {
+							checkX2= x-i-1;
+							checkY2= y-2-j;
+							break;
+						}
+					}
+					if(checkX2>=0&&checkX2<=14&&checkY2>=0&&checkY2<=19){
+						if(explored[checkY2][checkX2]==0){
+							stopstep = true;
+							break;
+						}else{
+							if(obstacles[checkY2][checkX2]==1){
+								break;
+							}
+						}
+					}
+				}
+				if(stopstep){
+					break;
+				}
+			}
+			steps= i<tempsteps?i:tempsteps;
+		}
+		
 		if(testTurnedLeft&&nMoveable!=0){
 			testTurnedLeft=false;
 			r.moveForward(10*steps);
 			instructions.add("F"+10*steps);
 			result= computeForwardLocation(direction, x, y, steps);
-			message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+			//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+			
 		}else{
 			if(wMoveable!=0){
 				testTurnedLeft=true;
@@ -212,7 +300,7 @@ public class ExplorationWallerType1 extends Exploration {
 					rmovement= "L"+(intDegree*-1);
 				}
 				instructions.add(rmovement);
-				message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
+				//message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
 			}else{
 				if(steps!=0){
 					if(testTurnedRight){
@@ -221,7 +309,8 @@ public class ExplorationWallerType1 extends Exploration {
 					r.moveForward(10*steps);
 					instructions.add("F"+10*steps);
 					result= computeForwardLocation(direction, x, y, steps);
-					message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+					//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+
 				}else{
 					testTurnedRight=true;
 					float degreeToMove =rotateToDirection(direction,robotsEast);
@@ -231,10 +320,21 @@ public class ExplorationWallerType1 extends Exploration {
 						rmovement= "L"+(intDegree*-1);
 					}
 					instructions.add(rmovement);
-					message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
+					//message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
 				}
 			}
 		}
+		String []movements = new String[instructions.size()];
+		int index=0;
+		for(String instruction: instructions){
+				movements[index] = instruction;
+				index++;
+		}
+		message  = new Message();
+		message.setMovements(movements);
+		message.setRobotLocation(result);
+		message.setEndOfExploration(false);
+		message.setDirection(direction);
 		return message;
 	}
 	
@@ -280,20 +380,36 @@ public class ExplorationWallerType1 extends Exploration {
 	}
 
 	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
-		ArrayList<String> instructions = new ArrayList<String>();
+
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
-			//System.out.println("Error:"+x1+","+y1);
-			//System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
 			return null;
 		}
 		Vertex[][] vertices =  m.getVertices();
 		Vertex e =vertices[y2][x2];
-		float direction = facing;
 		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
 		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
-		//System.out.println("Path to travel: "+path);
-		//System.out.println("I am facing "+direction);
+
+		ArrayList<String> instructions = new ArrayList<String>();
+		if(newVisit){
+			newVisit = false;
+			float degree = getDegreeBetweenTwoPoint(x1,y1,path.get(1).x,path.get(1).y);
+			////System.out.println(x1+","+y1+"=>"+","+path.get(1)+" - "+degree+" deg  <-->"+newVisitDirection);
+			if(degree!=facing){
+				float degreeToMove = rotateToDirection(facing,newVisitDirection);
+				facing= newVisitDirection;
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+			}
+		}
+		float direction = facing;
+		
 		int forwardCount = 0;
 		for(int i =0;i<path.size()-1;i++){
 			Vertex v1 =path.get(i);
@@ -303,6 +419,8 @@ public class ExplorationWallerType1 extends Exploration {
 			{
 				if(forwardCount!=0){
 					instructions.add("F"+forwardCount);
+					//for calibration
+					//distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 					r.moveForward(forwardCount);
 				}
 				forwardCount=0;
@@ -319,6 +437,8 @@ public class ExplorationWallerType1 extends Exploration {
 			forwardCount=forwardCount+10;
 			if(i==path.size()-2){
 				instructions.add("F"+forwardCount);
+				//for calibration
+				//distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 				r.moveForward(forwardCount);
 			}
 		}
@@ -354,8 +474,8 @@ public class ExplorationWallerType1 extends Exploration {
 		ArrayList<String> instructions = new ArrayList<String>();
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
-			//System.out.println("Error:"+x1+","+y1);
-			//System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
 			return null;
 		}
 		Vertex[][] vertices =  m.getVertices();
@@ -363,8 +483,8 @@ public class ExplorationWallerType1 extends Exploration {
 		float direction = facing;
 		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
 		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
-		//System.out.println("Path to travel: "+path);
-		//System.out.println("I am facing "+direction);
+		////System.out.println("Path to travel: "+path);
+		////System.out.println("I am facing "+direction);
 		int forwardCount = 0;
 		for(int i =0;i<path.size()-1;i++){
 			Vertex v1 =path.get(i);
@@ -374,6 +494,8 @@ public class ExplorationWallerType1 extends Exploration {
 			{
 				if(forwardCount!=0){
 					instructions.add("F"+forwardCount);
+					//for calibration
+					//distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 					r.moveForward(forwardCount);
 				}
 				forwardCount=0;
@@ -390,6 +512,8 @@ public class ExplorationWallerType1 extends Exploration {
 			forwardCount=forwardCount+10;
 			if(i==path.size()-2){
 				instructions.add("F"+forwardCount);
+				//for calibration
+				//distanceTraveledAfterCalibrate=distanceTraveledAfterCalibrate+forwardCount;
 				r.moveForward(forwardCount);
 			}
 		}
@@ -772,7 +896,7 @@ public class ExplorationWallerType1 extends Exploration {
 	public int isDirectionMoveable(float direction, int x, int y){
 		int[][]obstacles = m.getObstacles();
 		int[][]explored = m.getExploredTiles();
-		int maxMoveable = 3;
+		int maxMoveable = 10;
 		int dir = (int)direction;
 		switch (dir){
 		case 0: 

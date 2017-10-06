@@ -310,6 +310,10 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	public void onExplrCombo() {
 		ExplorationFactory.setSelectedType((String) explrCombo.getValue());
+		if(ExplorationFactory.getSelectedType().equals(ExplorationFactory.EX_WALL1)){
+
+			sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_2);
+		}
 	}
 	@FXML
 	public void onFpCombo() {
