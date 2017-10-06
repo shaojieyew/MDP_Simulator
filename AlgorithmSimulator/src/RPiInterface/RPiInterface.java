@@ -45,7 +45,7 @@ public abstract class RPiInterface {
 	
 	/*-1, 10-35, 0*/
 	
-	public static float sensorOffset[]={0f,0f,0f,0f,0f,0f};
+	public static float sensorOffset[]={7.3f,7.3f,5.4f,10f,14.9f,6f};
 	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,float sensorDistance []) {
 		int sensorInfo[] = new int[6];
 		int sensorIndex = 0;
@@ -80,6 +80,7 @@ public abstract class RPiInterface {
 		Map map = Map.getInstance();
 		int exploredTiles[][] = map.getExploredTiles();
 		int obstacles[][] = map.getObstacles();
+		System.out.println(robotLocationX+","+robotLocationY);
 		exploredTiles[(int) robotLocationY-1][(int) robotLocationX-1]=1;
 		exploredTiles[(int) robotLocationY-1][(int) robotLocationX]=1;
 		exploredTiles[(int) robotLocationY-1][(int) robotLocationX+1]=1;
@@ -98,11 +99,21 @@ public abstract class RPiInterface {
 			int sensorBlock = 1;
 			for(Position sensor:sensors){
 				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
-					exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
-					if(sensorInfo[sensorIndex]==sensorBlock){
-						obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
-						break;
+
+					if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
+						obstacles[sensor.getPosY()][(sensor.getPosX())]=0;
 					}
+					//if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
+						exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
+						if(sensorInfo[sensorIndex]==sensorBlock){
+							obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
+							break;
+						}
+					//}else{
+					//	if(obstacles[sensor.getPosY()][(sensor.getPosX())]==1){
+					//		break;
+					//	}
+					//}
 				}else{
 					break;
 				}

@@ -115,9 +115,8 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			robotLocationX = Float.parseFloat(robotLocation[0]);
 			robotLocationY = Float.parseFloat(robotLocation[1]);
 			robotDirection = Float.parseFloat(robotLocation[2]);
-			if(robotLocationY<0){
+			if(robotLocationY<1||robotLocationX<1){
 				robotLocationY=1;
-			}if(robotLocationX<0){
 				robotLocationX=1;
 			}
 		}
