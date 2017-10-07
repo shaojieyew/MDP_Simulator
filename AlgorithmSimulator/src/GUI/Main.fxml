@@ -63,16 +63,10 @@
                      </children>
                   </HBox>
                   <HBox />
-                  <HBox prefHeight="23.0" prefWidth="190.0">
-                     <children>
-                        <Label prefHeight="17.0" prefWidth="125.0" text="Speed: milsec/Sq" />
-                        <TextField fx:id="travelSpeedTextField" onKeyReleased="#onTravelSpeedChange" prefHeight="25.0" prefWidth="92.0" text="1000" />
-                     </children>
-                  </HBox>
                   <HBox prefHeight="39.0" prefWidth="190.0">
                      <children>
-                        <Label prefHeight="17.0" prefWidth="126.0" text="Speed: milsec/Rotate" />
-                        <TextField fx:id="rotateSpeedTextField" onKeyReleased="#onRotatSpeedChange" prefHeight="25.0" prefWidth="92.0" text="1000" />
+                        <Label prefHeight="17.0" prefWidth="126.0" text="RPM: " />
+                        <TextField fx:id="rpmTextField" onKeyReleased="#onRPMChange" prefHeight="25.0" prefWidth="92.0" text="50" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">
@@ -99,6 +93,7 @@
 					                <String fx:value="greedy2" />
 					                <String fx:value="hugwall1" />
 					                <String fx:value="hugwall2" />
+					                <String fx:value="hugwall2r" />
 					                <String fx:value="hugwall3" />
 					                <String fx:value="hugwall4" />
                               </FXCollections>

@@ -81,6 +81,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	private TextField waypointXpos;
 	@FXML
+	private TextField rpmTextField;
+	@FXML
 	private TextField waypointYpos;
 	@FXML
 	private Label Timer;
@@ -193,17 +195,18 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	private void onclickResetSimulator(){
 
-		//set robot location
 		Robot robot = Robot.getInstance();
+		if(explorationAlgorithm!=null){
+			explorationAlgorithm.terminate();
+			Map.getInstance().removeListener(explorationAlgorithm);
+			robot.removeListener(explorationAlgorithm);
+		}
+		//set robot location
 		robot.setPosX(1);
 		robot.setPosY(1);
 		robot.setDirection(0);
 		WayPoint.getInstance().setPosition(null);
 		Map.getInstance().setExploredTiles(new int[20][15]);
-		if(explorationAlgorithm!=null){
-			Map.getInstance().removeListener(explorationAlgorithm);
-			robot.removeListener(explorationAlgorithm);
-		}
 		
 		//terminate rpi simulator 
 		if(robot.getSensorSimulator()!=null)
@@ -254,6 +257,13 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	public void onTravelSpeedChange() {
 		int travelSpeed = Integer.parseInt(travelSpeedTextField.getText());
 		Robot.setMilisecondPer10CM(travelSpeed);
+	}
+	@FXML
+	public void onRPMChange() {
+		int rpm = Integer.parseInt(rpmTextField.getText());
+		int speed = (int) (((60f/(((float)rpm)*(6f*3.14f))))*10*1000);
+		Robot.setMilisecondPer10CM(speed);
+		Robot.setMilisecondPerRotate(speed*6);
 	}
 	@FXML
 	public void onclickDiscoverAll() {

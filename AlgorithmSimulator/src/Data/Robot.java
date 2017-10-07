@@ -38,9 +38,9 @@ public class Robot {
 	
 	
 	private static final int framePer10CM = 30;
-	private static final int framePerRotate = 30;
-	private static  int milisecondPer10CM = 1000;
-	private static  int milisecondPerRotate = 1000;
+	private static final int framePerRotate = 90;
+	private static  int milisecondPer10CM = 636;
+	private static  int milisecondPerRotate = 3816;
 
 	
 	private long exploringStartTime = 0;

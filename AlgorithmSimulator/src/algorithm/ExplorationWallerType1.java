@@ -82,18 +82,23 @@ public class ExplorationWallerType1 extends Exploration {
 				for(int i =currentDirectionIndex ; i<currentDirectionIndex+4 ; i++){
 					float directionToCheck = checkEnvironementOf[i%4];
 					int temp = howManyUndiscovered(currentX, currentY,directionToCheck);
+					//System.out.println(direction+" facing =  "+directionToCheck+" , "+ temp);
+					float degree = degreeToRotateToDirection(direction,  directionToCheck);
 					if(temp>count){
 						count = temp;
 						checkDirection = (int) directionToCheck;
+						toRotate = (int) degree;
 					}else{
 						if(temp==count){
-							float degree = degreeToRotateToDirection(direction,  directionToCheck);
 							if(Math.abs(degree)<toRotate){
+								//System.out.println(toRotate+" vs "+ degree);
 								checkDirection = (int) directionToCheck;
+								toRotate = (int) degree;
 							}
 						}
 					}
 				}
+				//System.out.println(checkDirection);
 					if(isAnyUndiscovered(currentX, currentY,checkDirection)){
 						float degree = rotateToDirection(direction,checkDirection);
 						int intDegree = Math.round(degree);
@@ -112,8 +117,8 @@ public class ExplorationWallerType1 extends Exploration {
 						return message;
 					}
 				}
-			
-		}
+			}
+		
 		
 		if(!finishHuggingWall){
 			ArrayList<String> instructions = new ArrayList<String>();
@@ -132,8 +137,9 @@ public class ExplorationWallerType1 extends Exploration {
 			message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);
 			if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1){
 				finishHuggingWall = true;
+			}else{
+				return message;
 			}
-			return message;
 		}
 		if(finishHuggingWall){
 			checkedVisited =new int[20][15];
@@ -144,11 +150,14 @@ public class ExplorationWallerType1 extends Exploration {
 			}
 			
 			//move to best location
-			message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1]);
+			
 			if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+				message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1],0);
 				message.setEndOfExploration(true);
 				cleanUpVar();
 				destroy();
+			}else{
+				message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1]);
 			}
 		}
 		return message;
@@ -177,14 +186,14 @@ public class ExplorationWallerType1 extends Exploration {
 		  turn 90deg right
 	 * */
 
-	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
+	
+	private int[] getNextWallHugCheckLocation( int x, int y,int direction,boolean turnedLeft, boolean turnedRight){
 		int robotsNorth = (int) ((NORTH+direction)%360);
 		int robotsEast = (int) ((EAST+direction)%360);
 		int robotsWest = (int) ((WEST+direction)%360);
 		int nMoveable = isDirectionMoveable(robotsNorth, x, y);
 		int wMoveable = isDirectionMoveable(robotsWest, x, y);
 		int previousBlocked = getLeftBlocks(direction,x, y);
-		Message message;
 		int [] result = {x,y,direction};
 		int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
 		if(steps>0){
@@ -281,61 +290,206 @@ public class ExplorationWallerType1 extends Exploration {
 				}
 			}
 			steps= i<tempsteps?i:tempsteps;
+		}else{
+			return result;
+		}
+		if(result[0]==1&&result[1]==1){
+			return result;
 		}
 		
-		if(testTurnedLeft&&nMoveable!=0){
-			testTurnedLeft=false;
-			r.moveForward(10*steps);
-			instructions.add("F"+10*steps);
-			result= computeForwardLocation(direction, x, y, steps);
-			//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
-			
+		if(turnedLeft&&nMoveable!=0){
+			int next_result[]= computeForwardLocation(direction, x, y, steps);
+			result=getNextWallHugCheckLocation(next_result[0],next_result[1],direction,false,turnedRight);
 		}else{
 			if(wMoveable!=0){
-				testTurnedLeft=true;
-				float degreeToMove =rotateToDirection(direction,robotsWest);
-				int intDegree = Math.round(degreeToMove);
-				String rmovement= "R"+intDegree;
-				if(intDegree<0){
-					rmovement= "L"+(intDegree*-1);
-				}
-				instructions.add(rmovement);
-				//message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
+				result=getNextWallHugCheckLocation(result[0],result[1],robotsWest,true,turnedRight);
 			}else{
 				if(steps!=0){
-					if(testTurnedRight){
-						testTurnedRight=false;
-					}
-					r.moveForward(10*steps);
-					instructions.add("F"+10*steps);
-					result= computeForwardLocation(direction, x, y, steps);
-					//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+					int next_result[]= computeForwardLocation(direction, x, y, steps);
+					result=getNextWallHugCheckLocation(next_result[0],next_result[1],direction,turnedLeft,false);
 
 				}else{
-					testTurnedRight=true;
-					float degreeToMove =rotateToDirection(direction,robotsEast);
+					result=getNextWallHugCheckLocation(result[0],result[1],robotsEast,turnedLeft,true);
+				}
+			}
+		}
+		return result;
+	}
+	
+	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
+		int robotsNorth = (int) ((NORTH+direction)%360);
+		int robotsEast = (int) ((EAST+direction)%360);
+		int robotsWest = (int) ((WEST+direction)%360);
+		int nMoveable = isDirectionMoveable(robotsNorth, x, y);
+		int wMoveable = isDirectionMoveable(robotsWest, x, y);
+		int previousBlocked = getLeftBlocks(direction,x, y);
+		Message message;
+		//int [] endResult = {x,y,direction};
+		int []endResult = getNextWallHugCheckLocation(x,y,direction,testTurnedLeft,testTurnedRight);
+		if(endResult[0]!=1||endResult[1]!=1||!endPointFound()){
+			int [] result = {x,y,direction};
+			int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
+			int tempsteps=1000;
+			if(steps>0){
+				//steps = 1;
+				int explored[][] = m.getExploredTiles();
+				int obstacles[][] = m.getObstacles();
+				boolean stopstep = false;
+				int i = 1;
+				
+				for( i =1;i<=steps;i++){
+					for(int j=0;j<3;j++){
+	
+						int checkX1  =0;
+						int checkY1 = 0;
+						switch(direction){
+							case 0: {
+								checkX1= x+2+j;
+								checkY1= y+i-1;
+								break;
+							}
+							case 90: {
+								checkX1= x+i-1;
+								checkY1= y-2-j;
+								break;
+							}
+							case 180: {
+								checkX1= x-2-j;
+								checkY1=y-i+1;
+								break;
+							}
+							case 270: {
+								checkX1= x-i+1;
+								checkY1= y+2+j;
+								break;
+							}
+						}
+						if(checkX1>=0&&checkX1<=14&&checkY1>=0&&checkY1<=19){
+							if(explored[checkY1][checkX1]==0){
+								stopstep = true;
+								break;
+							}else{
+								if(obstacles[checkY1][checkX1]==1){
+									break;
+								}
+							}
+						}
+					}
+					if(stopstep){
+						tempsteps = i;
+						break;
+					}
+				}
+				steps= steps<tempsteps?steps:tempsteps;
+				stopstep= false;
+				tempsteps =1000;
+				for( i =1;i<=steps;i++){
+					for(int j=0;j<3;j++){
+	
+						int checkX2  =0;
+						int checkY2 = 0;
+						switch(direction){
+							case 0: {
+								checkX2= x-2-j;
+								checkY2= y+i+1;
+								break;
+							}
+							case 90: {
+								checkX2= x+i+1;
+								checkY2= y+2+j;
+								break;
+							}
+							case 180: {
+								checkX2= x+2+j;
+								checkY2=y-i-1;
+								break;
+							}
+							case 270: {
+								checkX2= x-i-1;
+								checkY2= y-2-j;
+								break;
+							}
+						}
+						if(checkX2>=0&&checkX2<=14&&checkY2>=0&&checkY2<=19){
+							if(explored[checkY2][checkX2]==0){
+								stopstep = true;
+								break;
+							}else{
+								if(obstacles[checkY2][checkX2]==1){
+									break;
+								}
+							}
+						}
+					}
+					if(stopstep){
+						tempsteps = i;
+						break;
+					}
+				}
+				steps= steps<tempsteps?steps:tempsteps;
+			}
+			
+			if(testTurnedLeft&&nMoveable!=0){
+				testTurnedLeft=false;
+				r.moveForward(10*steps);
+				instructions.add("F"+10*steps);
+				result= computeForwardLocation(direction, x, y, steps);
+				//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+				
+			}else{
+				if(wMoveable!=0){
+					testTurnedLeft=true;
+					float degreeToMove =rotateToDirection(direction,robotsWest);
 					int intDegree = Math.round(degreeToMove);
 					String rmovement= "R"+intDegree;
 					if(intDegree<0){
 						rmovement= "L"+(intDegree*-1);
 					}
 					instructions.add(rmovement);
-					//message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
+					//message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
+				}else{
+					if(steps!=0){
+						if(testTurnedRight){
+							testTurnedRight=false;
+						}
+						r.moveForward(10*steps);
+						instructions.add("F"+10*steps);
+						result= computeForwardLocation(direction, x, y, steps);
+						//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+	
+					}else{
+						testTurnedRight=true;
+						float degreeToMove =rotateToDirection(direction,robotsEast);
+						int intDegree = Math.round(degreeToMove);
+						String rmovement= "R"+intDegree;
+						if(intDegree<0){
+							rmovement= "L"+(intDegree*-1);
+						}
+						instructions.add(rmovement);
+						//message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
+					}
 				}
 			}
+			String []movements = new String[instructions.size()];
+			int index=0;
+			for(String instruction: instructions){
+					movements[index] = instruction;
+					index++;
+			}
+			message  = new Message();
+			message.setMovements(movements);
+			message.setRobotLocation(result);
+			message.setEndOfExploration(false);
+			message.setDirection(direction);
+			return message;
+		}else{
+			message  = new Message();
+			message.setMovements(null);
+			message.setRobotLocation(endResult);
+			message.setEndOfExploration(false);
+			message.setDirection(direction);
+			return message;
 		}
-		String []movements = new String[instructions.size()];
-		int index=0;
-		for(String instruction: instructions){
-				movements[index] = instruction;
-				index++;
-		}
-		message  = new Message();
-		message.setMovements(movements);
-		message.setRobotLocation(result);
-		message.setEndOfExploration(false);
-		message.setDirection(direction);
-		return message;
 	}
 	
 	private int[] computeForwardLocation(int direction, int x, int y, int steps){
@@ -588,131 +742,133 @@ public class ExplorationWallerType1 extends Exploration {
 	}
 
 	 //greedy heuristic 
-	private int[] calculateScoreOfVertexAndCompare(int[] place1, int[] place2){
-		float mapDiscoveredRate = m.getExploredRate();
-		float exploreMoreWeightage = 1; //explore_score:1-36
-		int nearByWeightage = 0;	     //score: 1-28
-		float endLocationWeightage = 1;  //score: 1-28
-		float startWeightage = 0;        //score: 1-28
-		int distanceWeightage = 0;
-		
-		boolean isAllPossibleNodeVisited = allPossibleNodeVisited();
-		//if end point found
-		if(m.getExploredTiles()[18][13]==1||isAllPossibleNodeVisited){
-			endLocationWeightage=0;
-			//if map discovered rate 90% or more
-			if(mapDiscoveredRate>0.9){
-				startWeightage = 0;
-				exploreMoreWeightage=1;
-				distanceWeightage=1;
+		private int[] calculateScoreOfVertexAndCompare(int[] place1, int[] place2){
+			float mapDiscoveredRate = m.getExploredRate();
+			float exploreMoreWeightage = 1; //explore_score:1-36
+			int nearByWeightage = 0;	     //score: 1-28
+			float endLocationWeightage = 1;  //score: 1-28
+			float startWeightage = 0;        //score: 1-28
+			int distanceWeightage = 1;
+			
+			boolean isAllPossibleNodeVisited = allPossibleNodeVisited();
+			//if end point found
+			if(m.getExploredTiles()[18][13]==1||isAllPossibleNodeVisited){
+				endLocationWeightage=0;
+				//if map discovered rate 90% or more
+				if(mapDiscoveredRate>0.7){
+					startWeightage = 0;
+					exploreMoreWeightage=1;
+					distanceWeightage=1;
+				}
+				//if map discovered rate is 100%
+				if(mapDiscoveredRate>=getAutoTerminate_explore_rate()||isAllPossibleNodeVisited){
+					startWeightage = 1000000;
+					exploreMoreWeightage=0;
+					distanceWeightage=0;
+					terminate();
+				}
 			}
-			//if map discovered rate is 100%
-			if(mapDiscoveredRate>=getAutoTerminate_explore_rate()||isAllPossibleNodeVisited){
+			//check termiation or timeout
+			long currentTimeStamp = System.currentTimeMillis();
+	    	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000);
+			if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
 				startWeightage = 1000000;
 				exploreMoreWeightage=0;
 				distanceWeightage=0;
 				terminate();
 			}
-		}
-		//check termiation or timeout
-		long currentTimeStamp = System.currentTimeMillis();
-    	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000);
-		if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
-			startWeightage = 1000000;
-			exploreMoreWeightage=0;
-			distanceWeightage=0;
-			terminate();
-		}
-		int x1 = place1[0];
-		int y1 = place1[1];
-		int x2 = place2[0];
-		int y2 = place2[1];
-		
-		//compare to find mutual undiscovered tiles
-		ArrayList<Position> canExplore1 =whatTileCanBeDiscovered(x1,y1,false);
-		ArrayList<Position> canExplore2 =whatTileCanBeDiscovered(x2,y2,false);
-		float totalCount = (canExplore1.size()<canExplore2.size())?canExplore1.size():canExplore2.size();
-		float similarCount = 0;
-		if(totalCount>0){
-			boolean breakAll=false;
-			for(Position s1: canExplore1){
-				for(Position s2: canExplore2){
-					if(s1.equals(s2)){
-						similarCount++;
-						if((similarCount/totalCount)>0.5){
-							 distanceWeightage=0;
-							 breakAll=true;
-							 break;
+			
+			/*
+			int x1 = place1[0];
+			int y1 = place1[1];
+			int x2 = place2[0];
+			int y2 = place2[1];
+			
+			//compare to find mutual undiscovered tiles
+			ArrayList<Position> canExplore1 =whatTileCanBeDiscovered(x1,y1,false);
+			ArrayList<Position> canExplore2 =whatTileCanBeDiscovered(x2,y2,false);
+			float totalCount = (canExplore1.size()<canExplore2.size())?canExplore1.size():canExplore2.size();
+			float similarCount = 0;
+			if(totalCount>0){
+				boolean breakAll=false;
+				for(Position s1: canExplore1){
+					for(Position s2: canExplore2){
+						if(s1.equals(s2)){
+							similarCount++;
+							if((similarCount/totalCount)>0.5){
+								 distanceWeightage=0;
+								 breakAll=true;
+								 break;
+							}
+						}
+					}
+					if(breakAll){
+						 break;
+					}
+				}
+			}
+			//if mutually exclusive then visit the nearer one
+			if((totalCount!=0&&(similarCount==0))){
+				distanceWeightage=10;
+				exploreMoreWeightage=0;
+			}
+			*/
+			//get score of 2 location and compare
+			float score1=0;
+			float score2=0;
+			score1=calculateScore( place1,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+			score2=calculateScore( place2,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
+			
+			if(startWeightage>0){
+				if(place1[0]==1&&place1[1]==1){
+					score2=0;
+					score1=1;
+				}
+				if(place2[0]==1&&place2[1]==1){
+					score1=0;
+					score2=1;
+				}
+			}else{
+				if(score1==score2){
+					if(getStartingX()<=6){
+						if(place1[0]>place2[0]){
+							score1=0;
+							score2=1;
+						}else{
+							score1=1;
+							score2=0;
+						}
+					}else{
+						if(place1[0]<place2[0]){
+							score1=0;
+							score2=1;
+						}else{
+							score1=1;
+							score2=0;
 						}
 					}
 				}
-				if(breakAll){
-					 break;
-				}
 			}
-		}
-		//if mutually exclusive then visit the nearer one
-		if((totalCount!=0&&(similarCount==0))){
-			distanceWeightage=10;
-			exploreMoreWeightage=0;
-		}
-		
-		//get score of 2 location and compare
-		float score1=0;
-		float score2=0;
-		score1=calculateScore( place1,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
-		score2=calculateScore( place2,  distanceWeightage, startWeightage,  nearByWeightage,  endLocationWeightage,  exploreMoreWeightage);
-		
-		if(startWeightage>0){
-			if(place1[0]==1&&place1[1]==1){
-				score2=0;
-				score1=1;
-			}
-			if(place2[0]==1&&place2[1]==1){
-				score1=0;
-				score2=1;
-			}
-		}else{
-			if(score1==score2){
-				if(getStartingX()<=6){
-					if(place1[0]>place2[0]){
-						score1=0;
-						score2=1;
-					}else{
-						score1=1;
-						score2=0;
-					}
-				}else{
-					if(place1[0]<place2[0]){
-						score1=0;
-						score2=1;
-					}else{
-						score1=1;
-						score2=0;
-					}
-				}
-			}
-		}
-		
-		
-		//if(place1[2]!=0)
-			////System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
-		//if(place2[2]!=0)
-			////System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
 			
-		int []result;
-		if(score1>score2){
-			result = place1;
-		}else{
-			if(score1==score2){
+			
+			//if(place1[2]!=0)
+				//////System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
+			//if(place2[2]!=0)
+				//////System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
+				
+			int []result;
+			if(score1>score2){
 				result = place1;
 			}else{
-				result = place2;
+				if(score1==score2){
+					result = place1;
+				}else{
+					result = place2;
+				}
 			}
+			
+			return result;
 		}
-		
-		return result;
-	}
 	
 	int visitedTemp [][] = new int[20][15];
 	private int getTotalUnexploredTileConnected(Position pos){

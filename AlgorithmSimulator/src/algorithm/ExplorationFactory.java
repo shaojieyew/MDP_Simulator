@@ -6,6 +6,7 @@ public class ExplorationFactory {
 	public static final String EX_GREEDY2 = "greedy2";
 	public static final String EX_WALL1 = "hugwall1";
 	public static final String EX_WALL2 =  "hugwall2";
+	public static final String EX_WALL2R =  "hugwall2r";
 	public static final String EX_WALL3 =  "hugwall3";
 	public static final String EX_WALL4 =  "hugwall4";
 	public static  Exploration getInstance (String value){
@@ -21,6 +22,9 @@ public class ExplorationFactory {
 		if(value.equals(EX_WALL2)){
 			return new ExplorationWallerType2();
 		}
+		if(value.equals(EX_WALL2R)){
+			return new ExplorationWallerType2R();
+		}
 		if(value.equals(EX_WALL3)){
 			return new ExplorationWallerType3();
 		}
@@ -31,7 +35,7 @@ public class ExplorationFactory {
 	}
 	
 
-	public static String selectedType =  "hugwall2";
+	public static String selectedType =  "hugwall2r";
 	public static void setSelectedType(String selectedType) {
 		ExplorationFactory.selectedType = selectedType;
 	}

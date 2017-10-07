@@ -6,6 +6,7 @@ import java.awt.Polygon;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -90,18 +91,23 @@ public class ExplorationWallerType4 extends Exploration {
 				for(int i =currentDirectionIndex ; i<currentDirectionIndex+4 ; i++){
 					float directionToCheck = checkEnvironementOf[i%4];
 					int temp = howManyUndiscovered(currentX, currentY,directionToCheck);
+					//System.out.println(direction+" facing =  "+directionToCheck+" , "+ temp);
+					float degree = degreeToRotateToDirection(direction,  directionToCheck);
 					if(temp>count){
 						count = temp;
 						checkDirection = (int) directionToCheck;
+						toRotate = (int) degree;
 					}else{
 						if(temp==count){
-							float degree = degreeToRotateToDirection(direction,  directionToCheck);
 							if(Math.abs(degree)<toRotate){
+								//System.out.println(toRotate+" vs "+ degree);
 								checkDirection = (int) directionToCheck;
+								toRotate = (int) degree;
 							}
 						}
 					}
 				}
+				//System.out.println(checkDirection);
 					if(isAnyUndiscovered(currentX, currentY,checkDirection)){
 						float degree = rotateToDirection(direction,checkDirection);
 						int intDegree = Math.round(degree);
@@ -134,10 +140,13 @@ public class ExplorationWallerType4 extends Exploration {
 			}
 
 			if(!finishHuggingWall){
-				message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
 				if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+					message = moveToLocation(currentX, currentY, direction, result[0],result[1],0);
 					message.setEndOfExploration(true);
 					destroy();
+				}else{
+					message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
+					
 				}
 				return message;
 			}
@@ -150,18 +159,44 @@ public class ExplorationWallerType4 extends Exploration {
 				result[0]=1;
 				result[1]=1;
 			}
-			message = moveToLocation(currentX, currentY, direction, result[0],result[1]);
 			if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+				message = moveToLocation(currentX, currentY, direction, result[0],result[1],0);
 				message.setEndOfExploration(true);
 				cleanUpVar();
 				destroy();
+			}else{
+
+				message = moveToLocation(currentX, currentY, direction, result[0],result[1]);
 			}
 			return message ;
 		}
 
 		return message;
 	}
-
+	public boolean allPossiblePathExplored(int x,int y){
+		int visitedCheck [][] = new int[20][15];
+		Vertex v = m.getVertices()[y][x];
+		// BFS uses Queue data structure
+				Queue queue = new LinkedList();
+				queue.add(v);
+				visitedCheck[y][x] = 1;
+				while(!queue.isEmpty()) {
+					Vertex node = (Vertex)queue.remove();
+					if(visited[(int) node.getY()][(int) node.getX()]==0){
+						return false;
+					}
+					Vertex child=null;
+					if(node.adjacencies.size()>0)
+					for(int i =0;i<node.adjacencies.size();i++){
+						child = node.adjacencies.get(i);
+						if(visitedCheck[(int) child.getY()][(int) child.getX()]==0){
+							visitedCheck[(int) child.getY()][(int) child.getX()]=1;
+							queue.add(child);
+						}
+					}
+				}
+		return true;
+	}
 	@Override
 	public void updateMap(){
 
@@ -203,6 +238,10 @@ public class ExplorationWallerType4 extends Exploration {
 		int [] result = {x,y,direction};
 		if(visited[y][x]==0||(x==1 && y==1&&endPointFound())){
 			return result;
+		}
+		if(allPossiblePathExplored(x,y)){
+			int [] result1 = {1,1,0};
+			return result1;
 		}
 		int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
 		if(testTurnedLeft&&nMoveable!=0){
@@ -532,14 +571,14 @@ public class ExplorationWallerType4 extends Exploration {
 		int nearByWeightage = 0;	     //score: 1-28
 		float endLocationWeightage = 1;  //score: 1-28
 		float startWeightage = 0;        //score: 1-28
-		int distanceWeightage = 0;
+		int distanceWeightage = 1;
 		
 		boolean isAllPossibleNodeVisited = allPossibleNodeVisited();
 		//if end point found
 		if(m.getExploredTiles()[18][13]==1||isAllPossibleNodeVisited){
 			endLocationWeightage=0;
 			//if map discovered rate 90% or more
-			if(mapDiscoveredRate>0.9){
+			if(mapDiscoveredRate>0.7){
 				startWeightage = 0;
 				exploreMoreWeightage=1;
 				distanceWeightage=1;
@@ -636,9 +675,9 @@ public class ExplorationWallerType4 extends Exploration {
 		
 		
 		//if(place1[2]!=0)
-			////System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
+			//////System.out.println("\t ("+(place1[0])+","+place1[1]+")"+"- score:" +score1 +" \ttotal explorable:"+ place1[2]+" \t distance:"+ place1[3]);
 		//if(place2[2]!=0)
-			////System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
+			//////System.out.println("\t ("+(place2[0])+","+place2[1]+")"+"- score:" +score2+" \ttotal explorable:"+ place2[2]+" \t distance:"+ place1[3]);
 			
 		int []result;
 		if(score1>score2){

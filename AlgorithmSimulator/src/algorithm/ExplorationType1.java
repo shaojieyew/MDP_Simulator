@@ -118,10 +118,13 @@ public class ExplorationType1 extends Exploration {
 		}
 		
 		//move to best location
-		Message message = moveToLocation(currentX, currentY, direction, location[0],location[1]);
+		Message message ;
 		if(location[0]==1&&location[1]==1&&isOkToTerminate()){
+			message = moveToLocation(currentX, currentY, direction, location[0],location[1],0);
 			message.setEndOfExploration(true);
 			destroy();
+		}else{
+			message = moveToLocation(currentX, currentY, direction, location[0],location[1]);
 		}
 		return message;
 	}
@@ -199,7 +202,77 @@ public class ExplorationType1 extends Exploration {
 		message.setDirection(direction);
 		return message;
 	}
+	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
 
+		Vertex s = m.getVertices()[y1][x1];
+		if(s==null){
+			//System.out.println("Error:"+x1+","+y1);
+			//System.out.println("Error:"+x1+","+y1);
+			return null;
+		}
+		Vertex[][] vertices =  m.getVertices();
+		Vertex e =vertices[y2][x2];
+		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
+		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
+
+		ArrayList<String> instructions = new ArrayList<String>();
+		float direction = facing;
+		
+		int forwardCount = 0;
+		for(int i =0;i<path.size()-1;i++){
+			Vertex v1 =path.get(i);
+			Vertex v2 =path.get(i+1);
+			float degree = getDegreeBetweenTwoPoint(v1.x,v1.y,v2.x,v2.y);
+			if(degree!= direction)
+			{
+				if(forwardCount!=0){
+					instructions.add("F"+forwardCount);
+					r.moveForward(forwardCount);
+				}
+				forwardCount=0;
+				//float degreeBetween= degreeToRotateToDirection(direction,degree);
+				float degreeToMove =rotateToDirection(direction,degree);
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+				direction = degree;
+			}
+			forwardCount=forwardCount+10;
+			if(i==path.size()-2){
+				instructions.add("F"+forwardCount);
+				r.moveForward(forwardCount);
+			}
+		}
+		if(direction!=endDirection){
+			float degreeToMove =rotateToDirection(direction,endDirection);
+			int intDegree = Math.round(degreeToMove);
+			String rmovement= "R"+intDegree;
+			if(intDegree<0){
+				rmovement= "L"+(intDegree*-1);
+			}
+			instructions.add(rmovement);
+			direction = endDirection;
+		}
+
+		
+		String []movements = new String[instructions.size()];
+		int index=0;
+		for(String instruction: instructions){
+				movements[index] = instruction;
+				index++;
+		}
+		Message message  = new Message();
+		message.setMovements(movements);
+		Vertex lastLocation = path.get(path.size()-1);
+		int [] location = {(int) lastLocation.x,(int) lastLocation.y};
+		message.setRobotLocation(location);
+		message.setEndOfExploration(false);
+		message.setDirection(direction);
+		return message;
+	}
 
 	private int[] getBestNextStop(int inX, int inY, int maxHop) {
 

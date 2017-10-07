@@ -1,6 +1,6 @@
 package algorithm;
 
-/*follow left wall, with minimum rotation*/
+/*follow right wall, with minimum rotation*/
 
 import java.awt.List;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import Data.RobotListener;
 import Data.Vertex;
 import RPiInterface.Message;
 
-public class ExplorationWallerType2 extends Exploration {
+public class ExplorationWallerType2R extends Exploration {
 	public  int [][] visited = new int[20][15];
 	public  float checkEnvironementOf[];
 	int printCount=1;
@@ -36,15 +36,15 @@ public class ExplorationWallerType2 extends Exploration {
 	}
 	
 	//from rpi
-	public  ExplorationWallerType2(boolean isTerminate){
+	public  ExplorationWallerType2R(boolean isTerminate){
 		super(isTerminate);
 	}
 	
 	//from simulator
-	public ExplorationWallerType2(){
+	public ExplorationWallerType2R(){
 		super();
 	}
-	public ExplorationWallerType2(int startAtX, int startAtY){
+	public ExplorationWallerType2R(int startAtX, int startAtY){
 		super(startAtX,startAtY);
 	}
 
@@ -260,10 +260,10 @@ public class ExplorationWallerType2 extends Exploration {
 		int robotsEast = (int) ((EAST+direction)%360);
 		int robotsWest = (int) ((WEST+direction)%360);
 		int nMoveable = isDirectionMoveable(robotsNorth, x, y);
-		int wMoveable = isDirectionMoveable(robotsWest, x, y);
-		int previousBlocked = getSideBlocks(direction,x, y,true);
+		int eMoveable = isDirectionMoveable(robotsEast, x, y);
+		int previousBlocked = getSideBlocks(direction,x, y,false);
 		int [] result = {x,y,direction};
-		if(visited[y][x]==0||(x==1 && y==1&&endPointFound())){
+		if(visited[y][x]==0||(x==1 && y==1&&endPointFound())||(x==1 && y==1&&allPossiblePathExplored(x,y))){
 			return result;
 		}
 		if(allPossiblePathExplored(x,y)){
@@ -271,32 +271,32 @@ public class ExplorationWallerType2 extends Exploration {
 			return result1;
 		}
 		int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
-		if(testTurnedLeft&&nMoveable!=0){
-			testTurnedLeft=false;
+		if(testTurnedRight&&nMoveable!=0){
+			testTurnedRight=false;
 			//r.moveForward(10*nMoveable);
 			result= computeForwardLocation(direction, x, y, steps);
 			result=getNextWallHugLocation(result[0],result[1],direction);
 		}else{
-			if(wMoveable!=0){
-				testTurnedLeft=true;
-				result=getNextWallHugLocation(result[0],result[1],robotsWest);
+			if(eMoveable!=0){
+				testTurnedRight=true;
+				result=getNextWallHugLocation(result[0],result[1],robotsEast);
 			}else{
 				if(steps!=0){
-					if(testTurnedRight){
-						testTurnedRight=false;
+					if(testTurnedLeft){
+						testTurnedLeft=false;
 					}
 					result= computeForwardLocation(direction, x, y, steps);
 					result=getNextWallHugLocation(result[0],result[1],direction);
 				}else{
-					testTurnedRight=true;
-					result=getNextWallHugLocation(result[0],result[1],robotsEast);
+					testTurnedLeft=true;
+					result=getNextWallHugLocation(result[0],result[1],robotsWest);
 				}
 			}
 		}
 		return result;
 	}
 	
-	protected int[] computeForwardLocation(int direction, int x, int y, int steps){
+	private int[] computeForwardLocation(int direction, int x, int y, int steps){
 		switch(direction){
 		case 0:
 			y=y+steps;
@@ -325,79 +325,8 @@ public class ExplorationWallerType2 extends Exploration {
 		}
 		return true;
 	}
-	public int getSideBlocks(float direction, int x, int y, boolean left){
-		int[][]obstacles = m.getObstacles();
-		int[][]explored = m.getExploredTiles();
-		int dir = (int)direction;
-		int text_x=1;
-		int text_y=1;
-		switch (dir){
-		case 0: 
-			text_x = left?x-2:x+2;
-			if(text_x>=15||text_x<0){
-				return 3;
-			}
-			if(explored[y+1][text_x]==0||(explored[y+1][text_x]==1&&obstacles[y+1][text_x]==1)){
-				return 3;
-			}
-			if(explored[y][text_x]==0||(explored[y][text_x]==1&&obstacles[y][text_x]==1)){
-				return 2;
-			}
-			if(explored[y-1][text_x]==0||(explored[y-1][text_x]==1&&obstacles[y-1][text_x]==1)){
-				return 1;
-			}
-			break;
-		case 90: 
-			text_y = left?y+2:y-2;
-			if(text_y>=20||text_y<0){
-				return 3;
-			}
-			if(explored[text_y][x+1]==0||(explored[text_y][x+1]==1&&obstacles[text_y][x+1]==1)){
-				return 3;
-			}
-			if(explored[text_y][x]==0||(explored[text_y][x]==1&&obstacles[text_y][x]==1)){
-				return 2;
-			}
-			if(explored[text_y][x-1]==0||(explored[text_y][x-1]==1&&obstacles[text_y][x-1]==1)){
-				return 1;
-			}
-			break;
-		case 180: 
-			text_x = left?x+2:x-2;
-			if(text_x>=15||text_x<0){
-				return 3;
-			}
-			if(explored[y-1][text_x]==0||(explored[y-1][text_x]==1&&obstacles[y-1][text_x]==1)){
-				return 3;
-			}
-			if(explored[y][text_x]==0||(explored[y][text_x]==1&&obstacles[y][text_x]==1)){
-				return 2;
-			}
-			if(explored[y+1][text_x]==0||(explored[y+1][text_x]==1&&obstacles[y+1][text_x]==1)){
-				return 1;
-			}
-			break;
-		case 270: 
-			text_y = left?y-2:y+2;
-			if(text_y>=20||text_y<0){
-				return 3;
-			}
-			if(explored[text_y][x-1]==0||(explored[text_y][x-1]==1&&obstacles[text_y][x-1]==1)){
-				return 3;
-			}
-			if(explored[text_y][x]==0||(explored[text_y][x]==1&&obstacles[text_y][x]==1)){
-				return 2;
-			}
-			if(explored[text_y][x+1]==0||(explored[text_y][x+1]==1&&obstacles[text_y][x+1]==1)){
-				return 1;
-			}
-			break;
-		}
-		return 3;
-	}
-	
-	
-	protected boolean endPointFound() {
+
+	private boolean endPointFound() {
 		for(int x =12;x<15;x++){
 			for(int y =17;y<20;y++){
 				if(m.getExploredTiles()[y][x]!=1){
@@ -996,6 +925,76 @@ public class ExplorationWallerType2 extends Exploration {
 			break;
 		}
 		return maxMoveable;
+	}
+	public int getSideBlocks(float direction, int x, int y, boolean left){
+		int[][]obstacles = m.getObstacles();
+		int[][]explored = m.getExploredTiles();
+		int dir = (int)direction;
+		int text_x=1;
+		int text_y=1;
+		switch (dir){
+		case 0: 
+			text_x = left?x-2:x+2;
+			if(text_x>=15||text_x<0){
+				return 3;
+			}
+			if(explored[y+1][text_x]==0||(explored[y+1][text_x]==1&&obstacles[y+1][text_x]==1)){
+				return 3;
+			}
+			if(explored[y][text_x]==0||(explored[y][text_x]==1&&obstacles[y][text_x]==1)){
+				return 2;
+			}
+			if(explored[y-1][text_x]==0||(explored[y-1][text_x]==1&&obstacles[y-1][text_x]==1)){
+				return 1;
+			}
+			break;
+		case 90: 
+			text_y = left?y+2:y-2;
+			if(text_y>=20||text_y<0){
+				return 3;
+			}
+			if(explored[text_y][x+1]==0||(explored[text_y][x+1]==1&&obstacles[text_y][x+1]==1)){
+				return 3;
+			}
+			if(explored[text_y][x]==0||(explored[text_y][x]==1&&obstacles[text_y][x]==1)){
+				return 2;
+			}
+			if(explored[text_y][x-1]==0||(explored[text_y][x-1]==1&&obstacles[text_y][x-1]==1)){
+				return 1;
+			}
+			break;
+		case 180: 
+			text_x = left?x+2:x-2;
+			if(text_x>=15||text_x<0){
+				return 3;
+			}
+			if(explored[y-1][text_x]==0||(explored[y-1][text_x]==1&&obstacles[y-1][text_x]==1)){
+				return 3;
+			}
+			if(explored[y][text_x]==0||(explored[y][text_x]==1&&obstacles[y][text_x]==1)){
+				return 2;
+			}
+			if(explored[y+1][text_x]==0||(explored[y+1][text_x]==1&&obstacles[y+1][text_x]==1)){
+				return 1;
+			}
+			break;
+		case 270: 
+			text_y = left?y-2:y+2;
+			if(text_y>=20||text_y<0){
+				return 3;
+			}
+			if(explored[text_y][x-1]==0||(explored[text_y][x-1]==1&&obstacles[text_y][x-1]==1)){
+				return 3;
+			}
+			if(explored[text_y][x]==0||(explored[text_y][x]==1&&obstacles[text_y][x]==1)){
+				return 2;
+			}
+			if(explored[text_y][x+1]==0||(explored[text_y][x+1]==1&&obstacles[text_y][x+1]==1)){
+				return 1;
+			}
+			break;
+		}
+		return 3;
 	}
 	
 	
