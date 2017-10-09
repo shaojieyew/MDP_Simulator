@@ -67,7 +67,9 @@ public class ExplorationWallerType1 extends Exploration {
 		}
 		int result[] ;
 		updateVisitedList();
-		
+		if(allPossibleNodeVisited()){
+			finishHuggingWall=true;
+		}
 		
 		if(finishHuggingWall&&(!isOkToTerminate()||!startPointFound())){
 			int currentDirectionIndex = 0;
@@ -440,6 +442,8 @@ public class ExplorationWallerType1 extends Exploration {
 				if(wMoveable!=0){
 					testTurnedLeft=true;
 					float degreeToMove =rotateToDirection(direction,robotsWest);
+
+					direction = robotsWest;
 					int intDegree = Math.round(degreeToMove);
 					String rmovement= "R"+intDegree;
 					if(intDegree<0){
@@ -460,6 +464,7 @@ public class ExplorationWallerType1 extends Exploration {
 					}else{
 						testTurnedRight=true;
 						float degreeToMove =rotateToDirection(direction,robotsEast);
+						direction = robotsEast;
 						int intDegree = Math.round(degreeToMove);
 						String rmovement= "R"+intDegree;
 						if(intDegree<0){

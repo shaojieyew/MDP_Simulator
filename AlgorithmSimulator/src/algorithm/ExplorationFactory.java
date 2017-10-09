@@ -35,7 +35,7 @@ public class ExplorationFactory {
 	}
 	
 
-	public static String selectedType =  "hugwall2r";
+	public static String selectedType =  "hugwall1";
 	public static void setSelectedType(String selectedType) {
 		ExplorationFactory.selectedType = selectedType;
 	}

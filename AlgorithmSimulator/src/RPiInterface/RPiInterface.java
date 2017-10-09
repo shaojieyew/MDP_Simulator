@@ -4,6 +4,7 @@ import Data.Map;
 import Data.Position;
 import Data.Robot;
 import Data.WayPoint;
+import algorithm.ObstaclesConfident;
 
 public abstract class RPiInterface {
 	public abstract void startConnection();
@@ -34,6 +35,123 @@ public abstract class RPiInterface {
 		WayPoint.getInstance().setPosition(null);
 	}
 	
+/*	
+	  1	3 5
+  	  | | |
+  __ 0
+           
+  __ 2     4 __ 
+	*/
+	public static float sensorOffset[]={10.3f,10.5f,10.3f,8.3f,15.15f,10.5f};
+	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,float sensorDistance []) {
+		int sensorInfo[] = new int[6];
+		int sensorIndex = 0;
+		for(float distance : sensorDistance){
+			if(distance<0){
+				sensorInfo[sensorIndex] = 1;
+				sensorIndex++;
+				continue;
+			}
+			if(distance==0){
+				sensorInfo[sensorIndex] = 0;
+				sensorIndex++;
+				continue;
+			}
+			if((distance-sensorOffset[sensorIndex]<=5)){
+				sensorInfo[sensorIndex] = 1;
+			}else{
+				if((distance-sensorOffset[sensorIndex]<=15)){
+					sensorInfo[sensorIndex] = 2;
+				}else{
+					if((distance-sensorOffset[sensorIndex]<=25)){
+						sensorInfo[sensorIndex] = 3;
+					}else{
+						if(sensorIndex==4){
+							if((distance-sensorOffset[sensorIndex]<=35)){
+								sensorInfo[sensorIndex] = 4;
+							}else{
+								sensorInfo[sensorIndex] = 0;
+							}
+						}else{
+							sensorInfo[sensorIndex] = 0;
+						}
+					}
+				}
+			}
+			sensorIndex++;
+			continue;
+		}
+		
+		Map map = Map.getInstance();
+		int exploredTiles[][] = map.getExploredTiles();
+		int obstacles[][] = map.getObstacles();
+		System.out.println(robotLocationX+","+robotLocationY);
+		exploredTiles[(int) robotLocationY-1][(int) robotLocationX-1]=1;
+		exploredTiles[(int) robotLocationY-1][(int) robotLocationX]=1;
+		exploredTiles[(int) robotLocationY-1][(int) robotLocationX+1]=1;
+		exploredTiles[(int) robotLocationY][(int) robotLocationX-1]=1;
+		exploredTiles[(int) robotLocationY][(int) robotLocationX]=1;
+		exploredTiles[(int) robotLocationY][(int) robotLocationX+1]=1;
+		exploredTiles[(int) robotLocationY+1][(int) robotLocationX-1]=1;
+		exploredTiles[(int) robotLocationY+1][(int) robotLocationX]=1;
+		exploredTiles[(int) robotLocationY+1][(int) robotLocationX+1]=1;
+		
+		
+		RobotSensorSimulatorType2 simulator2 = new RobotSensorSimulatorType2();
+		Position[][] lineOfSensors = simulator2.getLineOfSensor((int)robotLocationX, (int)robotLocationY, robotDirection);
+		sensorIndex = 0;
+		for(Position[] sensors:lineOfSensors){
+			int sensorBlock = 1;
+			for(Position sensor:sensors){
+				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
+					//if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
+						if(sensorInfo[sensorIndex]==sensorBlock){
+							//obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
+							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]+(5-sensorBlock);
+							if(ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]>=1){
+								exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
+								obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
+								break;
+							}
+						}else{
+							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]-(5-sensorBlock);
+							if(ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]<=-1){
+								exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
+								obstacles[sensor.getPosY()][(sensor.getPosX())]=0;
+							}
+						}
+						//	obstacles[sensor.getPosY()][(sensor.getPosX())]=0;
+					//}
+					//if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
+					/*
+					exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
+						if(sensorInfo[sensorIndex]==sensorBlock){
+							obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
+							break;
+						}
+						
+						*/
+					
+					//}else{
+					//	if(obstacles[sensor.getPosY()][(sensor.getPosX())]==1){
+					//		break;
+					//	}
+					//}
+				}else{
+					break;
+				}
+				sensorBlock++;
+			}
+			sensorIndex++;
+		}
+
+		map.setExploredTiles(exploredTiles);
+		map.setObstacle(obstacles);
+	}
+	
+	
+	
+	
 	/*
 	 	  0	3 1
 	  	  | | |
@@ -45,7 +163,8 @@ public abstract class RPiInterface {
 	
 	/*-1, 10-35, 0*/
 	
-	public static float sensorOffset[]={7.3f,7.3f,5.4f,10f,14.9f,6f};
+	/*
+	public static float sensorOffset[]={10f,10f,5.4f,10f,14.9f,6f};
 	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,float sensorDistance []) {
 		int sensorInfo[] = new int[6];
 		int sensorIndex = 0;
@@ -100,9 +219,9 @@ public abstract class RPiInterface {
 			for(Position sensor:sensors){
 				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
 
-					if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
+					//if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
 						obstacles[sensor.getPosY()][(sensor.getPosX())]=0;
-					}
+					//}
 					//if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
 						exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
 						if(sensorInfo[sensorIndex]==sensorBlock){
@@ -124,5 +243,5 @@ public abstract class RPiInterface {
 
 		map.setExploredTiles(exploredTiles);
 		map.setObstacle(obstacles);
-	}
+	}*/
 }

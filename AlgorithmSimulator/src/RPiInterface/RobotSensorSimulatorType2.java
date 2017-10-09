@@ -48,47 +48,55 @@ public class RobotSensorSimulatorType2 extends RobotSensorSimulator {
 
 	@Override
 	public Position[][] getLineOfSensor(int x, int y,float direction){
+		Position lineOfSensor0[] = new Position[4];
 		Position lineOfSensor1[] = new Position[4];
 		Position lineOfSensor2[] = new Position[4];
 		Position lineOfSensor3[] = new Position[4];
 		Position lineOfSensor4[] = new Position[4];
 		Position lineOfSensor5[] = new Position[4];
-		Position lineOfSensor6[] = new Position[4];
-		Position[][] lineOfSensors = {lineOfSensor1,lineOfSensor2,lineOfSensor3,lineOfSensor4,lineOfSensor5,lineOfSensor6};
+		Position[][] lineOfSensors = {lineOfSensor0,lineOfSensor1,lineOfSensor2,lineOfSensor3,lineOfSensor4,lineOfSensor5};
 
-		for(int i =0;i<3;i++){
+		for(int i =0;i<4;i++){
 			switch ((int)direction){
 			case 0:
-				lineOfSensor1[i]=new Position(x-1,y+2+i);
-				lineOfSensor2[i]=new Position(x,y+2+i);
-				lineOfSensor3[i]=new Position(x+1,y+2+i);
-				lineOfSensor4[i]=new Position(x-2-i,y-1);
-				lineOfSensor5[i]=new Position(x-2-i,y+1);
-				lineOfSensor6[i]=new Position(x+2+i,y-1);
+				if(i<3){
+					lineOfSensor1[i]=new Position(x-1,y+2+i);//1
+					lineOfSensor3[i]=new Position(x,y+2+i);//3
+					lineOfSensor5[i]=new Position(x+1,y+2+i);//5
+					lineOfSensor2[i]=new Position(x-2-i,y-1);//2
+					lineOfSensor0[i]=new Position(x-2-i,y+1);//0
+				}
+				lineOfSensor4[i]=new Position(x+2+i,y-1);//4
 				break;
 			case 90:
-				lineOfSensor1[i]=new Position(x+2+i,y+1);
-				lineOfSensor2[i]=new Position(x+2+i,y);
-				lineOfSensor3[i]=new Position(x+2+i,y-1);
-				lineOfSensor4[i]=new Position(x+1,y+2+i);
-				lineOfSensor5[i]=new Position(x-1,y+2+i);
-				lineOfSensor6[i]=new Position(x-1,y-2-i);
+				if(i<3){
+					lineOfSensor1[i]=new Position(x+2+i,y+1);
+					lineOfSensor3[i]=new Position(x+2+i,y);
+					lineOfSensor5[i]=new Position(x+2+i,y-1);
+					lineOfSensor2[i]=new Position(x+1,y+2+i);
+					lineOfSensor0[i]=new Position(x-1,y+2+i);
+				}
+				lineOfSensor4[i]=new Position(x-1,y-2-i);
 				break;
 			case 180:
-				lineOfSensor1[i]=new Position(x+1,y-2-i);
-				lineOfSensor2[i]=new Position(x,y-2-i);
-				lineOfSensor3[i]=new Position(x-1,y-2-i);
-				lineOfSensor4[i]=new Position(x+2+i,y+1);
-				lineOfSensor5[i]=new Position(x+2+i,y-1);
-				lineOfSensor6[i]=new Position(x-2-i,y+1);
+				if(i<3){
+					lineOfSensor1[i]=new Position(x+1,y-2-i);
+					lineOfSensor3[i]=new Position(x,y-2-i);
+					lineOfSensor5[i]=new Position(x-1,y-2-i);
+					lineOfSensor2[i]=new Position(x+2+i,y+1);
+					lineOfSensor0[i]=new Position(x+2+i,y-1);
+				}
+				lineOfSensor4[i]=new Position(x-2-i,y+1);
 				break;
 			case 270:
-				lineOfSensor1[i]=new Position(x-2-i,y-1);
-				lineOfSensor2[i]=new Position(x-2-i,y);
-				lineOfSensor3[i]=new Position(x-2-i,y+1);
-				lineOfSensor4[i]=new Position(x+1,y-2-i);
-				lineOfSensor5[i]=new Position(x-1,y-2-i);
-				lineOfSensor6[i]=new Position(x+1,y+2+i);
+				if(i<3){
+					lineOfSensor1[i]=new Position(x-2-i,y-1);
+					lineOfSensor3[i]=new Position(x-2-i,y);
+					lineOfSensor5[i]=new Position(x-2-i,y+1);
+					lineOfSensor2[i]=new Position(x+1,y-2-i);
+					lineOfSensor0[i]=new Position(x-1,y-2-i);
+				}
+				lineOfSensor4[i]=new Position(x+1,y+2+i);
 				break;
 			}
 		}

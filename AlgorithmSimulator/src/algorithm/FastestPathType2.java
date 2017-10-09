@@ -27,7 +27,7 @@ import java.awt.Rectangle;
 
 public class FastestPathType2 extends FastestPath {
 	public static ArrayList<Line> debugLine = new  ArrayList<Line>();
-	public static boolean debugPath = false;
+	public static boolean debugPath = true;
 	public static float bufferArea = 1.2f;
 	
 	
