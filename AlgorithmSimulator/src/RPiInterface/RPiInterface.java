@@ -97,6 +97,17 @@ public abstract class RPiInterface {
 		exploredTiles[(int) robotLocationY+1][(int) robotLocationX+1]=1;
 		
 		
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY-1][(int) robotLocationX-1]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY-1][(int) robotLocationX]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY-1][(int) robotLocationX+1]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY][(int) robotLocationX-1]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY][(int) robotLocationX]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY][(int) robotLocationX+1]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY+1][(int) robotLocationX-1]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY+1][(int) robotLocationX]=-10000;
+		ObstaclesConfident.obstacleCounter[(int) robotLocationY+1][(int) robotLocationX+1]=-10000;
+		
+		
 		RobotSensorSimulatorType2 simulator2 = new RobotSensorSimulatorType2();
 		Position[][] lineOfSensors = simulator2.getLineOfSensor((int)robotLocationX, (int)robotLocationY, robotDirection);
 		sensorIndex = 0;
@@ -106,18 +117,22 @@ public abstract class RPiInterface {
 				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
 					//if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
 						if(sensorInfo[sensorIndex]==sensorBlock){
-							//obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
-							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]+(5-sensorBlock);
+							//obstacles[sensor.getPosY()][(sensor.getPosX())]=1;																//(5-sensorBlock)
+							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]+((5-sensorBlock));
 							if(ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]>=1){
 								exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
 								obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
 								break;
 							}
-						}else{
-							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]-(5-sensorBlock);
+						}else{																															//(5-sensorBlock)
+							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]-((5-sensorBlock));
 							if(ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]<=-1){
 								exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
 								obstacles[sensor.getPosY()][(sensor.getPosX())]=0;
+							}else{
+								if(obstacles[sensor.getPosY()][(sensor.getPosX())]==1){
+									break;
+								}
 							}
 						}
 						//	obstacles[sensor.getPosY()][(sensor.getPosX())]=0;

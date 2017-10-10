@@ -40,6 +40,7 @@ import algorithm.FastestPath;
 import algorithm.FastestPathFactory;
 import algorithm.FastestPathType1;
 import algorithm.FastestPathType2;
+import algorithm.ObstaclesConfident;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -194,7 +195,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	
 	@FXML
 	private void onclickResetSimulator(){
-
+		ObstaclesConfident.obstacleCounter = new int[20][15];
 		Robot robot = Robot.getInstance();
 		if(explorationAlgorithm!=null){
 			explorationAlgorithm.terminate();

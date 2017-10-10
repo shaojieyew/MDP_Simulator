@@ -13,6 +13,7 @@ import Data.Robot;
 import Data.RobotListener;
 import Data.Vertex;
 import RPiInterface.Message;
+import RPiInterface.RobotSensorSimulatorType2;
 
 public class ExplorationWallerType1 extends Exploration {
 
@@ -48,6 +49,38 @@ public class ExplorationWallerType1 extends Exploration {
 	}
 
 
+	public boolean outofWallhugging(){
+		//if left wall nothing, right wall got thing
+
+		int obstacles[][] = m.getObstacles();
+		int x = Math.round(r.getPosX());
+		int y =Math.round(r.getPosY());
+		int direction = (int) r.getDirection();
+		switch(direction){
+			case 0:
+				if(x==1||obstacles[y+1][x-2]==1||obstacles[y-1][x-2]==1||obstacles[y][x-2]==1){
+					return false;
+				}
+				break;
+			case 90:
+				if(y==19||obstacles[y+2][x-1]==1||obstacles[y+2][x+1]==1||obstacles[y+2][x]==1){
+					return false;
+				}
+				break;
+			case 180:
+				if(x==13||obstacles[y+1][x+2]==1||obstacles[y][x+2]==1||obstacles[y-1][x+2]==1){
+					return false;
+				}
+				break;
+			case 270:
+				if(y==0||obstacles[y-2][x+1]==1||obstacles[y-2][x]==1||obstacles[y-2][x-1]==1){
+					return false;
+				}
+				break;
+			}
+		return true;
+	}
+	
 	public Message computeAction(){
 		float mapDiscoveredRate = m.getExploredRate();
 		long currentTimeStamp = System.currentTimeMillis();
@@ -56,7 +89,9 @@ public class ExplorationWallerType1 extends Exploration {
 			finishHuggingWall=true;
 			terminate();
 		}
-		
+		if(outofWallhugging()){
+			finishHuggingWall=true;
+		}
 		Message message = null;
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
@@ -1027,7 +1062,8 @@ public class ExplorationWallerType1 extends Exploration {
 		ArrayList<Position> arrays=new ArrayList<Position>();
 		float[] allDirection = {NORTH,SOUTH,EAST,WEST};
 		for(float dir: allDirection){
-			Position[][] lineOfSensors = r.getSensorSimulator().getLineOfSensor(x, y, dir);
+			RobotSensorSimulatorType2 r = new RobotSensorSimulatorType2();
+			Position[][] lineOfSensors = r.getLineOfSensor(x, y, dir);
 			for(int i =0;i<3;i++){
 				Position[] sensors = lineOfSensors[i];
 				for(Position sensor:sensors){

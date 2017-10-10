@@ -73,8 +73,8 @@ public class RobotSensorSimulatorType2 extends RobotSensorSimulator {
 					lineOfSensor1[i]=new Position(x+2+i,y+1);
 					lineOfSensor3[i]=new Position(x+2+i,y);
 					lineOfSensor5[i]=new Position(x+2+i,y-1);
-					lineOfSensor2[i]=new Position(x+1,y+2+i);
-					lineOfSensor0[i]=new Position(x-1,y+2+i);
+					lineOfSensor2[i]=new Position(x-1,y+2+i);
+					lineOfSensor0[i]=new Position(x+1,y+2+i);
 				}
 				lineOfSensor4[i]=new Position(x-1,y-2-i);
 				break;
