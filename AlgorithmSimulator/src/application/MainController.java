@@ -316,7 +316,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	}
 	@FXML
 	public void onSensorSelected() {
-			//Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue());
+		Robot.getInstance().setSensorSimulatorType((String) sensorCombo.getValue(), false);
 	}
 	@FXML
 	public void onExplrCombo() {

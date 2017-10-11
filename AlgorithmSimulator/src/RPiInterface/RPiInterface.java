@@ -42,7 +42,9 @@ public abstract class RPiInterface {
            
   __ 2     4 __ 
 	*/
-	public static float sensorOffset[]={10.3f,10.5f,10.3f,8.3f,15.15f,10.5f};
+	//
+	//public static float sensorOffset[]={10.3f,10.5f,10.3f,8.3f,15.15f,10.5f};
+	public static float sensorOffset[]={11.99f,11.26f,10.83f,6.88f,15.24f,10.87f};
 	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,float sensorDistance []) {
 		int sensorInfo[] = new int[6];
 		int sensorIndex = 0;
@@ -118,14 +120,14 @@ public abstract class RPiInterface {
 					//if(exploredTiles[sensor.getPosY()][(sensor.getPosX())]==0){
 						if(sensorInfo[sensorIndex]==sensorBlock){
 							//obstacles[sensor.getPosY()][(sensor.getPosX())]=1;																//(5-sensorBlock)
-							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]+((5-sensorBlock));
+							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]+((sensorBlock==1)?1000:(5-sensorBlock));
 							if(ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]>=1){
 								exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
 								obstacles[sensor.getPosY()][(sensor.getPosX())]=1;
 								break;
 							}
 						}else{																															//(5-sensorBlock)
-							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]-((5-sensorBlock));
+							ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]=ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]-((sensorBlock==1)?1000:(5-sensorBlock));
 							if(ObstaclesConfident.obstacleCounter[sensor.getPosY()][(sensor.getPosX())]<=-1){
 								exploredTiles[sensor.getPosY()][(sensor.getPosX())]=1;
 								obstacles[sensor.getPosY()][(sensor.getPosX())]=0;

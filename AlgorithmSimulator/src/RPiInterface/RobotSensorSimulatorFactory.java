@@ -13,7 +13,7 @@ public class RobotSensorSimulatorFactory {
 			return new RobotSensorSimulatorType2();
 		}
 		if(value.equals(SENSOR_TYPE_3)){
-	//		return new RobotSensorSimulatorType3();
+			return new RobotSensorSimulatorType3();
 		}
 			return null;
 	}

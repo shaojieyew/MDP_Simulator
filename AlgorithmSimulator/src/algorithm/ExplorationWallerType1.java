@@ -89,9 +89,10 @@ public class ExplorationWallerType1 extends Exploration {
 			finishHuggingWall=true;
 			terminate();
 		}
+		/*
 		if(outofWallhugging()){
 			finishHuggingWall=true;
-		}
+		}*/
 		Message message = null;
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
