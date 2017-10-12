@@ -129,6 +129,7 @@
                               <FXCollections fx:factory="observableArrayList">
                                  <String fx:value="fp1" />
                                  <String fx:value="fp2" />
+                                 <String fx:value="fp3" />
                               </FXCollections>
                            </items>
                         </ComboBox>
