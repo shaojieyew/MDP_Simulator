@@ -60,7 +60,7 @@ public class Robot {
 	}
 	private boolean isMoving =false;
 	
-	private RobotSensorSimulator sensorSimulator = null;
+	private RobotSensorSimulator sensorSimulator = new RobotSensorSimulatorType2();
 
 	public RobotSensorSimulator getSensorSimulator() {
 		return sensorSimulator;

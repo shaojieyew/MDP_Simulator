@@ -129,16 +129,6 @@ public class ExplorationType2 extends Exploration {
 	}
 	
 	
-	private boolean startPointFound() {
-		for(int x =0;x<3;x++){
-			for(int y =0;y<3;y++){
-				if(m.getExploredTiles()[y][x]!=1){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
 
 	//get Instructions To Location
 	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {

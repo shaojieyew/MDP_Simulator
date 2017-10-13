@@ -141,16 +141,18 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 		computeSensor(robotLocationX,robotLocationY,robotDirection,sensorInfo);
 		Exploration explorationAlgorithm= ExplorationFactory.getInstance();
 		
+		
+		
 		//compute algo
 		Message message;
 		String hexExplored;
 		String hexExploredObstacle;
 		switch(action_status){
 		case "EX": case "TE":
-			Robot.getInstance().setSensorSimulatorType("type1", false);
 			if(action_status.equals("TE")){
 				explorationAlgorithm.terminate();
 			}
+			
 			message= explorationAlgorithm.start();
 			//prepare return message
 			hexExplored=HexBin.BinTohex(Map.getInstance().getBinaryExplored());

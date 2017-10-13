@@ -111,7 +111,7 @@
                   <HBox prefHeight="44.0" prefWidth="188.0">
                      <children>
                         <Label prefHeight="17.0" prefWidth="88.0" text="Time (sec): " />
-                        <TextField fx:id="terminateTimeTextField" maxWidth="1.7976931348623157E308" onKeyReleased="#onTerminateTimeTextField" prefHeight="25.0" prefWidth="125.0" text="600" />
+                        <TextField fx:id="terminateTimeTextField" maxWidth="1.7976931348623157E308" onKeyReleased="#onTerminateTimeTextField" prefHeight="25.0" prefWidth="125.0" text="270" />
                      </children>
                   </HBox>
                   <HBox prefHeight="44.0" prefWidth="188.0">

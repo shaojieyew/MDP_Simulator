@@ -62,9 +62,12 @@ public class ExplorationWallerType2 extends Exploration {
 		long currentTimeStamp = System.currentTimeMillis();
     	long seconds = ((currentTimeStamp-Robot.getInstance().getExploringStartTime())/1000);
 		//set goal to termination/start point
-    	if(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate()){
+    	if(waypointFound()&&endPointFound()&&(seconds>=getAutoTerminate_time()||isOkToTerminate()||mapDiscoveredRate>=getAutoTerminate_explore_rate())){
 			finishHuggingWall=true;
 			terminate();
+		}
+		if(outofWallhugging()){
+			finishHuggingWall=true;
 		}
 		
 		Message message = null;
@@ -315,16 +318,6 @@ public class ExplorationWallerType2 extends Exploration {
 		return result;
 	}
 	
-	private boolean startPointFound() {
-		for(int x =0;x<3;x++){
-			for(int y =0;y<3;y++){
-				if(m.getExploredTiles()[y][x]!=1){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
 	public int getSideBlocks(float direction, int x, int y, boolean left){
 		int[][]obstacles = m.getObstacles();
 		int[][]explored = m.getExploredTiles();
@@ -396,17 +389,6 @@ public class ExplorationWallerType2 extends Exploration {
 		return 3;
 	}
 	
-	
-	protected boolean endPointFound() {
-		for(int x =12;x<15;x++){
-			for(int y =17;y<20;y++){
-				if(m.getExploredTiles()[y][x]!=1){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
 
 	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
 

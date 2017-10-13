@@ -5,13 +5,15 @@ import Data.MapListener;
 import Data.Position;
 import Data.Robot;
 import Data.RobotListener;
+import Data.WayPoint;
 import RPiInterface.Message;
 import RPiInterface.RobotSensorSimulatorFactory;
 
 public abstract class Exploration implements  MapListener, RobotListener{
-	private static long autoTerminate_time=600;
+	private static long autoTerminate_time=270;
 	private static float autoTerminate_explore_rate=1;
 
+	
 	public static final float NORTH = 0;
 	public static final float EAST = 90;
 	public static final float SOUTH = 180;
@@ -43,7 +45,10 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	
 	public Message start(){
 		init();
-		r.setExploring(true);
+		if(Robot.getInstance().isExploring()==false){
+			r.setExploring(true);
+		}
+		
 		return computeAction();
 	}
 	
@@ -194,5 +199,73 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		}
 		return count;
 	}
+
+	public boolean outofWallhugging(){
+		//if left wall nothing, right wall got thing
+
+		int obstacles[][] = m.getObstacles();
+		int x = Math.round(r.getPosX());
+		int y =Math.round(r.getPosY());
+		int direction = (int) r.getDirection();
+		switch(direction){
+			case 0:
+				if(x==1||obstacles[y+1][x-2]==1||obstacles[y-1][x-2]==1||obstacles[y][x-2]==1){
+					return false;
+				}
+				break;
+			case 90:
+				if(y==18||obstacles[y+2][x-1]==1||obstacles[y+2][x+1]==1||obstacles[y+2][x]==1){
+					return false;
+				}
+				break;
+			case 180:
+				if(x==13||obstacles[y+1][x+2]==1||obstacles[y][x+2]==1||obstacles[y-1][x+2]==1){
+					return false;
+				}
+				break;
+			case 270:
+				if(y==1||obstacles[y-2][x+1]==1||obstacles[y-2][x]==1||obstacles[y-2][x-1]==1){
+					return false;
+				}
+				break;
+			}
+		return true;
+	}
 	
+
+	public boolean startPointFound() {
+		for(int x =0;x<3;x++){
+			for(int y =0;y<3;y++){
+				if(m.getExploredTiles()[y][x]!=1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean endPointFound() {
+		for(int x =12;x<15;x++){
+			for(int y =17;y<20;y++){
+				if(m.getExploredTiles()[y][x]!=1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	public boolean waypointFound() {
+		Position wp = WayPoint.getInstance().getPosition();
+		if(wp==null)
+			return true;
+		for(int x =wp.getPosX()-1;x<=wp.getPosX()-1;x++){
+			for(int y =wp.getPosY()-1;y<=wp.getPosY()-1;y++){
+				if(m.getExploredTiles()[y][x]!=1){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 }

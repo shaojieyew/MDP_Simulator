@@ -27,9 +27,10 @@ public abstract class RPiInterface {
 		robot.setDirection(robotDirection);
 	}
 	public void setWayPoint(int x, int y){
-		removeWayPoint();
-		if(x>0 && y>0)
+		if(x>0 && y>0){
+			removeWayPoint();
 			WayPoint.getInstance().setPosition(new Position(x,y));
+		}
 	}
 	public void removeWayPoint(){
 		WayPoint.getInstance().setPosition(null);
@@ -108,9 +109,10 @@ public abstract class RPiInterface {
 		ObstaclesConfident.obstacleCounter[(int) robotLocationY+1][(int) robotLocationX-1]=-10000;
 		ObstaclesConfident.obstacleCounter[(int) robotLocationY+1][(int) robotLocationX]=-10000;
 		ObstaclesConfident.obstacleCounter[(int) robotLocationY+1][(int) robotLocationX+1]=-10000;
+
 		
 		
-		RobotSensorSimulatorType2 simulator2 = new RobotSensorSimulatorType2();
+		RobotSensorSimulator simulator2 = Robot.getInstance().getSensorSimulator();
 		Position[][] lineOfSensors = simulator2.getLineOfSensor((int)robotLocationX, (int)robotLocationY, robotDirection);
 		sensorIndex = 0;
 		for(Position[] sensors:lineOfSensors){
