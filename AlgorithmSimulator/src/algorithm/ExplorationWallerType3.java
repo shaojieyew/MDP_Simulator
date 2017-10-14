@@ -68,10 +68,6 @@ public class ExplorationWallerType3 extends Exploration {
 			finishHuggingWall=true;
 			terminate();
 		}
-
-		if(outofWallhugging()){
-			finishHuggingWall=true;
-		}
 		Message message = null;
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
@@ -136,40 +132,45 @@ public class ExplorationWallerType3 extends Exploration {
 			if(newVisit){
 				 tempDirection= (int) newVisitDirection;
 			}
-			if(positionBeforeStrayAway!=null){
-				result = getNextWallHugLocation(positionBeforeStrayAway[0],positionBeforeStrayAway[1],positionBeforeStrayAway[2]);
-				positionBeforeStrayAway=null;
-			}else{
-				result = getNextWallHugLocation(currentX,currentY,(int)tempDirection);
-			}
 
-			int count1 =whatTileCanBeDiscovered(result[0],result[1],false).size();
-			if(result[0]!=currentX||result[1]!=currentY){
-				int tempResult[] = getBestNextStop(result[0], result[1], strayAwayDistanceThreshold);
-				positionBeforeStrayAway=null;
-				if((result[0]!=tempResult[0]||result[1]!=tempResult[1])&&(tempResult[0]!=currentX||tempResult[1]!=currentY)){
-					int count2 =whatTileCanBeDiscovered(tempResult[0],tempResult[1],false).size();
-					if(count2-count1>strayAwayDifferences){
-						//int temp[]= {currentX,currentY,(int)tempDirection};
-						positionBeforeStrayAway = result;
-						result = tempResult;
+			if(testTurnedLeft==true&&outofWallhugging(currentX,currentY,(int)tempDirection)){
+				finishHuggingWall=true;
+			}else{
+				if(positionBeforeStrayAway!=null){
+					result = getNextWallHugLocation(positionBeforeStrayAway[0],positionBeforeStrayAway[1],positionBeforeStrayAway[2]);
+					positionBeforeStrayAway=null;
+				}else{
+					result = getNextWallHugLocation(currentX,currentY,(int)tempDirection);
+				}
+	
+				int count1 =whatTileCanBeDiscovered(result[0],result[1],false).size();
+				if(result[0]!=currentX||result[1]!=currentY){
+					int tempResult[] = getBestNextStop(result[0], result[1], strayAwayDistanceThreshold);
+					positionBeforeStrayAway=null;
+					if((result[0]!=tempResult[0]||result[1]!=tempResult[1])&&(tempResult[0]!=currentX||tempResult[1]!=currentY)){
+						int count2 =whatTileCanBeDiscovered(tempResult[0],tempResult[1],false).size();
+						if(count2-count1>strayAwayDifferences){
+							//int temp[]= {currentX,currentY,(int)tempDirection};
+							positionBeforeStrayAway = result;
+							result = tempResult;
+						}
 					}
 				}
-			}
-			
-			if(result[0]==1&&result[1]==1&&positionBeforeStrayAway==null){
-				finishHuggingWall = true;
-			}
-
-			if(!finishHuggingWall){
-				if(result[0]==1&&result[1]==1&&isOkToTerminate()){
-					message = moveToLocation(currentX, currentY, direction, result[0],result[1],0);
-					message.setEndOfExploration(true);
-					destroy();
-				}else{
-					message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
+				
+				if(result[0]==1&&result[1]==1&&positionBeforeStrayAway==null){
+					finishHuggingWall = true;
 				}
-				return message;
+	
+				if(!finishHuggingWall){
+					if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+						message = moveToLocation(currentX, currentY, direction, result[0],result[1],0);
+						message.setEndOfExploration(true);
+						destroy();
+					}else{
+						message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
+					}
+					return message;
+				}
 			}
 		}
 

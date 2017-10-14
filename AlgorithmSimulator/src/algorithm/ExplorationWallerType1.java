@@ -59,14 +59,14 @@ public class ExplorationWallerType1 extends Exploration {
 			terminate();
 		}
 		
-		if(outofWallhugging()){
-			finishHuggingWall=true;
-		}
 		Message message = null;
 		int currentX = Math.round(r.getPosX());
 		int currentY =Math.round(r.getPosY());
 		float direction = r.getDirection();
 
+		if(outofWallhugging(currentX,currentY,(int) direction)){
+			finishHuggingWall=true;
+		}
 		if(m.getExploredTiles()[currentY][currentX]==0){
 			return null;
 		}

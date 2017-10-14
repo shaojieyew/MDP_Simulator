@@ -66,9 +66,6 @@ public class ExplorationWallerType2 extends Exploration {
 			finishHuggingWall=true;
 			terminate();
 		}
-		if(outofWallhugging()){
-			finishHuggingWall=true;
-		}
 		
 		Message message = null;
 		int currentX = Math.round(r.getPosX());
@@ -178,20 +175,24 @@ public class ExplorationWallerType2 extends Exploration {
 			if(newVisit){
 				 tempDirection= (int) newVisitDirection;
 			}
-			result = getNextWallHugLocation(currentX,currentY,(int)tempDirection);
-			if(result[0]==1&&result[1]==1){
-				finishHuggingWall = true;
-			}
-
-			if(!finishHuggingWall){
-				if(result[0]==1&&result[1]==1&&isOkToTerminate()){
-					message = moveToLocation(currentX, currentY, direction, result[0],result[1],(int)NORTH);
-					message.setEndOfExploration(true);
-					destroy();
-				}else{
-					message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
+			if(testTurnedLeft==true&&outofWallhugging(currentX,currentY,(int)tempDirection)){
+				finishHuggingWall=true;
+			}else{
+				result = getNextWallHugLocation(currentX,currentY,(int)tempDirection);
+				if(result[0]==1&&result[1]==1){
+					finishHuggingWall = true;
 				}
-				return message;
+
+				if(!finishHuggingWall){
+					if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+						message = moveToLocation(currentX, currentY, direction, result[0],result[1],(int)NORTH);
+						message.setEndOfExploration(true);
+						destroy();
+					}else{
+						message = moveToLocation(currentX, currentY, direction, result[0],result[1],result[2]);
+					}
+					return message;
+				}
 			}
 		}
 

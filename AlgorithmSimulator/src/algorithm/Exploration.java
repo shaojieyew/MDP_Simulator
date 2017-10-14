@@ -200,13 +200,10 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		return count;
 	}
 
-	public boolean outofWallhugging(){
+	public boolean outofWallhugging(int x, int y, int direction){
 		//if left wall nothing, right wall got thing
 
 		int obstacles[][] = m.getObstacles();
-		int x = Math.round(r.getPosX());
-		int y =Math.round(r.getPosY());
-		int direction = (int) r.getDirection();
 		switch(direction){
 			case 0:
 				if(x==1||obstacles[y+1][x-2]==1||obstacles[y-1][x-2]==1||obstacles[y][x-2]==1){
