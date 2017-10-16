@@ -64,9 +64,7 @@ public class ExplorationWallerType1 extends Exploration {
 		int currentY =Math.round(r.getPosY());
 		float direction = r.getDirection();
 
-		if(outofWallhugging(currentX,currentY,(int) direction)){
-			finishHuggingWall=true;
-		}
+		
 		if(m.getExploredTiles()[currentY][currentX]==0){
 			return null;
 		}
@@ -141,11 +139,15 @@ public class ExplorationWallerType1 extends Exploration {
 				}
 				instructions.add(rmovement);
 			}
-			message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);
-			if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1){
-				finishHuggingWall = true;
+			if(testTurnedRight==true&&outofWallhugging(currentX,currentY,(int)direction)){
+				finishHuggingWall=true;
 			}else{
-				return message;
+				message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);
+				if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1){
+					finishHuggingWall = true;
+				}else{
+					return message;
+				}
 			}
 		}
 		if(finishHuggingWall){
