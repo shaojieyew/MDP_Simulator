@@ -29,7 +29,7 @@ public class ExplorationWallerType1 extends Exploration {
 	public  float checkEnvironementOf[];
 	int printCount=1;
 
-	int movedCount = 0;
+	public static int movedCount = 0;
 	
 	//from rpi
 	public  ExplorationWallerType1(boolean isTerminate){
