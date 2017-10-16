@@ -65,8 +65,14 @@
                   <HBox />
                   <HBox prefHeight="39.0" prefWidth="190.0">
                      <children>
-                        <Label prefHeight="17.0" prefWidth="126.0" text="RPM: " />
-                        <TextField fx:id="rpmTextField" onKeyReleased="#onRPMChange" prefHeight="25.0" prefWidth="92.0" text="50" />
+                        <Label prefHeight="17.0" prefWidth="34.0" text="RPM: " />
+                        <TextField fx:id="rpmTextField" onKeyReleased="#onRPMChange" prefHeight="25.0" prefWidth="41.0" text="50" />
+                        <Label prefHeight="17.0" prefWidth="85.0" text="Calibrate intvl: ">
+                           <HBox.margin>
+                              <Insets left="3.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="30" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">
@@ -139,6 +145,7 @@
                            </font></Button>
                      </children>
                   </HBox>
+                  <HBox prefHeight="39.0" prefWidth="190.0" />
                </children>
             </VBox>
          </right>

@@ -91,7 +91,9 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private TextField forwardTextField;
 	@FXML
 	private TextField rotateTextField;
-
+	@FXML
+	private TextField calibrateTextField;
+	
 	@FXML
 	private TextField travelSpeedTextField;
 	@FXML
@@ -266,6 +268,13 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		Robot.setMilisecondPer10CM(speed);
 		Robot.setMilisecondPerRotate(speed*6);
 	}
+	@FXML
+	public void onCalibrateIntervalChange() {
+		int calibrate = Integer.parseInt(calibrateTextField.getText());
+		Exploration.intervalForCalibrate = calibrate;
+	}
+	
+	
 	@FXML
 	public void onclickDiscoverAll() {
 		int tiles[][]=new int[20][15];

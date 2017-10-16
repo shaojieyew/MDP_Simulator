@@ -3,6 +3,7 @@ package algorithm;
 
 import java.awt.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -28,6 +29,8 @@ public class ExplorationWallerType1 extends Exploration {
 	public  float checkEnvironementOf[];
 	int printCount=1;
 
+	int movedCount = 0;
+	
 	//from rpi
 	public  ExplorationWallerType1(boolean isTerminate){
 		super(isTerminate);
@@ -170,11 +173,6 @@ public class ExplorationWallerType1 extends Exploration {
 			}
 		}
 		return message;
-	}
-	
-	@Override
-	public void updateMap(){
-		computeAction();
 	}
 
 	public void cleanUpVar(){
@@ -326,6 +324,7 @@ public class ExplorationWallerType1 extends Exploration {
 	}
 	
 	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
+	
 		int robotsNorth = (int) ((NORTH+direction)%360);
 		int robotsEast = (int) ((EAST+direction)%360);
 		int robotsWest = (int) ((WEST+direction)%360);
@@ -438,11 +437,19 @@ public class ExplorationWallerType1 extends Exploration {
 				steps= steps<tempsteps?steps:tempsteps;
 			}
 			
-			if(testTurnedLeft&&nMoveable!=0){
+			if(testTurnedLeft&&nMoveable!=0){	
+				/***/
+				/* Calibration**/
+				if(movedCount>=intervalForCalibrate){
+					instructions = addCalibrationCommand(x,y,(int) direction,instructions);
+					movedCount = 0;
+				}
+				/***/
 				testTurnedLeft=false;
 				r.moveForward(10*steps);
 				instructions.add("F"+10*steps);
 				result= computeForwardLocation(direction, x, y, steps);
+				movedCount = movedCount+10*steps;
 				//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
 				
 			}else{
@@ -460,12 +467,20 @@ public class ExplorationWallerType1 extends Exploration {
 					//message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
 				}else{
 					if(steps!=0){
+						/***/
+						/* Calibration**/
+						if(movedCount>=intervalForCalibrate){
+							instructions = addCalibrationCommand(x,y,(int) direction,instructions);
+							movedCount = 0;
+						}
+						/***/
 						if(testTurnedRight){
 							testTurnedRight=false;
 						}
 						r.moveForward(10*steps);
 						instructions.add("F"+10*steps);
 						result= computeForwardLocation(direction, x, y, steps);
+						movedCount = movedCount+10*steps;
 						//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
 	
 					}else{
@@ -504,27 +519,10 @@ public class ExplorationWallerType1 extends Exploration {
 		}
 	}
 	
-	private int[] computeForwardLocation(int direction, int x, int y, int steps){
-		switch(direction){
-		case 0:
-			y=y+steps;
-			break;
-		case 90:
-			x=x+steps;
-			break;
-		case 180:
-			y=y-steps;
-			break;
-		case 270:
-			x=x-steps;
-			break;
-		}
-		int result[]={x,y};
-		return result;
-	}
+	/*
+	private Message moveToLocation1(int x1, int y1,float facing, int x2, int y2, int endDirection) {
 	
-	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
-
+		
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
 			////System.out.println("Error:"+x1+","+y1);
@@ -614,7 +612,9 @@ public class ExplorationWallerType1 extends Exploration {
 		return message;
 	}
 	//get Instructions To Location
-	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {
+	private Message moveToLocation2(int x1, int y1,float facing, int x2, int y2) {
+		System.out.println(x1+","+y1+" facing: "+facing);
+		
 		ArrayList<String> instructions = new ArrayList<String>();
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
@@ -677,6 +677,7 @@ public class ExplorationWallerType1 extends Exploration {
 		message.setDirection(direction);
 		return message;
 	}
+	*/
 
 
 	private int[] getBestNextStop(int inX, int inY, int maxHop) {
@@ -941,42 +942,7 @@ public class ExplorationWallerType1 extends Exploration {
 
 	
 	
-	private float rotateToDirection(float currentDirection, float inDirection){
-		////System.out.println("rotate from "+currentDirection+" to "+inDirection);
-		float degree = degreeToRotateToDirection(currentDirection,  inDirection);
-		r.rotate(degree);
-		return degree;
-	}
-	private float degreeToRotateToDirection(float currentDirection, float inDirection){
-		float difference = inDirection-currentDirection;
-		if(Math.abs(Math.round(difference))==180){
-			return 180;
-		}
-		if(difference<180){
-			if(Math.abs(difference)>180){
-				return difference+360;
-			}else{
-				return difference;
-			}
-		}else{
-			//return (-(currentDirection+360-difference));
-			
-			return (-(360-difference));
-		}
-	}
 	
-	//get degree between 2 point
-	private float getDegreeBetweenTwoPoint(float x,float y,float x2, float y2){
-		if(x==x2 && y==y2)
-			return 0;
-		   float angle = (float) Math.toDegrees(Math.atan2(y2 - y, x2 - x));
-		    if(angle < 0){
-		        angle += 360;
-		    }
-		    angle=(angle-90)%360;
-		    angle = (360-angle)%360;
-		    return angle;
-	}
 	
 
 	//update the visited list

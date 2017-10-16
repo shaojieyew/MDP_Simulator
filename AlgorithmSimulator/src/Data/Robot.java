@@ -161,6 +161,12 @@ public class Robot {
 	}
 	
 	public void calibrate (){
+		moveForward(3);
+		moveForward(-3);
+		moveForward(1);
+		moveForward(-1);
+		moveForward(3);
+		moveForward(-3);
 		moveForward(1);
 		moveForward(-1);
 	}

@@ -30,6 +30,7 @@ public class FastestPathType1 extends FastestPath {
 	public static ArrayList<Line> debugLine = new  ArrayList<Line>();
 	public static boolean debugPath = true;
 	public static float bufferArea = 1.1f;
+	public static int  lastMovedBeforeCalibrate=0;
 	
 	@Override
 	public Message computeAction() {		
@@ -65,12 +66,12 @@ public class FastestPathType1 extends FastestPath {
 		System.out.println("Path1: "+path);
 		if(end.x!=waypoint.x||end.y!=waypoint.y){
 			List<Vertex> path2 = d.computePaths(waypoint, end,vertices);
-			System.out.println("Path2: "+path2);
+			//System.out.println("Path2: "+path2);
 			path.remove(path.size()-1);
 			path.addAll(path2);
 		}
 	
-		System.out.println("Path: "+path);
+		//System.out.println("Path: "+path);
 		float direction = 0;
 		int forwardCount = 0;
 		ArrayList<String> instructions = new ArrayList<String>();
@@ -80,9 +81,15 @@ public class FastestPathType1 extends FastestPath {
 			float degree = getDegreeBetweenTwoPoint(v1.x,v1.y,v2.x,v2.y);
 			if(degree!= direction)
 			{
-				instructions.add("F"+forwardCount);
-				r.moveForward(forwardCount);
-				forwardCount=0;
+				if(forwardCount!=0){
+					instructions.add("F"+forwardCount);
+					r.moveForward(forwardCount);
+					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+					if(lastMovedBeforeCalibrate>=Exploration.intervalForCalibrate){
+						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+					}
+					forwardCount=0;
+				}
 				
 				float degreeToMove = rotateToDirection(direction,degree);
 				int intDegree = Math.round(degreeToMove);
@@ -95,9 +102,26 @@ public class FastestPathType1 extends FastestPath {
 			}
 			
 			forwardCount=forwardCount+10;
-			if(i==path.size()-2){
+			if(forwardCount>=Exploration.intervalForCalibrate){
 				instructions.add("F"+forwardCount);
 				r.moveForward(forwardCount);
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+				if(lastMovedBeforeCalibrate>=Exploration.intervalForCalibrate){
+					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+				}
+				forwardCount=0;
+			}else{
+				if(i==path.size()-2){
+					if(forwardCount>0){
+						instructions.add("F"+forwardCount);
+						r.moveForward(forwardCount);
+						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+						if(lastMovedBeforeCalibrate>=Exploration.intervalForCalibrate){
+							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+						}
+						forwardCount=0;
+					}
+				}
 			}
 		}
 
@@ -161,9 +185,214 @@ public class FastestPathType1 extends FastestPath {
 
 
 
+	public ArrayList<String>  addCalibrationCommand(int x, int y, int direction, ArrayList<String> instruction){
+		int bestDirection = direction;
+		int bestCount = getTotalSideForCalibration(x,y,direction);
+
+		int countE = getTotalSideForCalibration(x,y,(direction+90)%360);
+		if(countE>bestCount){
+			bestDirection = (direction+90)%360;
+			bestCount = countE;
+		}
+		int countW = getTotalSideForCalibration(x,y,(direction+270)%360);
+		if(countW>bestCount){
+			bestDirection = (direction-90)%360;
+			bestCount = countW;
+		}
+		int countS = getTotalSideForCalibration(x,y,(direction+180)%360);
+		if(countS>bestCount){
+			bestDirection = (direction-90)%360;
+			bestCount = countS;
+		}
+		if(bestCount>0){
+			float degreeToMove =rotateToDirection(direction,bestDirection);
+			int intDegree = Math.round(degreeToMove);
+			if(intDegree!=0){
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instruction.add(rmovement);
+			}
+			instruction.add("C");
+			lastMovedBeforeCalibrate=0;
+			r.calibrate();
+			degreeToMove =rotateToDirection(bestDirection,direction);
+			intDegree = Math.round(degreeToMove);
+			if(intDegree!=0){
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instruction.add(rmovement);
+			}
+		}
+		
+		return instruction;
+	}
+	
+	
+	public int getTotalSideForCalibration(int x, int y, int direction){
+		int count=0;
+		int totalBlocks = 0;
+		int obstacles[][] = m.getObstacles();
+		int explored[][] = m.getExploredTiles();
+		switch (direction){
+		case 0:
+			/*front sensorcheck*/
+			 totalBlocks = 0;
+			for(int i=0;i<3;i++){
+				for(int j=0;j<3;j++){
+					int checkX = x-1+i;
+					int checkY = y+2+j;
+					if(checkY>19||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+						totalBlocks++;
+						break;
+					}
+				}
+			}
+			if(totalBlocks>=2){
+				count++;
+			}
+
+			/*side sensorcheck*/
+			totalBlocks = 0;
+			for(int i=0;i<3;i++){
+				if(i==1)
+					continue;
+				for(int j=0;j<3;j++){
+					int checkX = x-2-j;
+					int checkY = y-1+i;
+					if(checkX<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+						totalBlocks++;
+						break;
+					}
+				}
+			}
+			if(totalBlocks>=2){
+				count++;
+			}
+			break;
+			
+		case 90:
+			/*front sensorcheck*/
+			totalBlocks = 0;
+			for(int i=0;i<3;i++){
+				for(int j=0;j<3;j++){
+					int checkX = x+2+j;
+					int checkY = y+1-i;
+					if(checkX>14||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+						totalBlocks++;
+						break;
+					}
+				}
+			}
+			if(totalBlocks>=2){
+				count++;
+			}
+
+			/*side sensorcheck*/
+			totalBlocks = 0;
+			for(int i=0;i<3;i++){
+				if(i==1)
+					continue;
+				for(int j=0;j<3;j++){
+					int checkX = x-1+i;
+					int checkY = y+2+j;
+					if(checkY>19||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+						totalBlocks++;
+						break;
+					}
+				}
+			}
+			if(totalBlocks>=2){
+				count++;
+			}
+			break;
+			
+			
+			case 180:
+				/*front sensorcheck*/
+				totalBlocks = 0;
+				for(int i=0;i<3;i++){
+					for(int j=0;j<3;j++){
+						int checkX = x+1-i;
+						int checkY = y-2-j;
+						if(checkY<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+							totalBlocks++;
+							break;
+						}
+					}
+				}
+				if(totalBlocks>=2){
+					count++;
+				}
+
+				/*side sensorcheck*/
+				totalBlocks = 0;
+				for(int i=0;i<3;i++){
+					if(i==1)
+						continue;
+					for(int j=0;j<3;j++){
+						int checkX = x+2+j;
+						int checkY = y+1-i;
+						if(checkX>14||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+							totalBlocks++;
+							break;
+						}
+					}
+				}
+				if(totalBlocks>=2){
+					count++;
+				}
+				break;
+
+				
+				
+			case 270:
+				/*front sensorcheck*/
+				totalBlocks = 0;
+				for(int i=0;i<3;i++){
+					for(int j=0;j<3;j++){
+						int checkX = x-2-j;
+						int checkY = y-1+i;
+						if(checkX<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+							totalBlocks++;
+							break;
+						}
+					}
+				}
+				if(totalBlocks>=2){
+					count++;
+				}
+
+				/*side sensorcheck*/
+				totalBlocks = 0;
+				for(int i=0;i<3;i++){
+					if(i==1)
+						continue;
+					for(int j=0;j<3;j++){
+						int checkX = x+1-i;
+						int checkY = y-2-j;
+						if(checkY<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
+							totalBlocks++;
+							break;
+						}
+					}
+				}
+				if(totalBlocks>=2){
+					count++;
+				}
+				break;
+		}
+		return  count;
+	}
+
 	@Override
 	public String geType() {
 		// TODO Auto-generated method stub
 		return FastestPathFactory.FP1;
 	}
+	
+	
 }

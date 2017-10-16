@@ -177,6 +177,202 @@ public class ExplorationWallerType4 extends Exploration {
 
 		return message;
 	}
+	
+	@Override
+	public Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
+
+		Vertex s = m.getVertices()[y1][x1];
+		if(s==null){
+			////System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
+			return null;
+		}
+		Vertex[][] vertices =  m.getVertices();
+		Vertex e =vertices[y2][x2];
+		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
+		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
+
+		ArrayList<String> instructions = new ArrayList<String>();
+		if(newVisit){
+			newVisit = false;
+			float degree = getDegreeBetweenTwoPoint(x1,y1,path.get(1).x,path.get(1).y);
+			////System.out.println(x1+","+y1+"=>"+","+path.get(1)+" - "+degree+" deg  <-->"+newVisitDirection);
+			if(degree!=facing){
+				float degreeToMove = rotateToDirection(facing,newVisitDirection);
+				facing= newVisitDirection;
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+			}
+		}
+		float direction = facing;
+		int forwardCount = 0;
+		for(int i =0;i<path.size()-1;i++){
+			Vertex v1 =path.get(i);
+			Vertex v2 =path.get(i+1);
+			float degree = getDegreeBetweenTwoPoint(v1.x,v1.y,v2.x,v2.y);
+			if(degree!= direction)
+			{
+				if(forwardCount!=0){
+					instructions.add("F"+forwardCount);
+					r.moveForward(forwardCount);
+					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+					if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+					}
+					forwardCount=0;
+				}
+				forwardCount=0;
+				//float degreeBetween= degreeToRotateToDirection(direction,degree);
+				float degreeToMove =rotateToDirection(direction,degree);
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+				direction = degree;
+			}
+			forwardCount=forwardCount+10;
+
+			if(forwardCount>=intervalForCalibrate){
+				instructions.add("F"+forwardCount);
+				r.moveForward(forwardCount);
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+				if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+				}
+				forwardCount=0;
+			}else{
+				if(i==path.size()-2){
+					if(forwardCount>0){
+						instructions.add("F"+forwardCount);
+						r.moveForward(forwardCount);
+						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+						if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+						}
+						forwardCount=0;
+					}
+				}
+			}
+		}
+		if(direction!=endDirection){
+			float degreeToMove =rotateToDirection(direction,endDirection);
+			int intDegree = Math.round(degreeToMove);
+			String rmovement= "R"+intDegree;
+			if(intDegree<0){
+				rmovement= "L"+(intDegree*-1);
+			}
+			instructions.add(rmovement);
+			direction = endDirection;
+		}
+
+		
+		String []movements = new String[instructions.size()];
+		int index=0;
+		for(String instruction: instructions){
+				movements[index] = instruction;
+				index++;
+		}
+		Message message  = new Message();
+		message.setMovements(movements);
+		Vertex lastLocation = path.get(path.size()-1);
+		int [] location = {(int) lastLocation.x,(int) lastLocation.y};
+		message.setRobotLocation(location);
+		message.setEndOfExploration(false);
+		message.setDirection(direction);
+		return message;
+	}
+	//get Instructions To Location
+
+	@Override
+	public Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {
+		ArrayList<String> instructions = new ArrayList<String>();
+
+		Vertex s = m.getVertices()[y1][x1];
+		if(s==null){
+			////System.out.println("Error:"+x1+","+y1);
+			////System.out.println("Error:"+x1+","+y1);
+			return null;
+		}
+		Vertex[][] vertices =  m.getVertices();
+		Vertex e =vertices[y2][x2];
+		float direction = facing;
+		DijkstraMinimunRotation d = new DijkstraMinimunRotation();
+		java.util.List<Vertex> path = d.computePaths(s, e,vertices);
+		////System.out.println("Path to travel: "+path);
+		////System.out.println("I am facing "+direction);
+		int forwardCount = 0;
+		for(int i =0;i<path.size()-1;i++){
+			Vertex v1 =path.get(i);
+			Vertex v2 =path.get(i+1);
+			float degree = getDegreeBetweenTwoPoint(v1.x,v1.y,v2.x,v2.y);
+			if(degree!= direction)
+			{
+				if(forwardCount!=0){
+					instructions.add("F"+forwardCount);
+					r.moveForward(forwardCount);
+					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+					if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+					}
+					forwardCount=0;
+				}
+				forwardCount=0;
+				//float degreeBetween= degreeToRotateToDirection(direction,degree);
+				float degreeToMove =rotateToDirection(direction,degree);
+				int intDegree = Math.round(degreeToMove);
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+				direction = degree;
+			}
+			forwardCount=forwardCount+10;
+			if(forwardCount>=intervalForCalibrate){
+				instructions.add("F"+forwardCount);
+				r.moveForward(forwardCount);
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+				if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+				}
+				forwardCount=0;
+			}else{
+				if(i==path.size()-2){
+					if(forwardCount>0){
+						instructions.add("F"+forwardCount);
+						r.moveForward(forwardCount);
+						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+						if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+						}
+						forwardCount=0;
+					}
+				}
+			}
+		}
+		
+		String []movements = new String[instructions.size()];
+		int index=0;
+		for(String instruction: instructions){
+				movements[index] = instruction;
+				index++;
+		}
+		Message message  = new Message();
+		message.setMovements(movements);
+		Vertex lastLocation = path.get(path.size()-1);
+		int [] location = {(int) lastLocation.x,(int) lastLocation.y};
+		message.setRobotLocation(location);
+		message.setEndOfExploration(false);
+		message.setDirection(direction);
+		return message;
+	}
+	
 	public boolean allPossiblePathExplored(int x,int y){
 		int visitedCheck [][] = new int[20][15];
 		Vertex v = m.getVertices()[y][x];
@@ -200,12 +396,6 @@ public class ExplorationWallerType4 extends Exploration {
 					}
 				}
 		return true;
-	}
-	@Override
-	public void updateMap(){
-
-		computeAction();
-		
 	}
 	/*
 	 if (turnedleft previously and forward no wall)
@@ -272,26 +462,8 @@ public class ExplorationWallerType4 extends Exploration {
 		return result;
 	}
 	
-	private int[] computeForwardLocation(int direction, int x, int y, int steps){
-		switch(direction){
-		case 0:
-			y=y+steps;
-			break;
-		case 90:
-			x=x+steps;
-			break;
-		case 180:
-			y=y-steps;
-			break;
-		case 270:
-			x=x-steps;
-			break;
-		}
-		int result[]={x,y};
-		return result;
-	}
 	
-	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
+	private Message moveToLocation1(int x1, int y1,float facing, int x2, int y2, int endDirection) {
 
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
@@ -325,7 +497,7 @@ public class ExplorationWallerType4 extends Exploration {
 		return fastestPath(x1,y1,x2,y2,direction, endDirection);
 	}
 	//get Instructions To Location
-	private Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {
+	private Message moveToLocation1(int x1, int y1,float facing, int x2, int y2) {
 		ArrayList<String> instructions = new ArrayList<String>();
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
@@ -754,44 +926,6 @@ public class ExplorationWallerType4 extends Exploration {
 		return  Math.abs(x1-x2)+Math.abs(y1-y2);
 	}
 
-	//check if the position and direction have any undiscovered tiles
-
-	private float rotateToDirection(float currentDirection, float inDirection){
-		////System.out.println("rotate from "+currentDirection+" to "+inDirection);
-		float degree = degreeToRotateToDirection(currentDirection,  inDirection);
-		r.rotate(degree);
-		return degree;
-	}
-	private float degreeToRotateToDirection(float currentDirection, float inDirection){
-		float difference = inDirection-currentDirection;
-		if(Math.abs(Math.round(difference))==180){
-			return 180;
-		}
-		if(difference<180){
-			if(Math.abs(difference)>180){
-				return difference+360;
-			}else{
-				return difference;
-			}
-		}else{
-			//return (-(currentDirection+360-difference));
-			
-			return (-(360-difference));
-		}
-	}
-	
-	//get degree between 2 point
-	private float getDegreeBetweenTwoPoint(float x,float y,float x2, float y2){
-		if(x==x2 && y==y2)
-			return 0;
-		   float angle = (float) Math.toDegrees(Math.atan2(y2 - y, x2 - x));
-		    if(angle < 0){
-		        angle += 360;
-		    }
-		    angle=(angle-90)%360;
-		    angle = (360-angle)%360;
-		    return angle;
-	}
 	
 
 	//update the visited list
