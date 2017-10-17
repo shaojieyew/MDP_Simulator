@@ -105,6 +105,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private TextField terminateRateTextField;
 	@FXML
 	private TextField textfield_address_port;
+	@FXML
+	private TextField rotateCostTextField;
 	
 
 	@FXML
@@ -272,6 +274,11 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	public void onCalibrateIntervalChange() {
 		int calibrate = Integer.parseInt(calibrateTextField.getText());
 		Exploration.intervalForCalibrate = calibrate;
+	}
+	@FXML
+	public void onrotateCostTextFieldChange() {
+		int calibrate = Integer.parseInt(rotateCostTextField.getText());
+		Exploration.rotationCost = calibrate;
 	}
 	
 	

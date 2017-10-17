@@ -98,6 +98,7 @@ public class FastestPathType1 extends FastestPath {
 					movement= "L"+(intDegree*-1);
 				}
 				instructions.add(movement);
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ Exploration.rotationCost;
 				direction = degree;
 			}
 			
@@ -213,6 +214,7 @@ public class FastestPathType1 extends FastestPath {
 					rmovement= "L"+(intDegree*-1);
 				}
 				instruction.add(rmovement);
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ Exploration.rotationCost;
 			}
 			instruction.add("C");
 			lastMovedBeforeCalibrate=0;
@@ -225,6 +227,7 @@ public class FastestPathType1 extends FastestPath {
 					rmovement= "L"+(intDegree*-1);
 				}
 				instruction.add(rmovement);
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ Exploration.rotationCost;
 			}
 		}
 		

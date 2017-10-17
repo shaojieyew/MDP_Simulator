@@ -34,18 +34,18 @@
                   </HBox>
                   <Button fx:id="editObstacle" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickEditObstacle" prefHeight="25.0" prefWidth="132.0" text="Edit/View Obstacle" />
                   <Button fx:id="resetBtn" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onclickResetSimulator" prefHeight="25.0" prefWidth="189.0" text="Reset" />
-                  <Label text="Robot Coord:" />
                   <HBox>
                      <children>
-                        <TextField fx:id="robotXpos" onKeyReleased="#robotPosXChanged" text="1" />
-                        <TextField fx:id="robotYpos" onKeyReleased="#robotPosYChanged" text="1" />
+                        <Label prefHeight="17.0" prefWidth="127.0" text="Robot Coord:" />
+                        <TextField fx:id="robotXpos" onKeyReleased="#robotPosXChanged" prefHeight="25.0" prefWidth="58.0" text="1" />
+                        <TextField fx:id="robotYpos" onKeyReleased="#robotPosYChanged" prefHeight="25.0" prefWidth="62.0" text="1" />
                      </children>
                   </HBox>
-                <Label text="Way Point: " />
                   <HBox>
                      <children>
-                        <TextField fx:id="waypointXpos" onKeyReleased="#waypointPosChanged" text="1" />
-                        <TextField fx:id="waypointYpos" onKeyReleased="#waypointPosChanged" text="1" />
+                      <Label prefHeight="17.0" prefWidth="120.0" text="Way Point: " />
+                        <TextField fx:id="waypointXpos" onKeyReleased="#waypointPosChanged" prefHeight="25.0" prefWidth="51.0" text="1" />
+                        <TextField fx:id="waypointYpos" onKeyReleased="#waypointPosChanged" prefHeight="25.0" prefWidth="53.0" text="1" />
                      </children>
                   </HBox>
                   <HBox prefHeight="14.0" prefWidth="190.0" spacing="20.0">
@@ -67,12 +67,18 @@
                      <children>
                         <Label prefHeight="17.0" prefWidth="34.0" text="RPM: " />
                         <TextField fx:id="rpmTextField" onKeyReleased="#onRPMChange" prefHeight="25.0" prefWidth="41.0" text="50" />
+                        <Label prefHeight="17.0" prefWidth="64.0" text="rotateCost:" />
+                        <TextField fx:id="rotateCostTextField" onKeyReleased="#onrotateCostTextFieldChange" prefHeight="25.0" prefWidth="41.0" text="15" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="39.0" prefWidth="190.0">
+                     <children>
                         <Label prefHeight="17.0" prefWidth="85.0" text="Calibrate intvl: ">
                            <HBox.margin>
                               <Insets left="3.0" />
                            </HBox.margin>
                         </Label>
-                        <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="30" />
+                        <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="60" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">

@@ -156,6 +156,7 @@ public class ExplorationWallerType2R extends Exploration {
 						if(intDegree<0){
 							movement= "L"+(intDegree*-1);
 						}
+						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 						message  = new Message();
 						String []movments = {movement};
 						message.setMovements(movments);
@@ -349,6 +350,8 @@ public class ExplorationWallerType2R extends Exploration {
 		}
 		return optimised;
 	}
+
+
 	@Override
 	public Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
 
@@ -376,6 +379,7 @@ public class ExplorationWallerType2R extends Exploration {
 				if(intDegree<0){
 					rmovement= "L"+(intDegree*-1);
 				}
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 				instructions.add(rmovement);
 			}
 		}
@@ -404,12 +408,12 @@ public class ExplorationWallerType2R extends Exploration {
 				if(intDegree<0){
 					rmovement= "L"+(intDegree*-1);
 				}
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 				instructions.add(rmovement);
 				direction = degree;
 			}
 			forwardCount=forwardCount+10;
-
-			if(forwardCount>=intervalForCalibrate){
+			if(lastMovedBeforeCalibrate+forwardCount>=intervalForCalibrate){
 				instructions.add("F"+forwardCount);
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
@@ -438,6 +442,7 @@ public class ExplorationWallerType2R extends Exploration {
 			if(intDegree<0){
 				rmovement= "L"+(intDegree*-1);
 			}
+			lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 			instructions.add(rmovement);
 			direction = endDirection;
 		}
@@ -501,11 +506,12 @@ public class ExplorationWallerType2R extends Exploration {
 				if(intDegree<0){
 					rmovement= "L"+(intDegree*-1);
 				}
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 				instructions.add(rmovement);
 				direction = degree;
 			}
 			forwardCount=forwardCount+10;
-			if(forwardCount>=intervalForCalibrate){
+			if(lastMovedBeforeCalibrate+forwardCount>=intervalForCalibrate){
 				instructions.add("F"+forwardCount);
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
@@ -543,6 +549,7 @@ public class ExplorationWallerType2R extends Exploration {
 		message.setDirection(direction);
 		return message;
 	}
+
 	 //greedy heuristic 
 	private int[] calculateScoreOfVertexAndCompare(int[] place1, int[] place2){
 		float mapDiscoveredRate = m.getExploredRate();

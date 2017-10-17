@@ -19,7 +19,8 @@ public abstract class Exploration implements  MapListener, RobotListener{
 
 
 	public static int lastMovedBeforeCalibrate = 0;
-	public static int intervalForCalibrate = 30;
+	public static int intervalForCalibrate = 60;
+	public static int rotationCost = 15;
 	public static final float NORTH = 0;
 	public static final float EAST = 90;
 	public static final float SOUTH = 180;
@@ -62,7 +63,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	@Override
 	public void updateMap(){
 		Message m = computeAction();
-		System.out.println(Arrays.toString(m.getMovements()));
+		//System.out.println(Arrays.toString(m.getMovements()));
 	}
 	
 	public abstract void init();
@@ -303,7 +304,11 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				instruction.add(rmovement);
 			}
 			instruction.add("C");
-			lastMovedBeforeCalibrate=0;
+			if(bestCount>1){
+				lastMovedBeforeCalibrate=0;
+			}else{
+				lastMovedBeforeCalibrate=10;
+			}
 			r.calibrate();
 			degreeToMove =rotateToDirection(bestDirection,direction);
 			intDegree = Math.round(degreeToMove);

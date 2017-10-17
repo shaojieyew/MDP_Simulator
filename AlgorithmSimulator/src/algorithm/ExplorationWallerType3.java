@@ -222,6 +222,7 @@ public class ExplorationWallerType3 extends Exploration {
 				if(intDegree<0){
 					rmovement= "L"+(intDegree*-1);
 				}
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 				instructions.add(rmovement);
 			}
 		}
@@ -250,12 +251,12 @@ public class ExplorationWallerType3 extends Exploration {
 				if(intDegree<0){
 					rmovement= "L"+(intDegree*-1);
 				}
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 				instructions.add(rmovement);
 				direction = degree;
 			}
 			forwardCount=forwardCount+10;
-
-			if(forwardCount>=intervalForCalibrate){
+			if(lastMovedBeforeCalibrate+forwardCount>=intervalForCalibrate){
 				instructions.add("F"+forwardCount);
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
@@ -284,6 +285,7 @@ public class ExplorationWallerType3 extends Exploration {
 			if(intDegree<0){
 				rmovement= "L"+(intDegree*-1);
 			}
+			lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 			instructions.add(rmovement);
 			direction = endDirection;
 		}
@@ -347,11 +349,12 @@ public class ExplorationWallerType3 extends Exploration {
 				if(intDegree<0){
 					rmovement= "L"+(intDegree*-1);
 				}
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 				instructions.add(rmovement);
 				direction = degree;
 			}
 			forwardCount=forwardCount+10;
-			if(forwardCount>=intervalForCalibrate){
+			if(lastMovedBeforeCalibrate+forwardCount>=intervalForCalibrate){
 				instructions.add("F"+forwardCount);
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;

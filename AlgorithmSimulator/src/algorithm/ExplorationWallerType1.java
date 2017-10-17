@@ -114,6 +114,7 @@ public class ExplorationWallerType1 extends Exploration {
 						if(intDegree<0){
 							movement= "L"+(intDegree*-1);
 						}
+						movedCount = movedCount+10;
 						message  = new Message();
 						String []movments = {movement};
 						message.setMovements(movments);
@@ -141,6 +142,7 @@ public class ExplorationWallerType1 extends Exploration {
 					rmovement= "L"+(intDegree*-1);
 				}
 				instructions.add(rmovement);
+				movedCount = movedCount+10;
 			}
 			if(testTurnedRight==true&&outofWallhugging(currentX,currentY,(int)direction)){
 				finishHuggingWall=true;
@@ -464,6 +466,7 @@ public class ExplorationWallerType1 extends Exploration {
 						rmovement= "L"+(intDegree*-1);
 					}
 					instructions.add(rmovement);
+					movedCount = movedCount+10;
 					//message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
 				}else{
 					if(steps!=0){
@@ -493,6 +496,7 @@ public class ExplorationWallerType1 extends Exploration {
 							rmovement= "L"+(intDegree*-1);
 						}
 						instructions.add(rmovement);
+						movedCount = movedCount+10;
 						//message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
 					}
 				}
