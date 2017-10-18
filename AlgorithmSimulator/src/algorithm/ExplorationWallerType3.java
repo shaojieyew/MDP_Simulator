@@ -194,7 +194,6 @@ public class ExplorationWallerType3 extends Exploration {
 
 		return message;
 	}
-
 	@Override
 	public Message moveToLocation(int x1, int y1,float facing, int x2, int y2, int endDirection) {
 
@@ -225,6 +224,9 @@ public class ExplorationWallerType3 extends Exploration {
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ rotationCost;
 				instructions.add(rmovement);
 			}
+		}
+		if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+			instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions);
 		}
 		float direction = facing;
 		int forwardCount = 0;
@@ -312,6 +314,9 @@ public class ExplorationWallerType3 extends Exploration {
 	public Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {
 		ArrayList<String> instructions = new ArrayList<String>();
 
+		if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+				instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions);
+		}
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
 			////System.out.println("Error:"+x1+","+y1);
@@ -392,16 +397,6 @@ public class ExplorationWallerType3 extends Exploration {
 		message.setDirection(direction);
 		return message;
 	}
-	/*
-	 if (turnedleft previously and forward no wall)
-		  go forwards 1 cell
-	 elseif (no wall at left)
-		  turn 90deg left
-		elseif (no wall forwards)
-		  go forwards 1 cell
-		else
-		  turn 90deg right
-	 * */
 
 	public boolean allPossiblePathExplored(int x,int y){
 		int visitedCheck [][] = new int[20][15];

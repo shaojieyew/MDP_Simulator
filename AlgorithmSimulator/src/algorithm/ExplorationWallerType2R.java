@@ -383,6 +383,9 @@ public class ExplorationWallerType2R extends Exploration {
 				instructions.add(rmovement);
 			}
 		}
+		if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+			instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions);
+		}
 		float direction = facing;
 		int forwardCount = 0;
 		for(int i =0;i<path.size()-1;i++){
@@ -469,6 +472,9 @@ public class ExplorationWallerType2R extends Exploration {
 	public Message moveToLocation(int x1, int y1,float facing, int x2, int y2) {
 		ArrayList<String> instructions = new ArrayList<String>();
 
+		if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+			instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions);
+		}
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
 			////System.out.println("Error:"+x1+","+y1);
