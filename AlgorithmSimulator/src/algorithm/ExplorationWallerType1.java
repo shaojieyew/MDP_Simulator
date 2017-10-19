@@ -73,7 +73,7 @@ public class ExplorationWallerType1 extends Exploration {
 		}
 		int result[] ;
 		updateVisitedList();
-		if(allPossibleNodeVisited()){
+		if(allPossibleNodeVisited()&&howManyUndiscovered(currentX,currentY)==0){
 			finishHuggingWall=true;
 		}
 		
@@ -148,7 +148,7 @@ public class ExplorationWallerType1 extends Exploration {
 				finishHuggingWall=true;
 			}else{
 				message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);
-				if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1){
+				if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1&&howManyUndiscovered(currentX,currentY)==0){
 					finishHuggingWall = true;
 				}else{
 					return message;

@@ -78,7 +78,7 @@
                               <Insets left="3.0" />
                            </HBox.margin>
                         </Label>
-                        <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="60" />
+                        <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="40" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">

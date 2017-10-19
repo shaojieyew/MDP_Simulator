@@ -19,7 +19,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 
 
 	public static int lastMovedBeforeCalibrate = 0;
-	public static int intervalForCalibrate = 60;
+	public static int intervalForCalibrate = 40;
 	public static int rotationCost = 15;
 	public static final float NORTH = 0;
 	public static final float EAST = 90;
@@ -184,7 +184,14 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		}
 		return thereExistUndiscovered;
 	}
-	
+	protected int howManyUndiscovered(int currentX,int currentY){
+		int count=0;
+		count = count+howManyUndiscovered(currentX, currentY, 0);
+		count = count+howManyUndiscovered(currentX, currentY, 90);
+		count = count+howManyUndiscovered(currentX, currentY, 180);
+		count = count+howManyUndiscovered(currentX, currentY, 270);
+		return count;
+	}
 	protected int howManyUndiscovered(int currentX,int currentY, float inDirection){
 		int count=0;
 		Position[][] lineOfSensors = r.getSensorSimulator().getLineOfSensor(currentX, currentY, inDirection);
@@ -304,11 +311,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				instruction.add(rmovement);
 			}
 			instruction.add("C");
-			if(bestCount>1){
-				lastMovedBeforeCalibrate=0;
-			}else{
-				lastMovedBeforeCalibrate=10;
-			}
+			lastMovedBeforeCalibrate=0;
 			r.calibrate();
 			degreeToMove =rotateToDirection(bestDirection,direction);
 			intDegree = Math.round(degreeToMove);
@@ -335,7 +338,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			/*front sensorcheck*/
 			 totalBlocks = 0;
 			for(int i=0;i<3;i++){
-				for(int j=0;j<3;j++){
+				for(int j=0;j<2;j++){
 					int checkX = x-1+i;
 					int checkY = y+2+j;
 					if(checkY>19||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -353,7 +356,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			for(int i=0;i<3;i++){
 				if(i==1)
 					continue;
-				for(int j=0;j<3;j++){
+				for(int j=0;j<2;j++){
 					int checkX = x-2-j;
 					int checkY = y-1+i;
 					if(checkX<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -371,7 +374,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			/*front sensorcheck*/
 			totalBlocks = 0;
 			for(int i=0;i<3;i++){
-				for(int j=0;j<3;j++){
+				for(int j=0;j<2;j++){
 					int checkX = x+2+j;
 					int checkY = y+1-i;
 					if(checkX>14||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -389,7 +392,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			for(int i=0;i<3;i++){
 				if(i==1)
 					continue;
-				for(int j=0;j<3;j++){
+				for(int j=0;j<2;j++){
 					int checkX = x-1+i;
 					int checkY = y+2+j;
 					if(checkY>19||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -408,7 +411,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				/*front sensorcheck*/
 				totalBlocks = 0;
 				for(int i=0;i<3;i++){
-					for(int j=0;j<3;j++){
+					for(int j=0;j<2;j++){
 						int checkX = x+1-i;
 						int checkY = y-2-j;
 						if(checkY<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -426,7 +429,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				for(int i=0;i<3;i++){
 					if(i==1)
 						continue;
-					for(int j=0;j<3;j++){
+					for(int j=0;j<2;j++){
 						int checkX = x+2+j;
 						int checkY = y+1-i;
 						if(checkX>14||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -446,7 +449,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				/*front sensorcheck*/
 				totalBlocks = 0;
 				for(int i=0;i<3;i++){
-					for(int j=0;j<3;j++){
+					for(int j=0;j<2;j++){
 						int checkX = x-2-j;
 						int checkY = y-1+i;
 						if(checkX<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -464,7 +467,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				for(int i=0;i<3;i++){
 					if(i==1)
 						continue;
-					for(int j=0;j<3;j++){
+					for(int j=0;j<2;j++){
 						int checkX = x+1-i;
 						int checkY = y-2-j;
 						if(checkY<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){

@@ -47,7 +47,8 @@ public abstract class RPiInterface {
 	//SS|
 	//public static float sensorOffset[]={10.3f,10.5f,10.3f,8.3f,15.15f,10.5f};
 	//public static float sensorOffset[]={11.99f,11.26f,10.83f,6.88f,15.24f,10.87f};
-	public static float sensorOffset[]={11.57f,10.33f,10.21f,5.77f,15.00f,10.30f};
+	//SS|11.57,10.33,10.21,5.77,-1.00,10.30
+	public static float sensorOffset[]={11.57f,10.33f,10.21f,5.77f,15f,10.30f};
 	public void computeSensor(float robotLocationX,float robotLocationY,float robotDirection,float sensorDistance []) {
 		int sensorInfo[] = new int[6];
 		int sensorIndex = 0;
