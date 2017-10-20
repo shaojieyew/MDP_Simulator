@@ -75,6 +75,21 @@ public class FastestPathType1 extends FastestPath {
 		float direction = 0;
 		int forwardCount = 0;
 		ArrayList<String> instructions = new ArrayList<String>();
+		direction = r.getDirection();
+		if(direction !=0){
+			float degreeToMove =rotateToDirection(direction,0);
+			int intDegree = Math.round(degreeToMove);
+			if(intDegree!=0){
+				String rmovement= "R"+intDegree;
+				if(intDegree<0){
+					rmovement= "L"+(intDegree*-1);
+				}
+				instructions.add(rmovement);
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ Exploration.rotationCost;
+			}
+			direction=0;
+		}
+		
 		for(int i =0;i<path.size()-1;i++){
 			Vertex v1 =path.get(i);
 			Vertex v2 =path.get(i+1);

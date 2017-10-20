@@ -6,7 +6,7 @@ import Data.Robot;
 import javafx.application.Platform;
 
 public abstract class RobotSensorSimulator implements Runnable {
-	private static int sensorInfoFreq= 500;
+	private static int sensorInfoFreq= 200;
 	boolean stop = false;
 	boolean moved = true;
 	@Override

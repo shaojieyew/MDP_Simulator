@@ -14,6 +14,7 @@ import Data.Robot;
 import Data.RobotListener;
 import Data.Vertex;
 import RPiInterface.Message;
+import RPiInterface.RobotSensorSimulator;
 import RPiInterface.RobotSensorSimulatorType2;
 
 public class ExplorationWallerType1 extends Exploration {
@@ -302,6 +303,10 @@ public class ExplorationWallerType1 extends Exploration {
 		}else{
 			return result;
 		}
+		
+		if(isLocationExploredByRobot(x,y,direction)==false){
+			return result;
+		}
 		if(result[0]==1&&result[1]==1){
 			return result;
 		}
@@ -323,6 +328,28 @@ public class ExplorationWallerType1 extends Exploration {
 			}
 		}
 		return result;
+	}
+	
+	private boolean isLocationExploredByRobot(int x, int y, int direction){
+		RobotSensorSimulator simulator2 = Robot.getInstance().getSensorSimulator();
+		Position[][] lineOfSensors = simulator2.getLineOfSensor((int)x, (int)y, direction);
+		int exploredTiles[][] = Map.getInstance().getExploredTiles();
+		int obstacleTiles[][] = Map.getInstance().getObstacles();
+		for(Position[] sensors:lineOfSensors){
+			for(Position sensor:sensors){
+				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
+					if(obstacleTiles[sensor.getPosY()][sensor.getPosX()]==1&&exploredTiles[sensor.getPosY()][sensor.getPosX()]==1){
+						break;
+					}
+					if(exploredTiles[sensor.getPosY()][sensor.getPosX()]==0){
+						return false;
+					}
+				}else{
+					break;
+				}
+			}
+		}
+		return true;
 	}
 	
 	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
@@ -448,10 +475,20 @@ public class ExplorationWallerType1 extends Exploration {
 				}
 				/***/
 				testTurnedLeft=false;
-				r.moveForward(10*steps);
-				instructions.add("F"+10*steps);
-				result= computeForwardLocation(direction, x, y, steps);
-				movedCount = movedCount+10*steps;
+				int test[] = computeForwardLocation(direction, x, y, steps);
+				if(test[0]==1&&test[1]==1){
+					message  = new Message();
+					message.setMovements(null);
+					message.setRobotLocation(endResult);
+					message.setEndOfExploration(false);
+					message.setDirection(direction);
+					return message;
+				}else{
+					r.moveForward(10*steps);
+					instructions.add("F"+10*steps);
+					result= computeForwardLocation(direction, x, y, steps);
+					movedCount = movedCount+10*steps;
+				}
 				//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
 				
 			}else{
@@ -480,10 +517,21 @@ public class ExplorationWallerType1 extends Exploration {
 						if(testTurnedRight){
 							testTurnedRight=false;
 						}
-						r.moveForward(10*steps);
-						instructions.add("F"+10*steps);
-						result= computeForwardLocation(direction, x, y, steps);
-						movedCount = movedCount+10*steps;
+
+						int test[]= computeForwardLocation(direction, x, y, steps);
+						if(test[0]==1&&test[1]==1){
+							message  = new Message();
+							message.setMovements(null);
+							message.setRobotLocation(endResult);
+							message.setEndOfExploration(false);
+							message.setDirection(direction);
+							return message;
+						}else{
+							r.moveForward(10*steps);
+							instructions.add("F"+10*steps);
+							result= computeForwardLocation(direction, x, y, steps);
+							movedCount = movedCount+10*steps;
+						}
 						//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
 	
 					}else{
@@ -514,12 +562,14 @@ public class ExplorationWallerType1 extends Exploration {
 			message.setDirection(direction);
 			return message;
 		}else{
+			
 			message  = new Message();
 			message.setMovements(null);
 			message.setRobotLocation(endResult);
 			message.setEndOfExploration(false);
 			message.setDirection(direction);
 			return message;
+			
 		}
 	}
 	
