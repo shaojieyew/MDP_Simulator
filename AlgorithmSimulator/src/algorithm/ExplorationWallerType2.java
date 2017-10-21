@@ -400,7 +400,7 @@ public class ExplorationWallerType2 extends Exploration {
 			}
 		}
 		if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-			instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions);
+			instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions,null);
 		}
 		float direction = facing;
 		int forwardCount = 0;
@@ -415,7 +415,7 @@ public class ExplorationWallerType2 extends Exploration {
 					r.moveForward(forwardCount);
 					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 					if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 					}
 					forwardCount=0;
 				}
@@ -437,7 +437,7 @@ public class ExplorationWallerType2 extends Exploration {
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 				if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 				}
 				forwardCount=0;
 			}else{
@@ -447,7 +447,7 @@ public class ExplorationWallerType2 extends Exploration {
 						r.moveForward(forwardCount);
 						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 						if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 						}
 						forwardCount=0;
 					}
@@ -489,7 +489,7 @@ public class ExplorationWallerType2 extends Exploration {
 		ArrayList<String> instructions = new ArrayList<String>();
 
 		if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-				instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions);
+				instructions = addCalibrationCommand((int)x1,(int)y1,(int) facing,instructions,null);
 		}
 		Vertex s = m.getVertices()[y1][x1];
 		if(s==null){
@@ -516,7 +516,7 @@ public class ExplorationWallerType2 extends Exploration {
 					r.moveForward(forwardCount);
 					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 					if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 					}
 					forwardCount=0;
 				}
@@ -538,7 +538,7 @@ public class ExplorationWallerType2 extends Exploration {
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 				if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 				}
 				forwardCount=0;
 			}else{
@@ -548,7 +548,7 @@ public class ExplorationWallerType2 extends Exploration {
 						r.moveForward(forwardCount);
 						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 						if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 						}
 						forwardCount=0;
 					}

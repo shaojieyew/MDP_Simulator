@@ -467,13 +467,6 @@ public class ExplorationWallerType1 extends Exploration {
 			}
 			
 			if(testTurnedLeft&&nMoveable!=0){	
-				/***/
-				/* Calibration**/
-				if(movedCount>=intervalForCalibrate){
-					instructions = addCalibrationCommand(x,y,(int) direction,instructions);
-					movedCount = 0;
-				}
-				/***/
 				testTurnedLeft=false;
 				int test[] = computeForwardLocation(direction, x, y, steps);
 				if(test[0]==1&&test[1]==1){
@@ -488,9 +481,15 @@ public class ExplorationWallerType1 extends Exploration {
 					instructions.add("F"+10*steps);
 					result= computeForwardLocation(direction, x, y, steps);
 					movedCount = movedCount+10*steps;
+
+					/***/
+					/* Calibration**/
+					if(movedCount>=intervalForCalibrate){
+						instructions = addCalibrationCommand(result[0],result[1],(int) direction,instructions, getNextWallHugInstruction(result[0],result[1],(int) direction));
+						movedCount = 0;
+					}
+					/***/
 				}
-				//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
-				
 			}else{
 				if(wMoveable!=0){
 					testTurnedLeft=true;
@@ -507,13 +506,6 @@ public class ExplorationWallerType1 extends Exploration {
 					//message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
 				}else{
 					if(steps!=0){
-						/***/
-						/* Calibration**/
-						if(movedCount>=intervalForCalibrate){
-							instructions = addCalibrationCommand(x,y,(int) direction,instructions);
-							movedCount = 0;
-						}
-						/***/
 						if(testTurnedRight){
 							testTurnedRight=false;
 						}
@@ -531,6 +523,13 @@ public class ExplorationWallerType1 extends Exploration {
 							instructions.add("F"+10*steps);
 							result= computeForwardLocation(direction, x, y, steps);
 							movedCount = movedCount+10*steps;
+							/***/
+							/* Calibration**/
+							if(movedCount>=intervalForCalibrate){
+								instructions = addCalibrationCommand(result[0],result[1],(int) direction,instructions, getNextWallHugInstruction(result[0],result[1],(int) direction));
+								movedCount = 0;
+							}
+							/***/
 						}
 						//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
 	
@@ -570,6 +569,166 @@ public class ExplorationWallerType1 extends Exploration {
 			message.setDirection(direction);
 			return message;
 			
+		}
+	}
+	
+	
+	private String getNextWallHugInstruction(int x, int y,int direction){
+		
+		int robotsNorth = (int) ((NORTH+direction)%360);
+		int robotsEast = (int) ((EAST+direction)%360);
+		int robotsWest = (int) ((WEST+direction)%360);
+		int nMoveable = isDirectionMoveable(robotsNorth, x, y);
+		int wMoveable = isDirectionMoveable(robotsWest, x, y);
+		int previousBlocked = getLeftBlocks(direction,x, y);
+		Message message;
+		//int [] endResult = {x,y,direction};
+		int []endResult = getNextWallHugCheckLocation(x,y,direction,testTurnedLeft,testTurnedRight);
+		if(endResult[0]!=1||endResult[1]!=1||!endPointFound()){
+			int [] result = {x,y,direction};
+			int steps = (nMoveable<previousBlocked)?nMoveable:previousBlocked;
+			int tempsteps=1000;
+			if(steps>0){
+				//steps = 1;
+				int explored[][] = m.getExploredTiles();
+				int obstacles[][] = m.getObstacles();
+				boolean stopstep = false;
+				int i = 1;
+				
+				for( i =1;i<=steps;i++){
+					for(int j=0;j<3;j++){
+	
+						int checkX1  =0;
+						int checkY1 = 0;
+						switch(direction){
+							case 0: {
+								checkX1= x+2+j;
+								checkY1= y+i-1;
+								break;
+							}
+							case 90: {
+								checkX1= x+i-1;
+								checkY1= y-2-j;
+								break;
+							}
+							case 180: {
+								checkX1= x-2-j;
+								checkY1=y-i+1;
+								break;
+							}
+							case 270: {
+								checkX1= x-i+1;
+								checkY1= y+2+j;
+								break;
+							}
+						}
+						if(checkX1>=0&&checkX1<=14&&checkY1>=0&&checkY1<=19){
+							if(explored[checkY1][checkX1]==0){
+								stopstep = true;
+								break;
+							}else{
+								if(obstacles[checkY1][checkX1]==1){
+									break;
+								}
+							}
+						}
+					}
+					if(stopstep){
+						tempsteps = i;
+						break;
+					}
+				}
+				steps= steps<tempsteps?steps:tempsteps;
+				stopstep= false;
+				tempsteps =1000;
+				for( i =1;i<=steps;i++){
+					for(int j=0;j<3;j++){
+	
+						int checkX2  =0;
+						int checkY2 = 0;
+						switch(direction){
+							case 0: {
+								checkX2= x-2-j;
+								checkY2= y+i+1;
+								break;
+							}
+							case 90: {
+								checkX2= x+i+1;
+								checkY2= y+2+j;
+								break;
+							}
+							case 180: {
+								checkX2= x+2+j;
+								checkY2=y-i-1;
+								break;
+							}
+							case 270: {
+								checkX2= x-i-1;
+								checkY2= y-2-j;
+								break;
+							}
+						}
+						if(checkX2>=0&&checkX2<=14&&checkY2>=0&&checkY2<=19){
+							if(explored[checkY2][checkX2]==0){
+								stopstep = true;
+								break;
+							}else{
+								if(obstacles[checkY2][checkX2]==1){
+									break;
+								}
+							}
+						}
+					}
+					if(stopstep){
+						tempsteps = i;
+						break;
+					}
+				}
+				steps= steps<tempsteps?steps:tempsteps;
+			}
+			
+			if(testTurnedLeft&&nMoveable!=0){	
+				int test[] = computeForwardLocation(direction, x, y, steps);
+				if(test[0]==1&&test[1]==1){
+					return null;
+				}else{
+					return "F"+10*steps;
+				}
+			}else{
+				if(wMoveable!=0){
+					float degreeToMove =degreeToRotateToDirection(direction,robotsWest);
+					direction = robotsWest;
+					int intDegree = Math.round(degreeToMove);
+					String rmovement= "R"+intDegree;
+					if(intDegree<0){
+						rmovement= "L"+(intDegree*-1);
+					}
+					return rmovement;
+				}else{
+					if(steps!=0){
+						int test[]= computeForwardLocation(direction, x, y, steps);
+						if(test[0]==1&&test[1]==1){
+							return null;
+						}else{
+							return "F"+10*steps;
+						}
+						//message=getNextWallHugLocation(result[0],result[1],direction,instructions);
+	
+					}else{
+						float degreeToMove =degreeToRotateToDirection(direction,robotsEast);
+						direction = robotsEast;
+						int intDegree = Math.round(degreeToMove);
+						String rmovement= "R"+intDegree;
+						if(intDegree<0){
+							rmovement= "L"+(intDegree*-1);
+						}
+						return rmovement;
+						//message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
+					}
+				}
+			}
+		}else{
+			return null;
 		}
 	}
 	
@@ -789,9 +948,9 @@ public class ExplorationWallerType1 extends Exploration {
 	 //greedy heuristic 
 		private int[] calculateScoreOfVertexAndCompare(int[] place1, int[] place2){
 			float mapDiscoveredRate = m.getExploredRate();
-			float exploreMoreWeightage = 1; //explore_score:1-36
+			float exploreMoreWeightage = 2; //explore_score:1-36
 			int nearByWeightage = 0;	     //score: 1-28
-			float endLocationWeightage = 3;  //score: 1-28
+			float endLocationWeightage = 2;  //score: 1-28
 			float startWeightage = 0;        //score: 1-28
 			int distanceWeightage = 1;
 			
@@ -802,7 +961,7 @@ public class ExplorationWallerType1 extends Exploration {
 				//if map discovered rate 90% or more
 				if(mapDiscoveredRate>0.7){
 					startWeightage = 0;
-					exploreMoreWeightage=3;
+					exploreMoreWeightage=2;
 					distanceWeightage=1;
 				}
 				//if map discovered rate is 100%

@@ -17,6 +17,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	private static long autoTerminate_time=270;
 	private static float autoTerminate_explore_rate=1;
 
+	public static boolean  arduinoAutoCalibrate = false;
 
 	public static int lastMovedBeforeCalibrate = 0;
 	public static int intervalForCalibrate = 40;
@@ -63,7 +64,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	@Override
 	public void updateMap(){
 		Message m = computeAction();
-		//System.out.println(Arrays.toString(m.getMovements()));
+		System.out.println(Arrays.toString(m.getMovements()));
 	}
 	
 	public abstract void init();
@@ -281,10 +282,10 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		return true;
 	}
 	
-	public ArrayList<String>  addCalibrationCommand(int x, int y, int direction, ArrayList<String> instruction){
+	
+	public ArrayList<String>  addCalibrationCommand(int x, int y, int direction, ArrayList<String> instruction, String nextInstruction){
 		int bestDirection = direction;
 		int bestCount = getTotalSideForCalibration(x,y,direction);
-
 		int countE = getTotalSideForCalibration(x,y,(direction+90)%360);
 		if(countE>bestCount){
 			bestDirection = (direction+90)%360;
@@ -292,36 +293,55 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		}
 		int countW = getTotalSideForCalibration(x,y,(direction+270)%360);
 		if(countW>bestCount){
-			bestDirection = (direction-90)%360;
+			bestDirection = (direction+270)%360;
 			bestCount = countW;
 		}
 		int countS = getTotalSideForCalibration(x,y,(direction+180)%360);
 		if(countS>bestCount){
-			bestDirection = (direction-90)%360;
+			bestDirection = (direction+180)%360;
 			bestCount = countS;
 		}
+		String prev = "";
 		if(bestCount>0){
-			float degreeToMove =rotateToDirection(direction,bestDirection);
-			int intDegree = Math.round(degreeToMove);
+			float degree = degreeToRotateToDirection(direction,  bestDirection);
+			int intDegree = Math.round(degree);
 			if(intDegree!=0){
 				String rmovement= "R"+intDegree;
 				if(intDegree<0){
 					rmovement= "L"+(intDegree*-1);
 				}
-				instruction.add(rmovement);
+				prev= rmovement;
 			}
-			instruction.add("C");
-			lastMovedBeforeCalibrate=0;
-			r.calibrate();
-			degreeToMove =rotateToDirection(bestDirection,direction);
-			intDegree = Math.round(degreeToMove);
-			if(intDegree!=0){
-				String rmovement= "R"+intDegree;
-				if(intDegree<0){
-					rmovement= "L"+(intDegree*-1);
+			
+			if(nextInstruction==null||(nextInstruction!=null&&!(nextInstruction.equals(prev)))){
+				float degreeToMove =rotateToDirection(direction,bestDirection);
+				intDegree = Math.round(degreeToMove);
+				if(intDegree!=0){
+					String rmovement= "R"+intDegree;
+					if(intDegree<0){
+						rmovement= "L"+(intDegree*-1);
+					}
+					instruction.add(rmovement);
+					prev= rmovement;
 				}
-				instruction.add(rmovement);
+				
+				if(!arduinoAutoCalibrate){
+					instruction.add("C");
+					lastMovedBeforeCalibrate=0;
+					r.calibrate();
+				}
+				
+				degreeToMove =rotateToDirection(bestDirection,direction);
+				intDegree = Math.round(degreeToMove);
+				if(intDegree!=0){
+					String rmovement= "R"+intDegree;
+					if(intDegree<0){
+						rmovement= "L"+(intDegree*-1);
+					}
+					instruction.add(rmovement);
+				}
 			}
+			
 		}
 		
 		return instruction;
@@ -553,7 +573,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 					r.moveForward(forwardCount);
 					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 					if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 					}
 					forwardCount=0;
 				}
@@ -574,7 +594,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 				if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 				}
 				forwardCount=0;
 			}else{
@@ -584,7 +604,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 						r.moveForward(forwardCount);
 						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 						if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 						}
 						forwardCount=0;
 					}
@@ -640,7 +660,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 					r.moveForward(forwardCount);
 					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 					if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+						instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 					}
 					forwardCount=0;
 				}
@@ -661,7 +681,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				r.moveForward(forwardCount);
 				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 				if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+					instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 				}
 				forwardCount=0;
 			}else{
@@ -671,7 +691,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 						r.moveForward(forwardCount);
 						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
 						if(lastMovedBeforeCalibrate>=intervalForCalibrate){
-							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions);
+							instructions = addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 						}
 						forwardCount=0;
 					}
@@ -720,7 +740,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			x=x-steps;
 			break;
 		}
-		int result[]={x,y};
+		int result[]={x,y,direction};
 		return result;
 	}
 }

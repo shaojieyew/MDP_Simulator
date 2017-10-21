@@ -48,6 +48,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -93,6 +94,9 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	private TextField rotateTextField;
 	@FXML
 	private TextField calibrateTextField;
+
+	@FXML
+	private CheckBox auto_cali_cb;
 	
 	@FXML
 	private TextField travelSpeedTextField;
@@ -342,6 +346,16 @@ public class MainController extends FXMLController  implements Initializable, Ro
 			sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_2);
 		}
 	}
+	@FXML
+	public void onclick_cb() {
+		if(auto_cali_cb.isSelected()){
+			Exploration.arduinoAutoCalibrate=true;
+		}else{
+			Exploration.arduinoAutoCalibrate=false;
+		}
+	}
+	
+	
 	@FXML
 	public void onFpCombo() {
 		FastestPathFactory.setSelectedType((String) fpCombo.getValue());
