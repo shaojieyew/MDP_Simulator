@@ -791,7 +791,7 @@ public class ExplorationWallerType1 extends Exploration {
 			float mapDiscoveredRate = m.getExploredRate();
 			float exploreMoreWeightage = 1; //explore_score:1-36
 			int nearByWeightage = 0;	     //score: 1-28
-			float endLocationWeightage = 1;  //score: 1-28
+			float endLocationWeightage = 3;  //score: 1-28
 			float startWeightage = 0;        //score: 1-28
 			int distanceWeightage = 1;
 			
@@ -802,7 +802,7 @@ public class ExplorationWallerType1 extends Exploration {
 				//if map discovered rate 90% or more
 				if(mapDiscoveredRate>0.7){
 					startWeightage = 0;
-					exploreMoreWeightage=1;
+					exploreMoreWeightage=3;
 					distanceWeightage=1;
 				}
 				//if map discovered rate is 100%
