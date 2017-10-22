@@ -75,4 +75,38 @@ public class Message {
 		}
 		return str;
 	}
+	
+	public String getArduinoMessage(){
+		String str = "";
+		String movementString="";
+		for(String movement: movements){
+			movementString = movementString+movement+",";
+		}
+		if(movementString.length()>0){
+			movementString=movementString.substring(0, movementString.length()-1);
+		}
+		
+		str = "MV|"+movementString;
+		return str;
+	}
+
+	public String getAndroidMessage(){
+		String str = "";
+		String movementString="";
+		for(String movement: movements){
+			movementString = movementString+movement+",";
+		}
+		if(movementString.length()>0){
+			movementString=movementString.substring(0, movementString.length()-1);
+		}
+		
+		str = status+"|"+ exploredTile+"|"+exploredObstacle+"|"+robotLocation[0]+","+robotLocation[1]+","+Math.round(direction)+"|"+movementString;
+
+		if(endOfExploration){
+			str=str+"|1";
+		}else{
+			str=str+"|0";
+		}
+		return str;
+	}
 }
