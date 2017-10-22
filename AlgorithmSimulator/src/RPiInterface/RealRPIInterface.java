@@ -161,7 +161,18 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			message.setExploredObstacle(hexExploredObstacle);
 			message.setStatus("EX");
 			//send out message
-			outputMessage(message.getMessage());
+			//outputMessage(message.getMessage());
+			
+			outputMessage(message.getArduinoMessage());
+			try {
+				Thread.sleep(100);
+				//outputMessage(message.getMessage());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			outputMessage(message.getAndroidMessage());
+			
 			break;
 
 		case "FP":
@@ -173,9 +184,22 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			message.setExploredTile(hexExplored);
 			message.setExploredObstacle(hexExploredObstacle);
 			message.setStatus(action_status);
+			message.setEndOfExploration(true);
 			//send out message
+
+			//outputMessage(message.getMessage());
 			
-			outputMessage(message.getMessage());
+			
+			outputMessage(message.getArduinoMessage());
+			try {
+				Thread.sleep(100);
+				//outputMessage(message.getMessage());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			outputMessage(message.getAndroidMessage());
+			
 			break;
 		}
 	}
