@@ -15,9 +15,9 @@ import RPiInterface.RobotSensorSimulatorFactory;
 
 public abstract class Exploration implements  MapListener, RobotListener{
 	private static long autoTerminate_time=270;
-	private static float autoTerminate_explore_rate=1;
+	public static int autoTerminate_explore_rate=300;
 
-	public static boolean  arduinoAutoCalibrate = false;
+	public static boolean  arduinoAutoCalibrate = true;
 
 	public static int lastMovedBeforeCalibrate = 0;
 	public static int intervalForCalibrate = 40;
@@ -107,7 +107,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	public static float getAutoTerminate_explore_rate() {
 		return autoTerminate_explore_rate;
 	}
-	public static void setAutoTerminate_explore_rate(float autoTerminate_explore_rate) {
+	public static void setAutoTerminate_explore_rate(int autoTerminate_explore_rate) {
 		Exploration.autoTerminate_explore_rate = autoTerminate_explore_rate;
 	}
 
@@ -283,21 +283,23 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	}
 	
 	
-	public ArrayList<String>  addCalibrationCommand(int x, int y, int direction, ArrayList<String> instruction, String nextInstruction){
+	public static ArrayList<String>  addCalibrationCommand(int x, int y, int direction, ArrayList<String> instruction, String nextInstruction){
 		int bestDirection = direction;
 		int bestCount = getTotalSideForCalibration(x,y,direction);
+
+		int countW = getTotalSideForCalibration(x,y,(direction+270)%360);
+		if(countW>bestCount&&bestCount==0){
+			bestDirection = (direction+270)%360;
+			bestCount = countW;
+		}
 		int countE = getTotalSideForCalibration(x,y,(direction+90)%360);
 		if(countE>bestCount){
 			bestDirection = (direction+90)%360;
 			bestCount = countE;
 		}
-		int countW = getTotalSideForCalibration(x,y,(direction+270)%360);
-		if(countW>bestCount){
-			bestDirection = (direction+270)%360;
-			bestCount = countW;
-		}
+		
 		int countS = getTotalSideForCalibration(x,y,(direction+180)%360);
-		if(countS>bestCount){
+		if(countS>bestCount&&bestCount==0){
 			bestDirection = (direction+180)%360;
 			bestCount = countS;
 		}
@@ -348,7 +350,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	}
 	
 	
-	public int getTotalSideForCalibration(int x, int y, int direction){
+	public static int getTotalSideForCalibration(int x, int y, int direction){
 		int count=0;
 		int totalBlocks = 0;
 		int obstacles[][] = m.getObstacles();
@@ -358,6 +360,8 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			/*front sensorcheck*/
 			 totalBlocks = 0;
 			for(int i=0;i<3;i++){
+				if(i==1)
+					continue;
 				for(int j=0;j<2;j++){
 					int checkX = x-1+i;
 					int checkY = y+2+j;
@@ -394,6 +398,8 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			/*front sensorcheck*/
 			totalBlocks = 0;
 			for(int i=0;i<3;i++){
+				if(i==1)
+					continue;
 				for(int j=0;j<2;j++){
 					int checkX = x+2+j;
 					int checkY = y+1-i;
@@ -431,6 +437,8 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				/*front sensorcheck*/
 				totalBlocks = 0;
 				for(int i=0;i<3;i++){
+					if(i==1)
+						continue;
 					for(int j=0;j<2;j++){
 						int checkX = x+1-i;
 						int checkY = y-2-j;
@@ -469,6 +477,8 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				/*front sensorcheck*/
 				totalBlocks = 0;
 				for(int i=0;i<3;i++){
+					if(i==1)
+						continue;
 					for(int j=0;j<2;j++){
 						int checkX = x-2-j;
 						int checkY = y-1+i;
@@ -517,13 +527,13 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		    return angle;
 	}
 	
-	public float rotateToDirection(float currentDirection, float inDirection){
+	public static float rotateToDirection(float currentDirection, float inDirection){
 		////System.out.println("rotate from "+currentDirection+" to "+inDirection);
 		float degree = degreeToRotateToDirection(currentDirection,  inDirection);
 		r.rotate(degree);
 		return degree;
 	}
-	public float degreeToRotateToDirection(float currentDirection, float inDirection){
+	public static float degreeToRotateToDirection(float currentDirection, float inDirection){
 		float difference = inDirection-currentDirection;
 		if(Math.abs(Math.round(difference))==180){
 			return 180;

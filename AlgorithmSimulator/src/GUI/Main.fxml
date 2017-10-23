@@ -80,7 +80,7 @@
                            </HBox.margin>
                         </Label>
                         <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="40" />
-                        <CheckBox fx:id="auto_cali_cb" mnemonicParsing="false" onAction="#onclick_cb" text="Auto Cali EX" />
+                        <CheckBox fx:id="auto_cali_cb" selected="true" mnemonicParsing="false" onAction="#onclick_cb" text="Auto Cali EX" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">
@@ -131,7 +131,7 @@
                   <HBox prefHeight="44.0" prefWidth="188.0">
                      <children>
                         <Label prefHeight="17.0" prefWidth="89.0" text="Explr Rate: " />
-                        <TextField fx:id="terminateRateTextField" maxWidth="1.7976931348623157E308" onKeyReleased="#onTerminateRateTextField" prefHeight="25.0" prefWidth="126.0" text="1" />
+                        <TextField fx:id="terminateRateTextField" maxWidth="1.7976931348623157E308" onKeyReleased="#onTerminateRateTextField" prefHeight="25.0" prefWidth="126.0" text="300" />
                      </children>
                   </HBox>
                   <Label fx:id="Timer" />

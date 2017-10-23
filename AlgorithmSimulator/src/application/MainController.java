@@ -424,7 +424,7 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	}
 	@FXML
 	public void onTerminateRateTextField() {
-		Exploration.setAutoTerminate_explore_rate(Float.parseFloat(terminateRateTextField.getText()));
+		Exploration.setAutoTerminate_explore_rate(Integer.parseInt(terminateRateTextField.getText()));
 	}
 	RPiInterface rpi = null;
 	@FXML

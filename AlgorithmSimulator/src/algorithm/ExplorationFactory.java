@@ -9,6 +9,7 @@ public class ExplorationFactory {
 	public static final String EX_WALL2R =  "hugwall2r";
 	public static final String EX_WALL3 =  "hugwall3";
 	public static final String EX_WALL4 =  "hugwall4";
+	public static final String EX_WALL6 = "hugwall6";
 	public static  Exploration getInstance (String value){
 		if(value.equals(EX_GREEDY1)){
 			return new ExplorationType1();
@@ -30,6 +31,9 @@ public class ExplorationFactory {
 		}
 		if(value.equals(EX_WALL4)){
 			return new ExplorationWallerType4();
+		}
+		if(value.equals(EX_WALL6)){
+			return new ExplorationWallerType6();
 		}
 		return null;
 	}

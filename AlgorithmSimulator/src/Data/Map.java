@@ -194,7 +194,7 @@ public class Map {
 				}
 			}
 		}
-		exploredRate = exploredCount/300f;
+		exploredRate = exploredCount;
 		updateListener();
 		
 		/*
