@@ -85,8 +85,11 @@ public class Message {
 		if(movementString.length()>0){
 			movementString=movementString.substring(0, movementString.length()-1);
 		}
-		
-		str = "MV|"+movementString;
+		if(status.equals("FP")){
+			str = "MR|"+movementString;
+		}else{
+			str = "MV|"+movementString;
+		}
 		return str;
 	}
 
