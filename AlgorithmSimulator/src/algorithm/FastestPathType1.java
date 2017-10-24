@@ -66,7 +66,7 @@ public class FastestPathType1 extends FastestPath {
 			 d = new DijkstraForCalibration();
 		}
 		List<Vertex> path = d.computePaths(start, waypoint,vertices);
-		System.out.println("Path1: "+path);
+	//	System.out.println("Path1: "+path);
 		if(end.x!=waypoint.x||end.y!=waypoint.y){
 			List<Vertex> path2 = d.computePaths(waypoint, end,vertices);
 			//System.out.println("Path2: "+path2);
