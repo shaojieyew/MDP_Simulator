@@ -17,11 +17,11 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	private static long autoTerminate_time=270;
 	public static int autoTerminate_explore_rate=300;
 
-	public static boolean  arduinoAutoCalibrate = true;
+	public static boolean  arduinoAutoCalibrate = false;
 
 	public static int lastMovedBeforeCalibrate = 0;
 	public static int intervalForCalibrate = 40;
-	public static int rotationCost = 15;
+	public static int rotationCost = 0;
 	public static final float NORTH = 0;
 	public static final float EAST = 90;
 	public static final float SOUTH = 180;
@@ -168,7 +168,12 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		for(Position[] sensors:lineOfSensors){
 			if(thereExistUndiscovered)
 				break;
+			int index=0;
 			for(Position sensor:sensors){
+				index++;
+				if(index==4){
+					break;
+				}
 				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
 					if(m.getExploredTiles()[sensor.getPosY()][(sensor.getPosX())]==0){
 						thereExistUndiscovered = true;
@@ -288,7 +293,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		int bestCount = getTotalSideForCalibration(x,y,direction);
 
 		int countW = getTotalSideForCalibration(x,y,(direction+270)%360);
-		if(countW>bestCount&&bestCount==0){
+		if(countW>bestCount&&((x==1&&y==1)||(bestCount==0))){
 			bestDirection = (direction+270)%360;
 			bestCount = countW;
 		}
@@ -354,6 +359,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		int count=0;
 		int totalBlocks = 0;
 		int obstacles[][] = m.getObstacles();
+		int layer = 1;
 		int explored[][] = m.getExploredTiles();
 		switch (direction){
 		case 0:
@@ -362,7 +368,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			for(int i=0;i<3;i++){
 				if(i==1)
 					continue;
-				for(int j=0;j<2;j++){
+				for(int j=0;j<layer;j++){
 					int checkX = x-1+i;
 					int checkY = y+2+j;
 					if(checkY>19||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -380,7 +386,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			for(int i=0;i<3;i++){
 				if(i==1)
 					continue;
-				for(int j=0;j<2;j++){
+				for(int j=0;j<layer;j++){
 					int checkX = x-2-j;
 					int checkY = y-1+i;
 					if(checkX<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -400,7 +406,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			for(int i=0;i<3;i++){
 				if(i==1)
 					continue;
-				for(int j=0;j<2;j++){
+				for(int j=0;j<layer;j++){
 					int checkX = x+2+j;
 					int checkY = y+1-i;
 					if(checkX>14||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -418,7 +424,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 			for(int i=0;i<3;i++){
 				if(i==1)
 					continue;
-				for(int j=0;j<2;j++){
+				for(int j=0;j<layer;j++){
 					int checkX = x-1+i;
 					int checkY = y+2+j;
 					if(checkY>19||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -439,7 +445,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				for(int i=0;i<3;i++){
 					if(i==1)
 						continue;
-					for(int j=0;j<2;j++){
+					for(int j=0;j<layer;j++){
 						int checkX = x+1-i;
 						int checkY = y-2-j;
 						if(checkY<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -457,7 +463,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				for(int i=0;i<3;i++){
 					if(i==1)
 						continue;
-					for(int j=0;j<2;j++){
+					for(int j=0;j<layer;j++){
 						int checkX = x+2+j;
 						int checkY = y+1-i;
 						if(checkX>14||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -479,7 +485,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				for(int i=0;i<3;i++){
 					if(i==1)
 						continue;
-					for(int j=0;j<2;j++){
+					for(int j=0;j<layer;j++){
 						int checkX = x-2-j;
 						int checkY = y-1+i;
 						if(checkX<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){
@@ -497,7 +503,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				for(int i=0;i<3;i++){
 					if(i==1)
 						continue;
-					for(int j=0;j<2;j++){
+					for(int j=0;j<layer;j++){
 						int checkX = x+1-i;
 						int checkY = y-2-j;
 						if(checkY<0||(obstacles[checkY][checkX]==1&&explored[checkY][checkX]==1)){

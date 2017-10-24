@@ -69,7 +69,7 @@
                         <Label prefHeight="17.0" prefWidth="34.0" text="RPM: " />
                         <TextField fx:id="rpmTextField" onKeyReleased="#onRPMChange" prefHeight="25.0" prefWidth="41.0" text="120" />
                         <Label prefHeight="17.0" prefWidth="64.0" text="rotateCost:" />
-                        <TextField fx:id="rotateCostTextField" onKeyReleased="#onrotateCostTextFieldChange" prefHeight="25.0" prefWidth="41.0" text="15" />
+                        <TextField fx:id="rotateCostTextField" onKeyReleased="#onrotateCostTextFieldChange" prefHeight="25.0" prefWidth="41.0" text="0" />
                      </children>
                   </HBox>
                   <HBox prefHeight="39.0" prefWidth="190.0">
@@ -80,7 +80,7 @@
                            </HBox.margin>
                         </Label>
                         <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="40" />
-                        <CheckBox fx:id="auto_cali_cb" selected="true" mnemonicParsing="false" onAction="#onclick_cb" text="Auto Cali EX" />
+                        <CheckBox fx:id="auto_cali_cb" selected="false" mnemonicParsing="false" onAction="#onclick_cb" text="Auto Cali EX" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">

@@ -91,7 +91,7 @@ public abstract class RPiInterface {
 		Map map = Map.getInstance();
 		int exploredTiles[][] = map.getExploredTiles();
 		int obstacles[][] = map.getObstacles();
-		System.out.println(robotLocationX+","+robotLocationY);
+		//System.out.println(robotLocationX+","+robotLocationY);
 		exploredTiles[(int) robotLocationY-1][(int) robotLocationX-1]=1;
 		exploredTiles[(int) robotLocationY-1][(int) robotLocationX]=1;
 		exploredTiles[(int) robotLocationY-1][(int) robotLocationX+1]=1;

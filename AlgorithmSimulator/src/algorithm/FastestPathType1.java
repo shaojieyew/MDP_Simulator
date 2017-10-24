@@ -61,8 +61,10 @@ public class FastestPathType1 extends FastestPath {
 			}
 		}
 		
-		//DijkstraMinimunRotation d = new DijkstraMinimunRotation();
-		DijkstraForCalibration d = new DijkstraForCalibration();
+		Dijkstra d = new DijkstraMinimunRotation();
+		if(calibration){
+			 d = new DijkstraForCalibration();
+		}
 		List<Vertex> path = d.computePaths(start, waypoint,vertices);
 		System.out.println("Path1: "+path);
 		if(end.x!=waypoint.x||end.y!=waypoint.y){
@@ -108,7 +110,9 @@ public class FastestPathType1 extends FastestPath {
 					if(i+2<path.size()-1){
 						 v4 =path.get(i+2);
 					}
-					instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
+					if(calibration){
+						instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
+					}
 					//}
 					forwardCount=0;
 				}
@@ -135,7 +139,9 @@ public class FastestPathType1 extends FastestPath {
 				if(i+2<path.size()-1){
 					 v4 =path.get(i+2);
 				}
-				instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
+				if(calibration){
+					instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
+				}
 			//}
 				forwardCount=0;
 			}else{
@@ -150,7 +156,9 @@ public class FastestPathType1 extends FastestPath {
 						if(i+2<path.size()-1){
 							 v4 =path.get(i+2);
 						}
-						instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
+						if(calibration){
+							instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
+								}
 					//}
 						forwardCount=0;
 					}
