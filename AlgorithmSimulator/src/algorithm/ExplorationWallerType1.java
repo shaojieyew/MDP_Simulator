@@ -18,7 +18,7 @@ import RPiInterface.RobotSensorSimulator;
 import RPiInterface.RobotSensorSimulatorType2;
 
 public class ExplorationWallerType1 extends Exploration {
-	public static int autoTerminateAfterWallhug = 298;
+	public static int autoTerminateAfterWallhug = 300;
 	public static boolean temporaryTurnRightOnWallhug =false;
 	public static boolean turnedLeft =false;
 	public static boolean turnedRight =false;
@@ -162,6 +162,10 @@ public class ExplorationWallerType1 extends Exploration {
 			}
 		}
 		if(finishHuggingWall){
+			if(autoTerminateAfterWallhug<=m.getExploredRate()){
+				terminate();
+			}
+			
 			checkedVisited =new int[20][15];
 			result  = getBestNextStop(currentX,currentY,10000);
 			if(currentX==result[0]&&currentY==result[1]&&(currentX!=1||currentY!=1)){
