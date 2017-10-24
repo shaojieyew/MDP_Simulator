@@ -108,6 +108,8 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	private TextField terminateRateTextField;
 	@FXML
+	private TextField terminateRateTextField1;
+	@FXML
 	private TextField textfield_address_port;
 	@FXML
 	private TextField rotateCostTextField;
@@ -425,6 +427,10 @@ public class MainController extends FXMLController  implements Initializable, Ro
 	@FXML
 	public void onTerminateRateTextField() {
 		Exploration.setAutoTerminate_explore_rate(Integer.parseInt(terminateRateTextField.getText()));
+	}
+	@FXML
+	public void onTerminateRateTextField1() {
+		ExplorationWallerType1.autoTerminateAfterWallhug = (Integer.parseInt(terminateRateTextField1.getText()));
 	}
 	RPiInterface rpi = null;
 	@FXML
