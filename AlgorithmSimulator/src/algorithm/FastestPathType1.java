@@ -30,11 +30,13 @@ public class FastestPathType1 extends FastestPath {
 	public static ArrayList<Line> debugLine = new  ArrayList<Line>();
 	public static boolean debugPath = true;
 	public static float bufferArea = 1.1f;
-	public static int  lastMovedBeforeCalibrate=0;
 	
 	@Override
 	public Message computeAction() {		
-		
+		Exploration.lastMovedBeforeCalibrate=0;
+		r.setDirection(0);
+		r.setPosX(1f);
+		r.setPosY(1f);
 		// ***Create the obstacles by taking user input and eliminate the impossible robot positions
 		// I have asked for user input, but you already have obstacles
 		//int obstacles[][] = m.getObstacles();
@@ -88,7 +90,7 @@ public class FastestPathType1 extends FastestPath {
 					rmovement= "L"+(intDegree*-1);
 				}
 				instructions.add(rmovement);
-				//lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ Exploration.rotationCost;
+				Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ Exploration.rotationCost;
 			}
 			direction=0;
 		}
@@ -102,7 +104,7 @@ public class FastestPathType1 extends FastestPath {
 				if(forwardCount!=0){
 					instructions.add("F"+forwardCount);
 					r.moveForward(forwardCount);
-					//lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+					Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ forwardCount;
 					//if(lastMovedBeforeCalibrate>=Exploration.intervalForCalibrate){
 					
 					Vertex v3 =path.get(i+1);
@@ -124,15 +126,16 @@ public class FastestPathType1 extends FastestPath {
 					movement= "L"+(intDegree*-1);
 				}
 				instructions.add(movement);
-				//lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ Exploration.rotationCost;
+				Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ Exploration.rotationCost;
 				direction = degree;
 			}
 			
 			forwardCount=forwardCount+10;
-			if(forwardCount>=Exploration.intervalForCalibrate){
+			if(Exploration.lastMovedBeforeCalibrate+forwardCount>=Exploration.intervalForCalibrate){
+			//if(forwardCount>=Exploration.intervalForCalibrate){
 				instructions.add("F"+forwardCount);
 				r.moveForward(forwardCount);
-				//lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+				Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ forwardCount;
 				//if(lastMovedBeforeCalibrate>=Exploration.intervalForCalibrate){
 				Vertex v3 =path.get(i+1);
 				Vertex v4 =null;
@@ -142,14 +145,13 @@ public class FastestPathType1 extends FastestPath {
 				if(calibration){
 					instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
 				}
-			//}
 				forwardCount=0;
 			}else{
 				if(i==path.size()-2){
 					if(forwardCount>0){
 						instructions.add("F"+forwardCount);
 						r.moveForward(forwardCount);
-						//lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+ forwardCount;
+						Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ forwardCount;
 						//if(lastMovedBeforeCalibrate>=Exploration.intervalForCalibrate){
 						Vertex v3 =path.get(i+1);
 						Vertex v4 =null;
@@ -158,7 +160,7 @@ public class FastestPathType1 extends FastestPath {
 						}
 						if(calibration){
 							instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
-								}
+							}
 					//}
 						forwardCount=0;
 					}

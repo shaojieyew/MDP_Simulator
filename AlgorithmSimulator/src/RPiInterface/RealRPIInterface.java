@@ -95,7 +95,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 		//[action status]|[explored map]|[explored obstacles]|[x,y,degree]|[s1,s2,s3,s4,s5]|[wpx,wpy]
 		//
 		string = string.trim();
-		//System.out.println("Received from RPi: "+string);
+		System.out.println("Received from RPi: "+string);
 		String parameters[] = string.split("\\|");
 		
 		
@@ -211,6 +211,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 		try {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			out.println(string);
+			System.out.println("Send to RPi: "+string);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -80,7 +80,7 @@
                            </HBox.margin>
                         </Label>
                         <TextField fx:id="calibrateTextField" onKeyReleased="#onCalibrateIntervalChange" prefHeight="25.0" prefWidth="40.0" text="40" />
-                        <CheckBox fx:id="auto_cali_cb" mnemonicParsing="false" onAction="#onclick_cb" selected="false" text="Auto Cali EX" />
+                        <CheckBox fx:id="auto_cali_cb" mnemonicParsing="false" onAction="#onclick_cb" selected="true" text="Auto Cali EX" />
                      </children>
                   </HBox>
                   <HBox prefHeight="42.0" prefWidth="190.0">
@@ -110,6 +110,7 @@
 					                <String fx:value="hugwall2r" />
 					                <String fx:value="hugwall3" />
 					                <String fx:value="hugwall4" />
+					                <String fx:value="hugwall5" />
                               </FXCollections>
                            </items>
                         </ComboBox>

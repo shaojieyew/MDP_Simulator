@@ -26,12 +26,12 @@ public class ExplorationWallerType1 extends Exploration {
 	public static boolean testTurnedRight =false;
 	public static boolean newVisit =false;
 	public static float newVisitDirection =0;
+	public static int maxStep = 2;
 	public static boolean finishHuggingWall =false;
 	public  int [][] visited = new int[20][15];
 	public  float checkEnvironementOf[];
 	int printCount=1;
 
-	public static int movedCount = 0;
 	
 	//from rpi
 	public  ExplorationWallerType1(boolean isTerminate){
@@ -120,7 +120,7 @@ public class ExplorationWallerType1 extends Exploration {
 						if(intDegree<0){
 							movement= "L"+(intDegree*-1);
 						}
-						movedCount = movedCount+10;
+						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+10;
 						message  = new Message();
 						String []movments = {movement};
 						message.setMovements(movments);
@@ -148,7 +148,7 @@ public class ExplorationWallerType1 extends Exploration {
 					rmovement= "L"+(intDegree*-1);
 				}
 				instructions.add(rmovement);
-				movedCount = movedCount+10;
+				lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+10;
 			}
 			if(temporaryTurnRightOnWallhug==false&&testTurnedRight==true&&outofWallhugging(currentX,currentY,(int)direction)){
 				finishHuggingWall=true;
@@ -185,6 +185,8 @@ public class ExplorationWallerType1 extends Exploration {
 				movements[length+1]="R90";
 				message.setMovements(movements);
 				float degree = rotateToDirection(270,0);
+				message.setRobotLocation(result);
+				message.setDirection(0);
 				cleanUpVar();
 				destroy();
 			}else{
@@ -371,12 +373,19 @@ public class ExplorationWallerType1 extends Exploration {
 	}
 	
 	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
+		/***/
+		/* Calibration**/
+		if(lastMovedBeforeCalibrate>=intervalForCalibrate){
+			instructions = addCalibrationCommand(x,y,(int) direction,instructions, getNextWallHugInstruction(x,y,(int) direction));
+			
+		}
+		/***/
 		int robotsNorth = (int) ((NORTH+direction)%360);
 		int robotsEast = (int) ((EAST+direction)%360);
 		int robotsWest = (int) ((WEST+direction)%360);
 		int robotsSouth = (int) ((SOUTH+direction)%360);
 		if(temporaryTurnRightOnWallhug){
-			movedCount = movedCount+Exploration.rotationCost;
+			lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+Exploration.rotationCost;
 			int intDegree = Math.round(rotateToDirection(direction,robotsSouth));
 			String rrmovement= "R"+intDegree;
 			if(intDegree<0){
@@ -499,7 +508,10 @@ public class ExplorationWallerType1 extends Exploration {
 				}
 				steps= steps<tempsteps?steps:tempsteps;
 			}
-			
+
+			if(steps>maxStep){
+				steps=maxStep;
+			}
 			if(testTurnedLeft&&nMoveable!=0){	
 				testTurnedLeft=false;
 				int test[] = computeForwardLocation(direction, x, y, steps);
@@ -514,13 +526,13 @@ public class ExplorationWallerType1 extends Exploration {
 					r.moveForward(10*steps);
 					instructions.add("F"+10*steps);
 					result= computeForwardLocation(direction, x, y, steps);
-					movedCount = movedCount+10*steps;
+					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+10*steps;
 
 					/***/
 					/* Calibration**/
-					if(movedCount>=intervalForCalibrate){
+					if(lastMovedBeforeCalibrate>=intervalForCalibrate){
 						instructions = addCalibrationCommand(result[0],result[1],(int) direction,instructions, getNextWallHugInstruction(result[0],result[1],(int) direction));
-						movedCount = 0;
+						
 					}
 					/***/
 				}
@@ -542,7 +554,7 @@ public class ExplorationWallerType1 extends Exploration {
 						rmovement= "L"+(intDegree*-1);
 					}
 					instructions.add(rmovement);
-					movedCount = movedCount+Exploration.rotationCost;
+					lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+Exploration.rotationCost;
 					//message=getNextWallHugLocation(result[0],result[1],robotsWest,instructions);
 				}else{
 					if(steps!=0){
@@ -562,12 +574,12 @@ public class ExplorationWallerType1 extends Exploration {
 							r.moveForward(10*steps);
 							instructions.add("F"+10*steps);
 							result= computeForwardLocation(direction, x, y, steps);
-							movedCount = movedCount+10*steps;
+							lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+10*steps;
 							/***/
 							/* Calibration**/
-							if(movedCount>=intervalForCalibrate){
+							if(lastMovedBeforeCalibrate>=intervalForCalibrate){
 								instructions = addCalibrationCommand(result[0],result[1],(int) direction,instructions, getNextWallHugInstruction(result[0],result[1],(int) direction));
-								movedCount = 0;
+								
 							}
 							/***/
 						}
@@ -583,7 +595,7 @@ public class ExplorationWallerType1 extends Exploration {
 							rmovement= "L"+(intDegree*-1);
 						}
 						instructions.add(rmovement);
-						movedCount = movedCount+Exploration.rotationCost;
+						lastMovedBeforeCalibrate = lastMovedBeforeCalibrate+Exploration.rotationCost;
 						//message=getNextWallHugLocation(result[0],result[1],robotsEast,instructions);
 					}
 				}
@@ -726,7 +738,9 @@ public class ExplorationWallerType1 extends Exploration {
 				}
 				steps= steps<tempsteps?steps:tempsteps;
 			}
-			
+			if(steps>maxStep){
+				steps=maxStep;
+			}
 			if(testTurnedLeft&&nMoveable!=0){	
 				int test[] = computeForwardLocation(direction, x, y, steps);
 				if(test[0]==1&&test[1]==1){

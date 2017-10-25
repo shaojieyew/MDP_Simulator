@@ -347,6 +347,18 @@ public class MainController extends FXMLController  implements Initializable, Ro
 
 			sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_2);
 		}
+		if(ExplorationFactory.getSelectedType().equals(ExplorationFactory.EX_WALL2)){
+
+			sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_3);
+		}
+		if(ExplorationFactory.getSelectedType().equals(ExplorationFactory.EX_WALL4)){
+
+			sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_2);
+		}
+		if(ExplorationFactory.getSelectedType().equals(ExplorationFactory.EX_WALL5)){
+
+			sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
+		}
 	}
 	@FXML
 	public void onclick_cb() {

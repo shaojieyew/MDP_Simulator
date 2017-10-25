@@ -13,7 +13,7 @@ public abstract class FastestPath {
 	protected static WayPoint w = WayPoint.getInstance();
 	protected static int startingX = 1;
 	protected static int startingY = 1;
-	public static boolean calibration = false;
+	public static boolean calibration = true;
 	
 	public static final float NORTH = 0;
 	public static final float EAST = 90;

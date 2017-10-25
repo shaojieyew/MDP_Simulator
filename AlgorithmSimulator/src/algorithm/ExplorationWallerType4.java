@@ -24,6 +24,7 @@ public class ExplorationWallerType4 extends Exploration {
 	public static boolean testTurnedRight =false;
 	public static boolean newVisit =false;
 	public static float newVisitDirection =0;
+	public static int maxStep = 2;
 	public static boolean finishHuggingWall =false;
 	public  int [][] visited = new int[20][15];
 	public  float checkEnvironementOf[];
@@ -183,6 +184,8 @@ public class ExplorationWallerType4 extends Exploration {
 				movements[length+1]="R90";
 				message.setMovements(movements);
 				float degree = rotateToDirection(270,0);
+				message.setRobotLocation(result);
+				message.setDirection(0);
 				cleanUpVar();
 				destroy();
 			}else{
@@ -315,6 +318,9 @@ public class ExplorationWallerType4 extends Exploration {
 				}
 			}
 			steps= i<tempsteps?i:tempsteps;
+			if(steps>maxStep){
+				steps=maxStep;
+			}
 		}else{
 			return result;
 		}
@@ -368,6 +374,7 @@ public class ExplorationWallerType4 extends Exploration {
 	}
 	
 	private Message getNextWallHugLocation( int x, int y,int direction,ArrayList<String> instructions){
+
 		int robotsNorth = (int) ((NORTH+direction)%360);
 		int robotsEast = (int) ((EAST+direction)%360);
 		int robotsWest = (int) ((WEST+direction)%360);
@@ -479,6 +486,9 @@ public class ExplorationWallerType4 extends Exploration {
 					}
 				}
 				steps= steps<tempsteps?steps:tempsteps;
+			}
+			if(steps>maxStep){
+				steps=maxStep;
 			}
 			
 			if(testTurnedLeft&&nMoveable!=0){	

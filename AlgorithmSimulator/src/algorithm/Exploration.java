@@ -17,7 +17,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	private static long autoTerminate_time=270;
 	public static int autoTerminate_explore_rate=300;
 
-	public static boolean  arduinoAutoCalibrate = false;
+	public static boolean  arduinoAutoCalibrate = true;
 
 	public static int lastMovedBeforeCalibrate = 0;
 	public static int intervalForCalibrate = 40;
@@ -293,7 +293,8 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		int bestCount = getTotalSideForCalibration(x,y,direction);
 
 		int countW = getTotalSideForCalibration(x,y,(direction+270)%360);
-		if(countW>bestCount&&((x==1&&y==1)||(bestCount==0))){
+	//	if(countW>bestCount&&((x==1&&y==1)||(bestCount==0))){
+		if(countW>bestCount){
 			bestDirection = (direction+270)%360;
 			bestCount = countW;
 		}
@@ -320,7 +321,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				prev= rmovement;
 			}
 			
-			if(nextInstruction==null||(nextInstruction!=null&&!(nextInstruction.equals(prev)))){
+			if(nextInstruction==null||(nextInstruction!=null&&(nextInstruction.charAt(0)=='F'))||(nextInstruction!=null&&(nextInstruction.charAt(0)=='R'||nextInstruction.charAt(0)=='L'))){
 				float degreeToMove =rotateToDirection(direction,bestDirection);
 				intDegree = Math.round(degreeToMove);
 				if(intDegree!=0){
@@ -334,9 +335,9 @@ public abstract class Exploration implements  MapListener, RobotListener{
 				
 				if(!arduinoAutoCalibrate){
 					instruction.add("C");
-					lastMovedBeforeCalibrate=0;
 					r.calibrate();
 				}
+				Exploration.lastMovedBeforeCalibrate=0;
 				
 				degreeToMove =rotateToDirection(bestDirection,direction);
 				intDegree = Math.round(degreeToMove);
