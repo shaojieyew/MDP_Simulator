@@ -153,7 +153,11 @@ public class ExplorationWallerType1 extends Exploration {
 			if(temporaryTurnRightOnWallhug==false&&testTurnedRight==true&&outofWallhugging(currentX,currentY,(int)direction)){
 				finishHuggingWall=true;
 			}else{
-				message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);
+				try{
+					message = getNextWallHugLocation(currentX,currentY,(int)direction, instructions);		
+				}catch(Exception ex){
+					finishHuggingWall = true;
+				}
 				if(message.getRobotLocation()[0]==1&&message.getRobotLocation()[1]==1&&howManyUndiscovered(currentX,currentY)==0){
 					finishHuggingWall = true;
 				}else{

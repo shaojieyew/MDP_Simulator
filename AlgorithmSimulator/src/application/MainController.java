@@ -235,11 +235,13 @@ public class MainController extends FXMLController  implements Initializable, Ro
 		MapGUI mapGui = new MapGUI();
 		Robot.getInstance().addListener(this);
 		mapPane.setCenter(mapGui);
-		sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_2);
-		explrCombo.setValue(ExplorationFactory.EX_WALL1);
+		//sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_2);
+		sensorCombo.setValue(RobotSensorSimulatorFactory.SENSOR_TYPE_1);
+		//explrCombo.setValue(ExplorationFactory.EX_WALL1);
+		explrCombo.setValue(ExplorationFactory.EX_WALL5);
 		fpCombo.setValue(FastestPathFactory.FP1);
 
-		ExplorationFactory.setSelectedType(ExplorationFactory.EX_WALL1);
+		ExplorationFactory.setSelectedType(ExplorationFactory.EX_WALL5);
 		FastestPathFactory.setSelectedType(FastestPathFactory.FP1);
 	}
 	

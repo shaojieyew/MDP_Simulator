@@ -18,6 +18,7 @@ import algorithm.FastestPath;
 import algorithm.FastestPathFactory;
 import algorithm.FastestPathType1;
 import algorithm.FastestPathType2;
+import algorithm.ObstaclesConfident;
 import application.MainController;
 import util.HexBin;
 
@@ -152,14 +153,29 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			if(action_status.equals("TE")){
 				explorationAlgorithm.terminate();
 			}
+			int [][]obstacles = Map.getInstance().getObstacles();
+			int [][]explored = Map.getInstance().getExploredTiles();
 			
 			message= explorationAlgorithm.start();
 			//prepare return message
+			if(message.isEndOfExploration()){
+				for(int x=0;x<14;x++){
+					for(int y=0;y<14;y++){
+						if(ObstaclesConfident.obstacleCounter[(int) x][(int) y]==0){
+							if(obstacles[x][y]==1&&explored[x][y]==1){
+								obstacles[x][y]=0;
+							}
+						}
+					}	
+				}
+			}
+			Map.getInstance().setObstacle(obstacles);
 			hexExplored=HexBin.BinTohex(Map.getInstance().getBinaryExplored());
 			hexExploredObstacle=HexBin.BinTohex("11111111"+Map.getInstance().getBinaryExploredObstacle()).substring(2);
 			message.setExploredTile(hexExplored);
 			message.setExploredObstacle(hexExploredObstacle);
 			message.setStatus("EX");
+			
 			//send out message
 			//outputMessage(message.getMessage());
 			
@@ -171,9 +187,9 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if(message.isEndOfExploration()){
+		//	if(message.isEndOfExploration()){
 				outputMessage(message.getAndroidMessage());
-			}
+		//	}
 			break;
 
 		case "FP":

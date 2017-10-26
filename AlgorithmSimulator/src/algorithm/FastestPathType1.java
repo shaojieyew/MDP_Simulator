@@ -64,7 +64,7 @@ public class FastestPathType1 extends FastestPath {
 		}
 		
 		Dijkstra d = new DijkstraMinimunRotation();
-		if(calibration){
+		if(calibrateAlgo){
 			 d = new DijkstraForCalibration();
 		}
 		List<Vertex> path = d.computePaths(start, waypoint,vertices);
@@ -90,7 +90,7 @@ public class FastestPathType1 extends FastestPath {
 					rmovement= "L"+(intDegree*-1);
 				}
 				instructions.add(rmovement);
-				Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ Exploration.rotationCost;
+				//Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ Exploration.rotationCost;
 			}
 			direction=0;
 		}
@@ -113,7 +113,7 @@ public class FastestPathType1 extends FastestPath {
 						 v4 =path.get(i+2);
 					}
 					if(calibration){
-						instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
+						instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,null);
 					}
 					//}
 					forwardCount=0;
@@ -131,7 +131,7 @@ public class FastestPathType1 extends FastestPath {
 			}
 			
 			forwardCount=forwardCount+10;
-			if(Exploration.lastMovedBeforeCalibrate+forwardCount>=Exploration.intervalForCalibrate){
+			if(forwardCount>=Exploration.intervalForCalibrate){
 			//if(forwardCount>=Exploration.intervalForCalibrate){
 				instructions.add("F"+forwardCount);
 				r.moveForward(forwardCount);

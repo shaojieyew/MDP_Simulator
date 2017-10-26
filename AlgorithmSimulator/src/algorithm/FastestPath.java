@@ -14,6 +14,7 @@ public abstract class FastestPath {
 	protected static int startingX = 1;
 	protected static int startingY = 1;
 	public static boolean calibration = true;
+	public static boolean calibrateAlgo = false;
 	
 	public static final float NORTH = 0;
 	public static final float EAST = 90;
