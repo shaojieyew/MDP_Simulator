@@ -41,7 +41,7 @@ public class DijkstraForCalibration extends Dijkstra
                 	float degree = getDegreeBetweenTwoPoint(u.previous.x,u.previous.y,u.x,u.y);
                 	int total = Exploration.getTotalSideForCalibration((int)v.x, (int)v.y, (int)degree);
                 	if(total>0){
-                		weight = weight/2.2;
+                		weight = weight/5;
                 	}
                 	
                 }else{
