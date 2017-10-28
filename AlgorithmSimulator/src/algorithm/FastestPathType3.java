@@ -81,7 +81,7 @@ public class FastestPathType3 extends FastestPath {
 					Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ Exploration.rotationCost;
 					direction = degree;
 				}
-				
+			
 				forwardCount=forwardCount+10;
 				if(forwardCount>=Exploration.intervalForCalibrate){
 				//if(forwardCount>=Exploration.intervalForCalibrate){
@@ -165,6 +165,7 @@ public class FastestPathType3 extends FastestPath {
 			//r.moveForward(10);
 			result= computeForwardLocation(direction, x, y, steps);
 			//movements.add("F10");
+			/****to remove redundant steps***/
 			for(int i =0;i<positions.size();i++){
 				if(positions.get(i).x==result[0]&&positions.get(i).y==result[1]){
 					for(int j =positions.size()-1;j>=i;j--){
@@ -172,7 +173,43 @@ public class FastestPathType3 extends FastestPath {
 					}
 					break;
 				}
+				int diff =1000;
+				if(positions.get(i).x==result[0]){
+					diff =  (int) (positions.get(i).y)-result[1];
+					if(Math.abs(diff)<=3&&Math.abs(diff)>0){
+						for(int j =positions.size()-1;j>=i+1;j--){
+							positions.remove(j);
+						}
+						for(int z =0;z<(Math.abs(diff)-1);z++){
+							if(diff<0){
+								positions.add(vertices[(int) positions.get(positions.size()-1).y+1][(int) positions.get(positions.size()-1).x]);	
+							}else{
+								positions.add(vertices[(int) positions.get(positions.size()-1).y-1][(int) positions.get(positions.size()-1).x]);	
+							}
+						}
+						break;
+					}
+				}else{
+					if(positions.get(i).y==result[1]){
+						diff = (int) (positions.get(i).x)-result[0];
+						if(Math.abs(diff)<=3&&Math.abs(diff)>0){
+							for(int j =positions.size()-1;j>=i+1;j--){
+								positions.remove(j);
+							}
+							for(int z =0;z<(Math.abs(diff)-1);z++){
+								if(diff<0){
+									positions.add(vertices[(int) positions.get(positions.size()-1).y][(int) positions.get(positions.size()-1).x+1]);	
+								}else{
+									positions.add(vertices[(int) positions.get(positions.size()-1).y][(int) positions.get(positions.size()-1).x-1]);	
+								}
+							}
+							break;
+						}
+					}
+				}
+				
 			}
+			/*******/
 			positions.add(vertices[result[1]][result[0]]);
 			positions=getNextWallHugLocation(result[0],result[1],direction,positions);
 		}else{
@@ -197,6 +234,7 @@ public class FastestPathType3 extends FastestPath {
 					//r.moveForward(10);
 					//movements.add("F10");
 					result= computeForwardLocation(direction, x, y, steps);
+					/****to remove redundant steps***/
 					for(int i =0;i<positions.size();i++){
 						if(positions.get(i).x==result[0]&&positions.get(i).y==result[1]){
 							for(int j =positions.size()-1;j>=i;j--){
@@ -204,7 +242,43 @@ public class FastestPathType3 extends FastestPath {
 							}
 							break;
 						}
+						int diff =1000;
+						if(positions.get(i).x==result[0]){
+							diff =  (int) (positions.get(i).y)-result[1];
+							if(Math.abs(diff)<=3&&Math.abs(diff)>0){
+								for(int j =positions.size()-1;j>=i+1;j--){
+									positions.remove(j);
+								}
+								for(int z =0;z<(Math.abs(diff)-1);z++){
+									if(diff<0){
+										positions.add(vertices[(int) positions.get(positions.size()-1).y+1][(int) positions.get(positions.size()-1).x]);	
+									}else{
+										positions.add(vertices[(int) positions.get(positions.size()-1).y-1][(int) positions.get(positions.size()-1).x]);	
+									}
+								}
+								break;
+							}
+						}else{
+							if(positions.get(i).y==result[1]){
+								diff = (int) (positions.get(i).x)-result[0];
+								if(Math.abs(diff)<=3&&Math.abs(diff)>0){
+									for(int j =positions.size()-1;j>=i+1;j--){
+										positions.remove(j);
+									}
+									for(int z =0;z<(Math.abs(diff)-1);z++){
+										if(diff<0){
+											positions.add(vertices[(int) positions.get(positions.size()-1).y][(int) positions.get(positions.size()-1).x+1]);	
+										}else{
+											positions.add(vertices[(int) positions.get(positions.size()-1).y][(int) positions.get(positions.size()-1).x-1]);	
+										}
+									}
+									break;
+								}
+							}
+						}
+						
 					}
+					/*******/
 					positions.add(vertices[result[1]][result[0]]);
 					//movements=getNextWallHugLocation(result[0],result[1],direction,movements);
 					positions=getNextWallHugLocation(result[0],result[1],direction,positions);
