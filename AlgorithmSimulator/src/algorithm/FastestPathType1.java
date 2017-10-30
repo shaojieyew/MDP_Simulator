@@ -133,8 +133,6 @@ public class FastestPathType1 extends FastestPath {
 			forwardCount=forwardCount+10;
 			if(forwardCount>=Exploration.intervalForCalibrate){
 			//if(forwardCount>=Exploration.intervalForCalibrate){
-				instructions.add("F"+forwardCount);
-				r.moveForward(forwardCount);
 				Exploration.lastMovedBeforeCalibrate = Exploration.lastMovedBeforeCalibrate+ forwardCount;
 				//if(lastMovedBeforeCalibrate>=Exploration.intervalForCalibrate){
 				Vertex v3 =path.get(i+1);
@@ -145,7 +143,12 @@ public class FastestPathType1 extends FastestPath {
 				if(calibration){
 					instructions = Exploration.addCalibrationCommand((int)v2.x,(int)v2.y,(int) direction,instructions,getNextInstruction(direction,v3,v4));
 				}
-				forwardCount=0;
+
+				if(Exploration.lastMovedBeforeCalibrate==0){
+					instructions.add("F"+forwardCount);
+					r.moveForward(forwardCount);
+					forwardCount=0;
+				}
 			}else{
 				if(i==path.size()-2){
 					if(forwardCount>0){

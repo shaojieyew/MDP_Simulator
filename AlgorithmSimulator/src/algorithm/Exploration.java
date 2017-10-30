@@ -205,7 +205,13 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		for(Position[] sensors:lineOfSensors){
 			if(thereExistUndiscovered)
 				break;
+
+			int index = 0;
 			for(Position sensor:sensors){
+				index++;
+				if(index>3){
+					break;
+				}
 				if(sensor!=null&&sensor.getPosY()>=0&&(sensor.getPosY())<20&&(sensor.getPosX())>=0&&(sensor.getPosX())<15){
 					if(m.getExploredTiles()[sensor.getPosY()][(sensor.getPosX())]==0){
 						count++;
@@ -222,7 +228,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 		return count;
 	}
 
-	public boolean outofWallhugging(int x, int y, int direction){
+	public static boolean outofWallhugging(int x, int y, int direction){
 		//if left wall nothing, right wall got thing
 
 		int obstacles[][] = m.getObstacles();
@@ -522,7 +528,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	}
 
 	//get degree between 2 point
-	public float getDegreeBetweenTwoPoint(float x,float y,float x2, float y2){
+	public static float getDegreeBetweenTwoPoint(float x,float y,float x2, float y2){
 		if(x==x2 && y==y2)
 			return 0;
 		   float angle = (float) Math.toDegrees(Math.atan2(y2 - y, x2 - x));
