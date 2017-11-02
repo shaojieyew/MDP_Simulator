@@ -40,6 +40,9 @@ public class Map {
 		this.obstacles = obstacles;
 		onLayoutUpdated();
 	}
+	public  void setObstacleNoUpdate(int[][] obstacles) {
+		this.obstacles = obstacles;
+	}
 	
 	private float exploredRate=0; 
 	

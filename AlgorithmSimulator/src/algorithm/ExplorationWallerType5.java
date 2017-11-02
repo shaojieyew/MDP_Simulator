@@ -185,10 +185,10 @@ public class ExplorationWallerType5 extends Exploration {
 				int [][]obstacles = Map.getInstance().getObstacles();
 				int [][]explored = Map.getInstance().getExploredTiles();
 				for(int x=0;x<14;x++){
-					for(int y=0;y<14;y++){
-						if(ObstaclesConfident.obstacleCounter[(int) x][(int) y]==0){
-							if(obstacles[x][y]==1&&explored[x][y]==1){
-								obstacles[x][y]=0;
+					for(int y=0;y<19;y++){
+						if(ObstaclesConfident.obstacleCounter[(int) y][(int) x]==0){
+							if(obstacles[y][x]==1&&explored[y][x]==1){
+								obstacles[y][x]=0;
 							}
 						}
 					}	
@@ -197,6 +197,7 @@ public class ExplorationWallerType5 extends Exploration {
 
 				if(!allPossibleNodeVisited()){
 					this.terminate(false);
+					checkedVisited =new int[20][15];
 					result  = getBestNextStop(currentX,currentY,10000);
 					if(currentX==result[0]&&currentY==result[1]&&(currentX!=1||currentY!=1)){
 						result[0]=1;
@@ -218,6 +219,8 @@ public class ExplorationWallerType5 extends Exploration {
 					message.setDirection(0);
 					cleanUpVar();
 					destroy();
+				}else{
+					message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1]);
 				}
 				
 			}else{
