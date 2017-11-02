@@ -20,7 +20,7 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	public static boolean  arduinoAutoCalibrate = true;
 
 	public static int lastMovedBeforeCalibrate = 0;
-	public static int intervalForCalibrate = 40;
+	public static int intervalForCalibrate = 40000;
 	public static int rotationCost = 0;
 	public static final float NORTH = 0;
 	public static final float EAST = 90;
@@ -37,6 +37,9 @@ public abstract class Exploration implements  MapListener, RobotListener{
 	}
 	public void terminate() {
 		 okToTerminate = true;
+	}
+	public void terminate(boolean is) {
+		 okToTerminate = is;
 	}
 	public Exploration(boolean isTerminate){
 		if(isTerminate){

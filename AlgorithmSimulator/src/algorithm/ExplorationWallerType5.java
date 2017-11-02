@@ -179,21 +179,47 @@ public class ExplorationWallerType5 extends Exploration {
 			}
 			
 			//move to best location
-			
+
 			if(result[0]==1&&result[1]==1&&isOkToTerminate()){
-				message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1],270);
-				message.setEndOfExploration(true);
-				String [] movements =  message.getMovements();
-				int length = movements.length;
-				movements = Arrays.copyOf(movements, length+2);
-				movements[length]="C";
-				movements[length+1]="R90";
-				message.setMovements(movements);
-				float degree = rotateToDirection(270,0);
-				message.setRobotLocation(result);
-				message.setDirection(0);
-				cleanUpVar();
-				destroy();
+
+				int [][]obstacles = Map.getInstance().getObstacles();
+				int [][]explored = Map.getInstance().getExploredTiles();
+				for(int x=0;x<14;x++){
+					for(int y=0;y<14;y++){
+						if(ObstaclesConfident.obstacleCounter[(int) x][(int) y]==0){
+							if(obstacles[x][y]==1&&explored[x][y]==1){
+								obstacles[x][y]=0;
+							}
+						}
+					}	
+				}
+				Map.getInstance().setObstacle(obstacles);
+
+				if(!allPossibleNodeVisited()){
+					this.terminate(false);
+					result  = getBestNextStop(currentX,currentY,10000);
+					if(currentX==result[0]&&currentY==result[1]&&(currentX!=1||currentY!=1)){
+						result[0]=1;
+						result[1]=1;
+					}
+				}
+				
+				if(result[0]==1&&result[1]==1&&isOkToTerminate()){
+					message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1],270);
+					message.setEndOfExploration(true);
+					String [] movements =  message.getMovements();
+					int length = movements.length;
+					movements = Arrays.copyOf(movements, length+2);
+					movements[length]="C";
+					movements[length+1]="R90";
+					message.setMovements(movements);
+					float degree = rotateToDirection(270,0);
+					message.setRobotLocation(result);
+					message.setDirection(0);
+					cleanUpVar();
+					destroy();
+				}
+				
 			}else{
 				message = moveToLocation(currentX, currentY, r.getDirection(), result[0],result[1]);
 			}
@@ -470,11 +496,6 @@ public class ExplorationWallerType5 extends Exploration {
 		if(x==1&&y==1){
 			return null;
 		}
-		if(x==defaultX&&y==defaultY&&direction!=defaultDirection){
-			int result1 [] = {x,y,direction,turnedLeft?1:0,turnedRight?1:0};
-			return result1;
-		}
-		
 		if(turnedLeft&&nMoveable!=0){
 			int next_result[]= computeForwardLocation(direction, x, y, steps);
 			result=getNextWallHugCheckLocation2(next_result[0],next_result[1],direction,false,turnedRight, defaultX,  defaultY,defaultDirection);
@@ -489,6 +510,13 @@ public class ExplorationWallerType5 extends Exploration {
 				}else{
 					result=getNextWallHugCheckLocation2(result[0],result[1],robotsEast,turnedLeft,true, defaultX,  defaultY,defaultDirection);
 				}
+			}
+		}
+
+		if(x==defaultX&&y==defaultY&&direction!=defaultDirection){
+			if(result==null||(result[0]!=x||result[1]!=y)){
+				int result1 [] = {x,y,direction,turnedLeft?1:0,turnedRight?1:0};
+				return result1;
 			}
 		}
 		return result;

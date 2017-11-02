@@ -62,6 +62,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 	public void run() {
 		try {
 			socket = new Socket(address,port);
+			socket.setTcpNoDelay(true);
 			BufferedReader in =new BufferedReader( new InputStreamReader(socket.getInputStream()));
 			//while(true){
 			//	out.println(string);
@@ -158,6 +159,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 			
 			message= explorationAlgorithm.start();
 			//prepare return message
+			/*
 			if(message.isEndOfExploration()){
 				for(int x=0;x<14;x++){
 					for(int y=0;y<14;y++){
@@ -168,7 +170,7 @@ public class RealRPIInterface extends RPiInterface implements Runnable{
 						}
 					}	
 				}
-			}
+			}*/
 			Map.getInstance().setObstacle(obstacles);
 			hexExplored=HexBin.BinTohex(Map.getInstance().getBinaryExplored());
 			hexExploredObstacle=HexBin.BinTohex("11111111"+Map.getInstance().getBinaryExploredObstacle()).substring(2);

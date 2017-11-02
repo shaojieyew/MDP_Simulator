@@ -37,6 +37,7 @@ public class DijkstraMinimunRotation extends Dijkstra
                 	if(u.previous.y==u.y&&v.y==u.y){
                 		weight = weight/2.0;
                 	}
+                	
                 	if(!Exploration.outofWallhugging((int)v.x, (int)v.y, (int)Exploration.getDegreeBetweenTwoPoint(u.x, u.y, v.x, v.y))){
                 		weight = weight/1.3;
                 	}
